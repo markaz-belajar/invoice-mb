@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Markaz Belajar — Invoice</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markaz Belajar — Invoice &amp; Tracking</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <style>
 :root {
   --bg:         #212121;
   --surface:    #2f2f2f;
@@ -22,15 +22,18 @@
   --success-dim:rgba(110,231,183,0.10);
   --danger:     #f87171;
   --danger-dim: rgba(248,113,113,0.10);
+  --warning:    #fbbf24;
+  --warning-dim:rgba(251,191,36,0.10);
   --r:8px; --rl:12px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;width:100%;}
 body{font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
 
 /* HEADER */
-.hdr{position:sticky;top:0;z-index:200;background:var(--bg);border-bottom:1px solid var(--border);padding:0 28px;height:52px;display:flex;align-items:center;justify-content:space-between;}
+.hdr{position:sticky;top:0;z-index:200;background:var(--bg);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;}
 .hdr-brand{display:flex;align-items:center;gap:10px;}
 .hdr-logo{width:26px;height:26px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;}
 .hdr-logo svg{width:14px;height:14px;color:#1a1a1a;}
@@ -38,81 +41,71 @@ body{font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--t
 .hdr-sub{font-size:12px;color:var(--text3);margin-left:6px;}
 .badge{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--success);background:var(--success-dim);padding:4px 10px;border-radius:99px;}
 .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--success);}
-.badge.loading{color:var(--accent);background:var(--accent-dim);}
-.badge.error{color:var(--danger);background:var(--danger-dim);}
+
+/* NAV TABS */
+.nav-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--surface);padding:0 20px;margin-bottom:0;}
+.nav-tab{padding:12px 16px;font-size:13px;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;font-weight:500;}
+.nav-tab:hover{color:var(--text);}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+@media(max-width:640px){
+  .nav-tabs{padding:0 12px;gap:2px;}
+  .nav-tab{padding:10px 12px;font-size:12px;}
+}
 
 /* LAYOUT */
-.wrap{max-width:1400px;margin:0 auto;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:calc(100vh - 52px);}
-
-@media (max-width:1024px){
-  .wrap{grid-template-columns:1fr;min-height:auto;}
-  .form-panel{padding:28px 24px;}
-  .preview-panel-wrapper{display:none;}
-  .preview-panel-wrapper.mobile-show{display:block;padding:0 24px 80px;}
-  .preview-toggle-btn{display:block;}
-}
-@media (min-width:1025px){
-  .form-panel{padding:28px 24px;border-right:1px solid var(--border);max-height:calc(100vh - 52px);overflow-y:auto;}
-  .preview-panel-wrapper{padding:28px 24px;max-height:calc(100vh - 52px);overflow-y:auto;}
-  .preview-toggle-btn{display:none;}
-}
-
-/* LOGO SPACE */
-.logo-area{background:var(--surface);border:2px dashed var(--border2);border-radius:var(--rl);padding:40px;text-align:center;margin-bottom:20px;cursor:pointer;transition:all .2s;}
-.logo-area:hover{border-color:var(--accent);background:var(--accent-dim);}
-.logo-area input[type="file"]{display:none;}
-.logo-area-text{color:var(--text3);font-size:13px;}
-.logo-area-icon{font-size:24px;margin-bottom:8px;}
-.logo-preview{width:100%;max-width:120px;margin:0 auto;height:auto;border-radius:6px;}
-.logo-area.has-logo{padding:20px;}
+.wrap{max-width:1200px;margin:0 auto;padding:20px;overflow-y:auto;height:calc(100% - 52px);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
 
 /* SECTION */
-.sec{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px;margin-bottom:12px;}
-.sec-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:7px;margin-bottom:16px;}
+.sec{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:16px;margin-bottom:12px;}
+.sec-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:7px;margin-bottom:14px;}
 .sec-title svg{width:13px;height:13px;flex-shrink:0;}
 
 /* GRID */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+@media(max-width:640px){
+  .g2{grid-template-columns:1fr;gap:10px;}
+  .g3{grid-template-columns:1fr;gap:10px;}
+}
+
 label{display:block;font-size:12px;color:var(--text2);margin-bottom:5px;font-weight:500;}
 
 /* INPUTS */
-input,select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:8px 11px;color:var(--text);font-family:inherit;font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none;}
-input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+input,select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:8px 11px;color:var(--text);font-family:inherit;font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
 input[readonly]{color:var(--text2);cursor:default;}
-input:disabled,select:disabled{opacity:.5;cursor:not-allowed;}
 select option{background:var(--surface2);}
+textarea{resize:vertical;min-height:80px;}
 
-/* STUDENT CARD */
-.student-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin-top:10px;}
-.sf-lbl{font-size:11px;color:var(--text3);margin-bottom:2px;}
-.sf-val{font-size:13px;color:var(--text);font-weight:500;}
-.student-empty{padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);color:var(--text3);font-size:13px;margin-top:10px;}
+/* TRACKING TABLE */
+.track-table{width:100%;border-collapse:collapse;margin-top:12px;}
+.track-table th{background:var(--surface2);padding:10px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);}
+.track-table td{padding:12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);}
+.track-table tr:hover{background:rgba(138,180,248,0.05);}
+.track-table tr:last-child td{border-bottom:none;}
 
-/* REG FEE TOGGLE */
-.reg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:border-color .15s,background .15s;user-select:none;}
-.reg-row:hover{border-color:var(--border2);}
-.reg-row.on{border-color:var(--accent);background:var(--accent-dim);}
-.reg-left{display:flex;align-items:center;gap:10px;}
-.reg-left svg{width:15px;height:15px;color:var(--text3);}
-.reg-row.on .reg-left svg{color:var(--accent);}
-.reg-info{font-size:13px;font-weight:500;}
-.reg-hint{font-size:11px;color:var(--text3);}
-.reg-row.on .reg-hint{color:var(--accent);}
-.reg-price{font-size:13px;font-weight:600;color:var(--text2);font-family:'Geist Mono',monospace;}
-.reg-row.on .reg-price{color:var(--accent);}
-.sw{width:36px;height:20px;background:var(--border2);border-radius:99px;position:relative;transition:background .2s;flex-shrink:0;}
-.sw::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s;}
-.reg-row.on .sw{background:var(--accent);}
-.reg-row.on .sw::after{transform:translateX(16px);}
+/* STATUS BADGES */
+.status-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;}
+.status-pending{background:var(--warning-dim);color:var(--warning);}
+.status-sent{background:var(--accent-dim);color:var(--accent);}
+.status-partial{background:rgba(110,231,183,0.15);color:#fbbf24;}
+.status-paid{background:var(--success-dim);color:var(--success);}
+.status-pending-send{background:rgba(248,113,113,0.12);color:var(--danger);}
+.status-pending-pay{background:rgba(248,113,113,0.12);color:var(--danger);}
 
-/* PROGRAMS */
-.prog-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px;}
-.prog-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.prog-num{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
-.prog-price{font-size:13px;font-weight:600;color:var(--accent);font-family:'Geist Mono',monospace;}
-.empty-state{text-align:center;padding:28px;color:var(--text3);font-size:13px;border:1px dashed var(--border);border-radius:var(--r);}
-.empty-state svg{width:24px;height:24px;margin:0 auto 8px;display:block;opacity:.25;}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:500;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;}
+.modal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.modal-title svg{width:16px;height:16px;color:var(--accent);}
+.modal-close{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{color:var(--text);}
+.modal-body{margin-bottom:20px;}
+.modal-field{margin-bottom:14px;}
+.modal-actions{display:flex;gap:10px;margin-top:16px;}
 
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;border:none;outline:none;transition:all .15s;white-space:nowrap;}
@@ -123,37 +116,24 @@ select option{background:var(--surface2);}
 .btn-accent:hover{opacity:.9;}
 .btn-success{background:var(--success-dim);color:var(--success);border:1px solid rgba(110,231,183,.2);}
 .btn-success:hover{background:rgba(110,231,183,.2);}
+.btn-small{padding:6px 10px;font-size:11px;}
 .btn-icon{background:none;border:none;padding:5px;border-radius:6px;color:var(--text3);cursor:pointer;transition:all .15s;display:flex;align-items:center;}
 .btn-icon:hover{background:var(--danger-dim);color:var(--danger);}
-.btn-dashed{width:100%;background:transparent;border:1px dashed var(--border2);color:var(--text3);border-radius:var(--r);padding:10px;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;font-size:13px;cursor:pointer;transition:all .15s;}
+.btn-dashed{width:100%;background:transparent;border:1px dashed var(--border2);color:var(--text3);border-radius:var(--r);padding:9px 12px;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;font-size:13px;cursor:pointer;transition:all .15s;margin-top:8px;}
 .btn-dashed:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
-.btn-dashed svg{width:14px;height:14px;}
-.btn-dashed:disabled{opacity:.5;cursor:not-allowed;border-color:var(--border);}
-.btn-add-program{width:100%;margin-top:8px;}
+.btn-dashed svg{width:14px;height:14px;flex-shrink:0;}
+.btn-text-label{display:none;}
+@media(min-width:769px){
+  .btn-text-label{display:inline;}
+}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
-.actions .btn{flex:1;justify-content:center;min-width:90px;}
+.actions .btn{flex:1;justify-content:center;min-width:80px;font-size:12px;}
+@media(max-width:640px){
+  .actions{gap:6px;}
+  .actions .btn{flex:1;padding:8px 10px;font-size:12px;}
+}
 
-/* PREVIEW TOGGLE */
-.preview-toggle-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;font-family:inherit;color:var(--text2);font-size:13px;transition:all .15s;margin-top:12px;}
-.preview-toggle-btn:hover{border-color:var(--border2);color:var(--text);}
-.preview-toggle-btn svg{width:14px;height:14px;transition:transform .3s;}
-.preview-toggle-btn.open svg.chevron{transform:rotate(180deg);}
-.ptb-left{display:flex;align-items:center;gap:8px;}
-
-/* PREVIEW PANEL */
-.preview-panel{overflow:hidden;max-height:0;opacity:0;pointer-events:none;transition:max-height .4s ease,opacity .3s,padding .3s;padding:0 0;}
-.preview-panel.open{max-height:3000px;opacity:1;pointer-events:auto;padding:16px 0 0;}
-.preview-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px;}
-.preview-lbl{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:16px;display:flex;align-items:center;gap:7px;}
-.preview-lbl svg{width:13px;height:13px;}
-
-/* TOAST NOTIFICATION */
-.toast{position:fixed;bottom:20px;right:20px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:13px;z-index:999;display:flex;align-items:center;gap:8px;animation:slideIn .3s ease;}
-.toast.success{border-color:rgba(110,231,183,.3);background:var(--success-dim);}
-.toast.error{border-color:rgba(248,113,113,.3);background:var(--danger-dim);}
-@keyframes slideIn{from{transform:translateX(400px);opacity:0;}to{transform:translateX(0);opacity:1;}}
-
-/* INVOICE DOCUMENT */
+/* INVOICE DOC */
 .inv-doc{background:#fff;border-radius:10px;overflow:hidden;font-family:'Geist',sans-serif;color:#1c1c1c;font-size:11.5px;width:100%;max-width:520px;margin:0 auto;}
 .inv-top{background:#1c1c1c;color:#fff;padding:20px 24px 16px;}
 .inv-top-row{display:flex;justify-content:space-between;align-items:flex-start;}
@@ -164,8 +144,6 @@ select option{background:var(--surface2);}
 .inv-title-word{font-size:20px;font-weight:300;letter-spacing:-.04em;opacity:.75;}
 .inv-num{font-size:10px;font-weight:600;color:#8ab4f8;font-family:'Geist Mono',monospace;margin-top:2px;}
 .inv-body{padding:18px 24px;}
-.inv-logo-area{text-align:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #eef0f4;}
-.inv-logo-img{max-width:100px;max-height:60px;display:inline-block;}
 .inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}
 .inv-plbl{font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
 .inv-pname{font-size:12px;font-weight:700;color:#1c1c1c;}
@@ -194,758 +172,1440 @@ select option{background:var(--surface2);}
 .inv-created{margin-top:6px;font-size:9px;color:#aaa;}
 .inv-footer{padding:10px 24px;background:#f4f5f8;text-align:center;font-size:9px;color:#aaa;}
 
-/* SETUP CONFIG */
-.config-panel{background:var(--surface);border:2px dashed var(--border2);border-radius:var(--rl);padding:20px;margin-bottom:20px;}
-.config-title{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:12px;}
-.config-note{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:8px;}
-.config-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:8px 11px;color:var(--text);font-family:'Geist Mono',monospace;font-size:11px;}
-.config-btn{margin-top:8px;}
+/* STUDENT CARD */
+.student-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin-top:10px;}
+.sf-lbl{font-size:11px;color:var(--text3);margin-bottom:2px;}
+.sf-val{font-size:13px;color:var(--text);font-weight:500;}
+.student-empty{padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);color:var(--text3);font-size:13px;margin-top:10px;}
+@media(max-width:640px){
+  .student-card{grid-template-columns:1fr;gap:8px 0;}
+}
 
-@media (max-width:1024px){
-  .wrap{grid-template-columns:1fr;}
+/* REG FEE TOGGLE */
+.reg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:border-color .15s,background .15s;user-select:none;}
+.reg-row:hover{border-color:var(--border2);}
+.reg-row.on{border-color:var(--accent);background:var(--accent-dim);}
+.reg-left{display:flex;align-items:center;gap:10px;}
+.reg-left svg{width:15px;height:15px;color:var(--text3);}
+.reg-row.on .reg-left svg{color:var(--accent);}
+.reg-info{font-size:13px;font-weight:500;}
+.reg-hint{font-size:11px;color:var(--text3);}
+.reg-row.on .reg-hint{color:var(--accent);}
+.reg-price{font-size:13px;font-weight:600;color:var(--text2);font-family:'Geist Mono',monospace;}
+.reg-row.on .reg-price{color:var(--accent);}
+.sw{width:36px;height:20px;background:var(--border2);border-radius:99px;position:relative;transition:background .2s;flex-shrink:0;}
+.sw::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s;}
+.reg-row.on .sw{background:var(--accent);}
+.reg-row.on .sw::after{transform:translateX(16px);}
+
+/* PROGRAMS */
+.prog-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:8px;}
+.prog-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+.prog-num{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
+.prog-price{font-size:13px;font-weight:600;color:var(--accent);font-family:'Geist Mono',monospace;}
+.empty-state{text-align:center;padding:20px;color:var(--text3);font-size:13px;border:1px dashed var(--border);border-radius:var(--r);}
+.empty-state svg{width:24px;height:24px;margin:0 auto 8px;display:block;opacity:.25;}
+
+/* PREVIEW TOGGLE */
+.preview-toggle-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;font-family:inherit;color:var(--text2);font-size:13px;transition:all .15s;margin-top:12px;}
+.preview-toggle-btn:hover{border-color:var(--border2);color:var(--text);}
+.preview-toggle-btn svg{width:14px;height:14px;transition:transform .3s;}
+.preview-toggle-btn.open svg.chevron{transform:rotate(180deg);}
+.ptb-left{display:flex;align-items:center;gap:8px;}
+
+/* PREVIEW PANEL */
+.preview-panel{overflow:hidden;max-height:0;opacity:0;pointer-events:none;transition:max-height .4s ease,opacity .3s,padding .3s;padding:0 0;}
+.preview-panel.open{max-height:3000px;opacity:1;pointer-events:auto;padding:16px 0 0;}
+.preview-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:16px;overflow-x:auto;}
+.preview-lbl{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:16px;display:flex;align-items:center;gap:7px;}
+.preview-lbl svg{width:13px;height:13px;}
+
+/* DATE PICKER */
+.date-wrap{position:relative;}
+.date-btn{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:8px 11px;color:var(--text);font-family:inherit;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border-color .15s,box-shadow .15s;user-select:none;text-align:left;}
+.date-btn:hover{border-color:var(--border2);}
+.date-btn.open{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+.date-btn-text{color:var(--text);}
+.date-btn-text.placeholder{color:var(--text3);}
+.date-btn svg{width:14px;height:14px;color:var(--text3);flex-shrink:0;}
+.cal-popup{position:absolute;top:calc(100% + 6px);left:0;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);box-shadow:0 12px 32px rgba(0,0,0,.6);padding:16px;width:272px;display:none;}
+.cal-popup.open{display:block;}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cal-nav-btn{background:none;border:none;cursor:pointer;color:var(--text2);padding:5px 8px;border-radius:6px;display:flex;align-items:center;transition:background .1s;}
+.cal-nav-btn:hover{background:var(--surface2);color:var(--text);}
+.cal-nav-btn svg{width:13px;height:13px;}
+.cal-month-lbl{font-size:13px;font-weight:600;color:var(--text);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-dn{text-align:center;font-size:10px;color:var(--text3);padding:4px 0;font-weight:600;}
+.cal-d{text-align:center;font-size:12px;color:var(--text2);padding:6px 2px;border-radius:6px;cursor:pointer;transition:all .1s;}
+.cal-d:hover{background:var(--surface2);color:var(--text);}
+.cal-d.today{color:var(--accent);font-weight:600;}
+.cal-d.selected{background:var(--accent);color:#1c1c1c;font-weight:600;}
+.cal-d.empty,.cal-d.other{color:var(--text3);opacity:.4;cursor:default;pointer-events:none;}
+
+@media print{
+  body{margin:0;padding:0;background:#fff;}
+  .wrap{padding:0;max-width:100%;}
+  .inv-doc{max-width:100%;border-radius:0;}
 }
 </style>
-</head>
-<body>
-
-<header class="hdr">
-  <div class="hdr-brand">
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body>
+  <header class="hdr">
+   <div class="hdr-brand">
     <div class="hdr-logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+     </svg>
+    </div><span class="hdr-name">Markaz Belajar</span> <span class="hdr-sub">Invoice &amp; Tracking</span>
+   </div>
+   <div style="display:flex;align-items:center;gap:8px;">
+    <div id="syncStatus" style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);max-width:240px;overflow:hidden;">
+     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+     <span>Memuat...</span>
     </div>
-    <span class="hdr-name">Markaz Belajar</span>
-    <span class="hdr-sub">Invoice</span>
+    <button onclick="manualRefresh()" title="Refresh data dari Google Sheets" style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 9px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-family:inherit;transition:all .15s;">
+     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+     <span class="btn-text-label">Refresh</span>
+    </button>
+   </div>
+  </header><!-- NAV TABS -->
+  <div class="nav-tabs"><button class="nav-tab active" onclick="switchTab('create',this)">
+    <svg style="display:inline;width:14px;height:14px;margin-right:6px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+     <path d="M12 5v14M5 12h14" />
+    </svg>Buat Invoice </button> <button class="nav-tab" onclick="switchTab('tracking',this)">
+    <svg style="display:inline;width:14px;height:14px;margin-right:6px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>Tracking </button>
   </div>
-  <div class="badge" id="statusBadge"><div class="badge-dot"></div>Siap</div>
-</header>
-
-<div class="wrap">
-  
-  <!-- LEFT PANEL: FORM -->
-  <div class="form-panel">
-    
-    <!-- Config Section (untuk setup awal) -->
-    <div class="config-panel" id="configPanel" style="display:none;">
-      <div class="config-title">⚙️ Setup Google Sheets</div>
-      <div class="config-note">
-        Untuk mengaktifkan sinkronisasi, masukkan URL deployment Google Apps Script:
-      </div>
-      <input type="text" class="config-input" id="apiUrl" placeholder="https://script.google.com/macros/d/YOUR_SCRIPT_ID/usercache" />
-      <button type="button" class="btn btn-accent config-btn" onclick="saveApiUrl()">Simpan & Lanjutkan</button>
-      <div class="config-note" style="margin-top:12px;font-size:11px;">
-        Belum punya URL? Buka SETUP_GUIDE_LENGKAP.md untuk panduan lengkap.
-      </div>
+  <div class="wrap"><!-- SETUP BANNER -->
+   <div id="setupBanner" style="background:rgba(138,180,248,0.08);border:1px solid rgba(138,180,248,0.25);border-radius:var(--rl);padding:14px 16px;margin-bottom:12px;display:flex;align-items:flex-start;gap:12px;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div style="flex:1;">
+     <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:4px;">Pengaturan Google Sheets</div>
+     <div style="font-size:12px;color:var(--text2);line-height:1.7;">
+      Agar data otomatis terbaca, pastikan kedua Google Sheets sudah disetel ke <strong style="color:var(--text);">Anyone with the link → Viewer</strong>.<br>
+      <span style="color:var(--text3);">Sheet 1 (Siswa): kolom → <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:11px;">Nama Siswa, Jenjang, Tipe, Guru, Nama Orang Tua, No HP</code></span><br>
+      <span style="color:var(--text3);">Sheet 2 (Program): kolom → <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:11px;">Jenjang, Program, Tipe, 1 Bulan, 3 Bulan, 6 Bulan</code></span>
+     </div>
     </div>
-
-    <!-- Logo Upload Area -->
-    <div class="logo-area" id="logoArea" onclick="document.getElementById('logoInput').click()">
-      <input type="file" id="logoInput" accept="image/*">
-      <div class="logo-area-icon">📷</div>
-      <div class="logo-area-text">Klik untuk upload logo Markaz Belajar</div>
-      <div class="logo-area-text" style="font-size:11px;color:var(--text3);margin-top:4px;">(JPG, PNG, optimal 120x60px)</div>
-    </div>
-
-    <!-- Invoice Info -->
+    <button onclick="document.getElementById('setupBanner').style.display='none'" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1;padding:0 2px;flex-shrink:0;" title="Tutup">×</button>
+   </div><!-- TAB: CREATE INVOICE -->
+   <div id="tab-create" class="tab-content active"><!-- Invoice Info -->
     <div class="sec">
-      <div class="sec-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
-        Informasi Invoice
+     <div class="sec-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" /><line x1="9" y1="7" x2="15" y2="7" /><line x1="9" y1="12" x2="15" y2="12" />
+      </svg> Informasi Invoice
+     </div>
+     <div class="g2" style="margin-bottom:12px;">
+      <div>
+       <label>Nomor Invoice</label> <input id="invoiceNumber" type="text" readonly>
       </div>
-      <div class="g2" style="margin-bottom:12px;">
-        <div>
-          <label>Nomor Invoice</label>
-          <input id="invoiceNumber" type="text" readonly>
-        </div>
-        <div>
-          <label>Dibuat Oleh</label>
-          <select id="createdBy">
-            <option>Elis</option>
-            <option>Yessi</option>
-            <option>Admin</option>
-          </select>
-        </div>
+      <div>
+       <label>Dibuat Oleh</label> <select id="createdBy"> <option>Elis</option> <option>Yessi</option> <option>Admin</option> </select>
       </div>
-      <div class="g2">
-        <div>
-          <label>Tanggal Invoice</label>
-          <input type="date" id="invoiceDate">
-        </div>
-        <div>
-          <label>Jatuh Tempo</label>
-          <input type="date" id="dueDate">
-        </div>
+     </div>
+     <div class="g2">
+      <div>
+       <label>Tanggal Invoice</label>
+       <div class="date-wrap">
+        <button type="button" class="date-btn" id="invDateBtn" onclick="openCal('inv')"> <span id="invDateTxt" class="date-btn-text placeholder">Pilih tanggal</span>
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+         </svg></button>
+        <div class="cal-popup" id="invCal"></div><input type="hidden" id="invDateVal">
+       </div>
       </div>
-    </div>
-
-    <!-- Siswa -->
+      <div>
+       <label>Jatuh Tempo</label>
+       <div class="date-wrap">
+        <button type="button" class="date-btn" id="dueDateBtn" onclick="openCal('due')"> <span id="dueDateTxt" class="date-btn-text placeholder">Pilih tanggal</span>
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+         </svg></button>
+        <div class="cal-popup" id="dueCal"></div><input type="hidden" id="dueDateVal">
+       </div>
+      </div>
+     </div>
+    </div><!-- Siswa -->
     <div class="sec">
-      <div class="sec-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Tagihan Kepada
-      </div>
-      <label>Pilih Siswa</label>
-      <select id="studentSelect" onchange="onSelectStudent()">
-        <option value="">-- Loading... --</option>
-      </select>
-      <div id="studentInfo" class="student-empty">Pilih siswa untuk melihat detail</div>
-    </div>
-
-    <!-- Registration Fee -->
+     <div class="sec-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+      </svg> Tagihan Kepada
+     </div>
+     <div>
+      <label>Pilih Siswa</label> <select id="studentSel"></select>
+     </div>
+     <div id="studentCard" class="student-empty">
+      Pilih siswa untuk melihat detail.
+     </div>
+    </div><!-- Biaya Pendaftaran -->
     <div class="sec">
-      <div class="sec-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8m-3-3h6"/></svg>
-        Biaya Tambahan
-      </div>
-      <div class="reg-row" id="regFeeRow" onclick="toggleRegFee()">
-        <div class="reg-left">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          <div>
-            <div class="reg-info">Biaya Pendaftaran</div>
-            <div class="reg-hint">(Dikenakan sekali saat pertama kali daftar)</div>
-          </div>
+     <div class="sec-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg> Biaya Pendaftaran
+     </div>
+     <div class="reg-row" id="regRow" onclick="toggleReg()">
+      <div class="reg-left">
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+       </svg>
+       <div>
+        <div class="reg-info">
+         Tambahkan Biaya Pendaftaran
         </div>
-        <div>
-          <div class="reg-price" id="regPrice">Rp 150.000</div>
-          <div class="sw"></div>
+        <div class="reg-hint" id="regHint">
+         Untuk siswa baru — Rp 150.000
         </div>
+       </div>
       </div>
-    </div>
-
-    <!-- Programs -->
+      <div style="display:flex;align-items:center;gap:12px;">
+       <div class="sw" id="regSw"></div>
+      </div>
+     </div>
+    </div><!-- Program -->
     <div class="sec">
-      <div class="sec-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z"/><path d="M9 3h6v4H9z"/></svg>
-        Produk / Program
+     <div class="sec-title" style="justify-content:space-between;margin-bottom:12px;">
+      <span style="display:flex;align-items:center;gap:7px;">
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" />
+       </svg> Program / Layanan </span> <span id="progCount" style="font-size:11px;color:var(--text3);font-weight:400;letter-spacing:normal;text-transform:none;"></span>
+     </div>
+     <div id="progList"></div><button class="btn-dashed" onclick="addProg()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+      </svg><span class="btn-text-label">Tambah Program</span> </button>
+    </div><!-- Catatan -->
+    <div class="sec">
+     <div class="sec-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" />
+      </svg> Catatan
+     </div><input type="text" id="notes" placeholder="Catatan tambahan (opsional)">
+    </div><!-- Preview Toggle --> <button class="preview-toggle-btn" id="previewToggleBtn" onclick="togglePreview()"> <span class="ptb-left">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M1 12s4 11 11 11 11-11 11-11-4-11-11-11-11 11-11 11z" /><circle cx="12" cy="12" r="3" />
+      </svg> Lihat Preview Invoice </span>
+     <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9" />
+     </svg></button>
+    <div class="preview-panel" id="previewPanel">
+     <div class="preview-inner">
+      <div class="preview-lbl">
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4 11 11 11 11-11 11-11-4-11-11-11-11 11-11 11z" /><circle cx="12" cy="12" r="3" />
+       </svg> Preview
       </div>
-      <div id="programsContainer"></div>
-      <button type="button" class="btn btn-dashed btn-add-program" onclick="addProgram()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Tambah Program
+      <div id="previewDoc"></div>
+     </div>
+    </div><!-- Actions -->
+    <div class="actions">
+      <button class="btn btn-ghost" onclick="resetForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-5"/></svg>
+        <span class="btn-text-label">Reset</span>
+      </button>
+      <button class="btn btn-ghost" onclick="saveDraft()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span class="btn-text-label">Draft</span>
+      </button>
+      <button class="btn btn-ghost" onclick="printFromForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span class="btn-text-label">Download PDF</span>
+      </button>
+      <button class="btn btn-success" onclick="finishInvoice()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span class="btn-text-label">Buat Invoice</span>
       </button>
     </div>
-
-    <!-- Actions -->
+   </div><!-- TAB: TRACKING -->
+   <div id="tab-tracking" class="tab-content">
     <div class="sec">
-      <div class="actions">
-        <button type="button" class="btn btn-ghost" onclick="resetForm()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36M20.49 15a9 9 0 0 1-14.85 3.36"/></svg>
-          Reset
-        </button>
-        <button type="button" class="btn btn-success" onclick="saveDraft()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          Simpan
-        </button>
-        <button type="button" class="btn btn-accent" onclick="downloadPDF()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download PDF
-        </button>
-        <button type="button" class="btn btn-success" onclick="sendWhatsApp()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          WhatsApp
-        </button>
+     <div class="sec-title" style="justify-content:space-between;margin-bottom:16px;"><span style="display:flex;align-items:center;gap:7px;">
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" />
+       </svg> Tracking Invoice </span>
+      <div style="display:flex;gap:8px;align-items:center;"><input type="text" id="trackingSearch" placeholder="Cari invoice..." style="width:200px;padding:6px 10px;font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);"> <select id="trackingFilter" style="padding:6px 10px;font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);"> <option value="all">Semua Status</option> <option value="pending">Belum Bayar</option> <option value="partial">Cicilan</option> <option value="paid">Lunas</option> <option value="overdue">Lewat Jatuh Tempo</option> </select>
       </div>
+     </div>
+     <div style="overflow-x:auto;">
+      <table class="track-table">
+       <thead>
+        <tr>
+         <th style="width:12%;">No. Invoice</th>
+         <th style="width:11%;">Siswa</th>
+         <th style="width:9%;">Total</th>
+         <th style="width:10%;">Jatuh Tempo</th>
+         <th style="width:10%;">Pengiriman</th>
+         <th style="width:10%;">Pembayaran</th>
+         <th style="width:9%;">Waktu Bayar</th>
+         <th style="width:10%;">Bukti Pembayaran</th>
+         <th style="width:18%;">Aksi</th>
+        </tr>
+       </thead>
+       <tbody id="trackingList">
+        <tr>
+         <td colspan="9" style="text-align:center;color:var(--text3);padding:40px 20px;">Belum ada invoice. Buat invoice di tab Buat Invoice.</td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+     <div style="margin-top:16px;padding:12px;background:var(--surface2);border-radius:var(--r);display:flex;justify-content:space-around;font-size:12px;">
+      <div>
+       <strong id="statTotal">0</strong> Total Invoice
+      </div>
+      <div>
+       <strong id="statPaid" style="color:var(--success);">0</strong> Lunas
+      </div>
+      <div>
+       <strong id="statPartial" style="color:#fbbf24;">0</strong> Cicilan
+      </div>
+      <div>
+       <strong id="statPending" style="color:var(--danger);">0</strong> Belum Bayar
+      </div>
+      <div>
+       <strong id="statOverdue" style="color:var(--danger);">0</strong> Lewat Tempo
+      </div>
+     </div>
     </div>
-
+   </div>
+  </div><!-- MODAL: KIRIM INVOICE -->
+  <div class="modal-overlay" id="sendModal">
+   <div class="modal">
+    <div class="modal-title">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+     </svg> Kirim Invoice
+    </div>
+    <div class="modal-body">
+     <div class="modal-field"><label>Pilih Metode Pengiriman</label>
+      <div style="display:flex;gap:10px;margin-top:8px;"><button class="btn btn-accent" onclick="sendVia('whatsapp')" style="flex:1;">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.782 1.146l-.384.214-.3-.01c-3.898 0-7.573 2.127-9.561 5.514-1.987 3.388-1.987 7.547 0 10.935 1.988 3.387 5.663 5.514 9.561 5.514h.004c3.898 0 7.573-2.127 9.561-5.514 1.988-3.388 1.988-7.547 0-10.935-1.988-3.387-5.664-5.514-9.561-5.514z" />
+        </svg> WhatsApp </button> <button class="btn btn-accent" onclick="sendVia('email')" style="flex:1;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+        </svg> Email </button>
+      </div>
+     </div>
+     <div class="modal-field" id="sendNoteField" style="display:none;"><label>Catatan (Opsional)</label> <textarea id="sendNote" placeholder="Masukkan catatan tambahan..."></textarea>
+     </div>
+     <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;"><button class="btn btn-ghost" onclick="printCurrentInvoice()" style="width:100%;justify-content:center;">
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9" /><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><rect x="6" y="14" width="12" height="8" />
+       </svg> Cetak PDF </button>
+     </div>
+    </div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('sendModal')">Batal</button> <button class="btn btn-success" onclick="confirmSend()">Kirim</button>
+    </div>
+   </div>
+  </div><!-- MODAL: PEMBAYARAN -->
+  <div class="modal-overlay" id="paymentModal">
+   <div class="modal">
+    <div class="modal-title">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+     </svg> Update Pembayaran
+    </div>
+    <div class="modal-body">
+     <div class="modal-field"><label>Status Pembayaran</label> <select id="paymentStatus"> <option value="pending">Menunggu Pembayaran</option> <option value="partial">Pembayaran Sebagian</option> <option value="paid">Lunas</option> </select>
+     </div>
+     <div class="modal-field"><label>Jumlah Pembayaran (Rp)</label> <input type="number" id="paymentAmount" placeholder="Masukkan jumlah pembayaran">
+     </div>
+     <div class="modal-field"><label>Tanggal Pembayaran</label> <input type="date" id="paymentDate">
+     </div>
+     <div class="modal-field"><label>Metode Pembayaran</label> <select id="paymentMethod"> <option value="transfer">Transfer Bank</option> <option value="dana">Dana</option> <option value="gopay">GoPay</option> <option value="ovo">OVO</option> <option value="cash">Tunai</option> </select>
+     </div>
+     <div class="modal-field"><label>Catatan</label> <textarea id="paymentNotes" placeholder="Catatan pembayaran (opsional)..."></textarea>
+     </div>
+     <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
+      <div class="modal-field">
+       <label>Bukti Pembayaran</label> <input type="file" id="paymentProofUploadInput" accept="image/*" style="display:none;"> <button style="width:100%;background:var(--surface2);border:1px dashed var(--border2);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .15s;font-family:inherit;color:var(--text2);" onclick="document.getElementById('paymentProofUploadInput').click();">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" style="display:block;margin:0 auto 8px;">
+         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px;">
+         Pilih Gambar Bukti
+        </div>
+        <div style="font-size:11px;color:var(--text3);">
+         PNG, JPG, atau GIF (Maks 5MB)
+        </div></button>
+       <div id="paymentProofPreview" style="margin-top:10px;"></div>
+      </div>
+     </div>
+    </div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('paymentModal')">Batal</button> <button class="btn btn-success" onclick="confirmPayment()">Simpan Pembayaran</button>
+    </div>
+   </div>
   </div>
+  <script>
+    /* ════ GOOGLE SHEETS CONFIG ════ */
+    // Sheet 1: Data Peserta (dari Google Form)
+    // Kolom yang diharapkan: Nama Siswa, Jenjang, Tipe (Reguler/Private), Guru, Nama Orang Tua, No HP
+    const SHEET1_ID = '1Jt2fv8NLgBxuzdXvw0ptSreCfGBlSuXvODcg5ia9CfA';
+    // Sheet 2: Program & Harga
+    // Kolom yang diharapkan: Jenjang, Program, Tipe, 1 Bulan, 3 Bulan, 6 Bulan
+    const SHEET2_ID = '1w57hxwf_2n6l89mmLWZFggucsIty2CMqKpd6Ce95kFI';
+    const SHEET1_URL = `https://docs.google.com/spreadsheets/d/${SHEET1_ID}/gviz/tq?tqx=out:csv`;
+    const SHEET2_URL = `https://docs.google.com/spreadsheets/d/${SHEET2_ID}/gviz/tq?tqx=out:csv`;
+    const SYNC_INTERVAL_MS = 2 * 60 * 1000; // auto-refresh tiap 2 menit
 
-  <!-- RIGHT PANEL: PREVIEW -->
-  <div class="preview-panel-wrapper" id="previewWrapper">
-    <button type="button" class="preview-toggle-btn" onclick="togglePreview()" id="toggleBtn">
-      <div class="ptb-left">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        Preview Invoice
-      </div>
-      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-    </button>
-    <div class="preview-panel" id="previewPanel">
-      <div class="preview-inner">
-        <div class="preview-lbl">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-          Preview Invoice
-        </div>
-        <div id="previewContent" style="text-align:center;color:var(--text3);font-size:13px;">Buat invoice untuk melihat preview</div>
-      </div>
-    </div>
-  </div>
+    /* ════ DATA (diisi dari Google Sheets) ════ */
+    let STUDENTS = [];
+    let PROGS = {};
+    let PRICES = {};
+    const REG_FEE = 150000;
+    const MO=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    const DN=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
 
-</div>
+    /* ════ STATE ════ */
+    let student=null, progs=[], pc=0, regOn=false, prevOpen=false;
+    let invCnt=parseInt(localStorage.getItem('mrkz_cnt')||'0')+1;
+    let currentInvoiceId=null;
+    let invoices=JSON.parse(localStorage.getItem('mrkz_invoices')||'[]');
+    let currentSendMethod=null;
+    let currentProofData=null;
+    let syncTimer=null;
+    let lastSyncTime=null;
 
-<!-- TOAST -->
-<div id="toastContainer"></div>
-
-<script>
-// ═══════════════════════════════════════════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════════════════════════════════════════
-
-let API_URL = localStorage.getItem('markaz_api_url') || '';
-const CONFIG = {
-  regFee: 150000,
-  banks: [
-    { name: 'Dana', num: '0838-665-830-82' },
-    { name: 'BCA', num: '651-065-92-26' }
-  ],
-  bankOwner: 'Elis Rosmiati'
-};
-
-let PROGRAMS_DATA = {};
-let STUDENTS = [];
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════════════════════════════
-
-let state = {
-  programs: [],
-  regFeeActive: false,
-  logoData: null,
-  invoiceNo: 1,
-  currentStudent: null
-};
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════════════════════
-
-document.addEventListener('DOMContentLoaded', async () => {
-  // Check if API URL is set
-  if (!API_URL) {
-    document.getElementById('configPanel').style.display = 'block';
-    showToast('Setup diperlukan: Masukkan URL deployment Google Apps Script', 'error');
-    return;
-  }
-
-  // Initialize
-  await loadStudents();
-  await loadPrograms();
-  setDefaultDates();
-  updateInvoiceNum();
-  renderPrograms();
-  updatePreview();
-
-  // Logo upload handler
-  document.getElementById('logoInput').addEventListener('change', handleLogoUpload);
-
-  // Responsive preview
-  if (window.innerWidth <= 1024) {
-    document.getElementById('previewWrapper').classList.add('mobile-show');
-  }
-  window.addEventListener('resize', () => {
-    if (window.innerWidth <= 1024) {
-      document.getElementById('previewPanel').classList.remove('open');
-      document.getElementById('toggleBtn').classList.remove('open');
-    }
-  });
-});
-
-function saveApiUrl() {
-  const url = document.getElementById('apiUrl').value.trim();
-  if (!url) {
-    showToast('URL tidak boleh kosong', 'error');
-    return;
-  }
-  localStorage.setItem('markaz_api_url', url);
-  API_URL = url;
-  document.getElementById('configPanel').style.display = 'none';
-  location.reload();
-}
-
-function updateStatusBadge(status, type = 'success') {
-  const badge = document.getElementById('statusBadge');
-  badge.className = 'badge';
-  if (type === 'loading') badge.classList.add('loading');
-  if (type === 'error') badge.classList.add('error');
-  badge.innerHTML = (type === 'loading' ? '⏳ ' : '✓ ') + status;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// GOOGLE SHEETS API CALLS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-async function callAPI(action, data = {}) {
-  try {
-    updateStatusBadge('Loading...', 'loading');
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action, ...data })
-    });
-    const result = await response.json();
-    updateStatusBadge('Siap', 'success');
-    return result;
-  } catch(err) {
-    console.error('API Error:', err);
-    updateStatusBadge('Error', 'error');
-    showToast('Error: ' + err.message, 'error');
-    return { success: false, error: err.message };
-  }
-}
-
-async function loadStudents() {
-  const result = await callAPI('getStudents');
-  if (result.success && result.data) {
-    STUDENTS = result.data;
-    populateStudents();
-  }
-}
-
-async function loadPrograms() {
-  const result = await callAPI('getPrograms');
-  if (result.success && result.data) {
-    PROGRAMS_DATA = result.data;
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// STUDENTS MANAGEMENT
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function populateStudents() {
-  const select = document.getElementById('studentSelect');
-  select.innerHTML = '<option value="">-- Pilih Siswa --</option>';
-  STUDENTS.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.id;
-    opt.textContent = `${s.name} (${s.jenjang} - ${s.program})`;
-    select.appendChild(opt);
-  });
-}
-
-function onSelectStudent() {
-  const id = document.getElementById('studentSelect').value;
-  const student = STUDENTS.find(s => s.id == id);
-  if (!student) {
-    document.getElementById('studentInfo').className = 'student-empty';
-    document.getElementById('studentInfo').innerHTML = 'Pilih siswa untuk melihat detail';
-    state.currentStudent = null;
-    return;
-  }
-
-  state.currentStudent = student;
-  document.getElementById('studentInfo').className = 'student-card';
-  document.getElementById('studentInfo').innerHTML = `
-    <div><div class="sf-lbl">Jenjang</div><div class="sf-val">${student.jenjang}</div></div>
-    <div><div class="sf-lbl">Program</div><div class="sf-val">${student.program}</div></div>
-    <div><div class="sf-lbl">Tipe</div><div class="sf-val">${student.type === 'reguler' ? 'Reguler' : 'Private'}</div></div>
-    <div><div class="sf-lbl">Guru</div><div class="sf-val">${student.guru}</div></div>
-    <div><div class="sf-lbl">Parent</div><div class="sf-val">${student.parentName}</div></div>
-    <div><div class="sf-lbl">No. HP</div><div class="sf-val">${student.parentPhone}</div></div>
-  `;
-  updatePreview();
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// DATES
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function setDefaultDates() {
-  const today = new Date();
-  const dueDate = new Date(today);
-  dueDate.setDate(dueDate.getDate() + 30);
-  
-  document.getElementById('invoiceDate').valueAsDate = today;
-  document.getElementById('dueDate').valueAsDate = dueDate;
-}
-
-function formatIDDate(date) {
-  if (!date) return '-';
-  if (typeof date === 'string') date = new Date(date + 'T00:00:00');
-  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// REGISTRATION FEE
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function toggleRegFee() {
-  state.regFeeActive = !state.regFeeActive;
-  document.getElementById('regFeeRow').classList.toggle('on', state.regFeeActive);
-  updatePreview();
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// PROGRAMS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function addProgram() {
-  if (!state.currentStudent) {
-    showToast('Pilih siswa terlebih dahulu!', 'error');
-    return;
-  }
-
-  const student = state.currentStudent;
-  state.programs.push({
-    id: Date.now(),
-    program: student.program,
-    type: student.type,
-    jenjang: student.jenjang,
-    duration: 1,
-    price: PROGRAMS_DATA[student.jenjang]?.[student.program]?.[student.type]?.[1] || 0
-  });
-
-  renderPrograms();
-  updatePreview();
-}
-
-function renderPrograms() {
-  const cont = document.getElementById('programsContainer');
-  if (state.programs.length === 0) {
-    cont.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20m10-10H2"/></svg>Belum ada program. Klik "Tambah Program" untuk mulai</div>';
-    return;
-  }
-
-  cont.innerHTML = state.programs.map((p, i) => {
-    const pricesByDuration = PROGRAMS_DATA[p.jenjang]?.[p.program]?.[p.type] || {};
-    return `
-      <div class="prog-item">
-        <div class="prog-hdr">
-          <div class="prog-num">Program ${i + 1}</div>
-          <button type="button" class="btn-icon" onclick="removeProgram(${p.id})">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-          </button>
-        </div>
-        <div class="g3" style="margin-bottom:12px;">
-          <div>
-            <label>Program</label>
-            <select disabled style="opacity:.6;">
-              <option>${p.program}</option>
-            </select>
-          </div>
-          <div>
-            <label>Tipe</label>
-            <select disabled style="opacity:.6;">
-              <option>${p.type === 'reguler' ? 'Reguler' : 'Private'}</option>
-            </select>
-          </div>
-          <div>
-            <label>Durasi</label>
-            <select onchange="changeDuration(${p.id}, this.value)">
-              <option value="1" ${p.duration == 1 ? 'selected' : ''}>1 Bulan</option>
-              <option value="3" ${p.duration == 3 ? 'selected' : ''}>3 Bulan</option>
-              <option value="6" ${p.duration == 6 ? 'selected' : ''}>6 Bulan</option>
-            </select>
-          </div>
-        </div>
-        <div style="text-align:right;font-size:13px;color:var(--text2);font-family:'Geist Mono';font-weight:600;">
-          Rp ${(pricesByDuration[p.duration] || 0).toLocaleString('id-ID')}
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function changeDuration(id, duration) {
-  const prog = state.programs.find(p => p.id === id);
-  if (prog) {
-    prog.duration = parseInt(duration);
-    prog.price = PROGRAMS_DATA[prog.jenjang]?.[prog.program]?.[prog.type]?.[prog.duration] || 0;
-    renderPrograms();
-    updatePreview();
-  }
-}
-
-function removeProgram(id) {
-  state.programs = state.programs.filter(p => p.id !== id);
-  renderPrograms();
-  updatePreview();
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// INVOICE NUMBER & CALCULATIONS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function updateInvoiceNum() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const num = String(state.invoiceNo).padStart(3, '0');
-  document.getElementById('invoiceNumber').value = `INV/${year}/${month}/${num}`;
-}
-
-function calculateTotals() {
-  let subtotal = 0;
-  state.programs.forEach(p => {
-    subtotal += p.price;
-  });
-  if (state.regFeeActive) {
-    subtotal += CONFIG.regFee;
-  }
-  return { subtotal, tax: 0, total: subtotal };
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// PREVIEW
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function updatePreview() {
-  const student = state.currentStudent;
-  const { subtotal, tax, total } = calculateTotals();
-  const invDate = document.getElementById('invoiceDate').value;
-  const dueDate = document.getElementById('dueDate').value;
-  const createdBy = document.getElementById('createdBy').value;
-  const invoiceNum = document.getElementById('invoiceNumber').value;
-
-  if (!student || state.programs.length === 0) {
-    document.getElementById('previewContent').innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px;">Buat invoice untuk melihat preview</div>';
-    return;
-  }
-
-  let itemsHtml = '';
-  state.programs.forEach(p => {
-    itemsHtml += `
-      <tr>
-        <td>${p.program}</td>
-        <td style="text-align:center;">${p.duration} Bulan</td>
-        <td style="text-align:right;">Rp ${p.price.toLocaleString('id-ID')}</td>
-      </tr>
-    `;
-  });
-  if (state.regFeeActive) {
-    itemsHtml += `
-      <tr>
-        <td>Biaya Pendaftaran</td>
-        <td style="text-align:center;">1x</td>
-        <td style="text-align:right;">Rp ${CONFIG.regFee.toLocaleString('id-ID')}</td>
-      </tr>
-    `;
-  }
-
-  const logoHtml = state.logoData ? `<div class="inv-logo-area"><img class="inv-logo-img" src="${state.logoData}" alt="Logo"></div>` : '';
-
-  const invDoc = `
-    <div class="inv-doc">
-      <div class="inv-top">
-        <div class="inv-top-row">
-          <div>
-            <div class="inv-brand">📚 <span>MARKAZ</span></div>
-            <div class="inv-tagline">Invoice System</div>
-          </div>
-          <div class="inv-title-block">
-            <div class="inv-title-word">Invoice</div>
-            <div class="inv-num">${invoiceNum}</div>
-          </div>
-        </div>
-      </div>
-      <div class="inv-body">
-        ${logoHtml}
-        <div class="inv-parties">
-          <div>
-            <div class="inv-plbl">Dari</div>
-            <div class="inv-pname">Markaz Belajar</div>
-            <div class="inv-psub">Jl.Raya Sirih - Rt 01 Rw 05, des.Kamasan<br/>kec.Cinangka, Kab.serang - Banten<br/>Indonesia<br/>Telp: 08366583082<br/>Email: markaz.belajar@gmail.com</div>
-          </div>
-          <div>
-            <div class="inv-plbl">Tagihan Kepada</div>
-            <div class="inv-pname">${student.name}</div>
-            <div class="inv-psub">${student.parentName}<br/>${student.parentPhone}<br/>Program: ${student.program}<br/>Guru: ${student.guru}</div>
-          </div>
-        </div>
-        <div class="inv-meta">
-          <div class="inv-mb">
-            <div class="inv-ml">Referensi</div>
-            <div class="inv-mv">${invoiceNum}</div>
-          </div>
-          <div class="inv-mb">
-            <div class="inv-ml">Tanggal</div>
-            <div class="inv-mv">${formatIDDate(invDate)}</div>
-          </div>
-          <div class="inv-mb">
-            <div class="inv-ml">Jatuh Tempo</div>
-            <div class="inv-mv">${formatIDDate(dueDate)}</div>
-          </div>
-        </div>
-        <table class="inv-tbl">
-          <thead>
-            <tr>
-              <th>Produk / Program</th>
-              <th style="text-align:center;">Durasi</th>
-              <th style="text-align:right;">Harga</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${itemsHtml}
-          </tbody>
-        </table>
-        <div class="inv-totals">
-          <div class="inv-trow">
-            <span>Subtotal</span>
-            <span>Rp ${subtotal.toLocaleString('id-ID')}</span>
-          </div>
-          <div class="inv-trow">
-            <span>Pajak (0%)</span>
-            <span>Rp ${tax.toLocaleString('id-ID')}</span>
-          </div>
-          <div class="inv-tfinal">
-            <span class="inv-tflbl">TOTAL</span>
-            <span class="inv-tfval">Rp ${total.toLocaleString('id-ID')}</span>
-          </div>
-        </div>
-        <div class="inv-bank">
-          <div class="inv-bank-ttl">Metode Pembayaran</div>
-          ${CONFIG.banks.map(b => `
-            <div class="inv-bank-row">
-              <span class="inv-bname">${b.name}</span>
-              <span class="inv-bnum">${b.num}</span>
-            </div>
-          `).join('')}
-          <div class="inv-ban">Atas Nama: ${CONFIG.bankOwner}</div>
-        </div>
-        <div class="inv-notes">Terima kasih telah mempercayai Markaz Belajar</div>
-        <div class="inv-created">Dibuat oleh: ${createdBy}</div>
-      </div>
-      <div class="inv-footer">Markaz Belajar — Invoice System</div>
-    </div>
-  `;
-
-  document.getElementById('previewContent').innerHTML = invDoc;
-}
-
-function togglePreview() {
-  const panel = document.getElementById('previewPanel');
-  const btn = document.getElementById('toggleBtn');
-  panel.classList.toggle('open');
-  btn.classList.toggle('open');
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// LOGO
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function handleLogoUpload(e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      state.logoData = evt.target.result;
-      const logoArea = document.getElementById('logoArea');
-      logoArea.innerHTML = `<img class="logo-preview" src="${state.logoData}" alt="Logo"><div style="margin-top:8px;"><button type="button" class="btn btn-ghost" style="font-size:11px;padding:5px 10px;" onclick="removeLogo()">Hapus Logo</button></div>`;
-      logoArea.classList.add('has-logo');
-      updatePreview();
-      showToast('Logo berhasil diupload', 'success');
+    const cal={
+      inv:{yr:0,mo:0,val:'',btnId:'invDateBtn',txtId:'invDateTxt',valId:'invDateVal',popId:'invCal'},
+      due:{yr:0,mo:0,val:'',btnId:'dueDateBtn',txtId:'dueDateTxt',valId:'dueDateVal',popId:'dueCal'},
     };
-    reader.readAsDataURL(file);
-  }
-}
 
-function removeLogo() {
-  state.logoData = null;
-  const logoArea = document.getElementById('logoArea');
-  logoArea.innerHTML = `<div class="logo-area-icon">📷</div><div class="logo-area-text">Klik untuk upload logo Markaz Belajar</div><div class="logo-area-text" style="font-size:11px;color:var(--text3);margin-top:4px;">(JPG, PNG, optimal 120x60px)</div>`;
-  logoArea.classList.remove('has-logo');
-  updatePreview();
-}
+    /* ════ CSV PARSER ════ */
+    function parseCSV(text){
+      const lines=[];
+      let cur='',inQ=false;
+      const rows=[];
+      for(let i=0;i<text.length;i++){
+        const c=text[i];
+        if(c==='"'){inQ=!inQ;}
+        else if(c===','&&!inQ){cur=cur.replace(/^"|"$/g,'').replace(/""/g,'"');lines.push(cur);cur='';}
+        else if((c==='\n'||c==='\r')&&!inQ){
+          cur=cur.replace(/^"|"$/g,'').replace(/""/g,'"');lines.push(cur);rows.push([...lines]);lines.length=0;cur='';
+          if(text[i+1]==='\n')i++;
+        }else{cur+=c;}
+      }
+      if(cur||lines.length){cur=cur.replace(/^"|"$/g,'').replace(/""/g,'"');lines.push(cur);rows.push([...lines]);}
+      return rows.filter(r=>r.some(c=>c.trim()));
+    }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// ACTIONS
-// ═══════════════════════════════════════════════════════════════════════════════
+    /* ════ LOAD STUDENTS FROM SHEET 1 ════ */
+    async function loadStudents(){
+      try{
+        setSyncStatus('syncing');
+        const resp=await fetch(SHEET1_URL+'&t='+Date.now());
+        if(!resp.ok)throw new Error('HTTP '+resp.status);
+        const text=await resp.text();
+        const rows=parseCSV(text);
+        if(rows.length<2){setSyncStatus('warn','Sheet 1 kosong atau tidak terbaca');return;}
+        
+        // Deteksi header — cari kolom penting (case-insensitive)
+        const hdr=rows[0].map(h=>h.trim().toLowerCase());
+        const col=(names)=>{
+          for(const n of names){const i=hdr.findIndex(h=>h.includes(n));if(i>=0)return i;}
+          return -1;
+        };
+        const iName   = col(['nama siswa','nama_siswa','student','nama']);
+        const iJenjang= col(['jenjang','level','kelas']);
+        const iTipe   = col(['tipe','type','kelas_tipe','reguler']);
+        const iGuru   = col(['guru','teacher','pengajar']);
+        const iParent = col(['orang tua','ortu','wali','nama orang tua','parent']);
+        const iPhone  = col(['no hp','nomor hp','phone','whatsapp','no. hp','no.hp','kontak']);
 
-function resetForm() {
-  state.programs = [];
-  state.regFeeActive = false;
-  document.getElementById('studentSelect').value = '';
-  document.getElementById('createdBy').value = 'Elis';
-  document.getElementById('regFeeRow').classList.remove('on');
-  setDefaultDates();
-  state.invoiceNo++;
-  updateInvoiceNum();
-  renderPrograms();
-  onSelectStudent();
-  updatePreview();
-  showToast('Form direset', 'success');
-}
+        const newStudents=[];
+        for(let r=1;r<rows.length;r++){
+          const row=rows[r];
+          const name=(iName>=0?row[iName]:'').trim();
+          if(!name)continue;
+          newStudents.push({
+            id: r,
+            name,
+            jenjang: iJenjang>=0?row[iJenjang].trim():'Elementary',
+            defaultType: iTipe>=0?row[iTipe].trim():'Reguler',
+            guru: iGuru>=0?row[iGuru].trim():'',
+            parentName: iParent>=0?row[iParent].trim():name,
+            parentPhone: iPhone>=0?row[iPhone].trim().replace(/\s+/g,''):'',
+            _row: r
+          });
+        }
+        STUDENTS=newStudents;
+        lastSyncTime=new Date();
+        setSyncStatus('ok', `${STUDENTS.length} siswa · sync ${fmtTime(lastSyncTime)}`);
+        rebuildStudentSelect();
+        return true;
+      }catch(e){
+        setSyncStatus('error','Gagal memuat data siswa: '+e.message);
+        console.error('Sheet1 error',e);
+        return false;
+      }
+    }
 
-async function saveDraft() {
-  if (!state.currentStudent || state.programs.length === 0) {
-    showToast('Lengkapi invoice terlebih dahulu!', 'error');
-    return;
-  }
+    /* ════ LOAD PROGRAMS & PRICES FROM SHEET 2 ════ */
+    async function loadPrograms(){
+      try{
+        const resp=await fetch(SHEET2_URL+'&t='+Date.now());
+        if(!resp.ok)throw new Error('HTTP '+resp.status);
+        const text=await resp.text();
+        const rows=parseCSV(text);
+        if(rows.length<2){
+          // Pakai default jika sheet kosong
+          setDefaultPrograms();
+          return;
+        }
+        const hdr=rows[0].map(h=>h.trim().toLowerCase());
+        const col=(names)=>{
+          for(const n of names){const i=hdr.findIndex(h=>h.includes(n));if(i>=0)return i;}
+          return -1;
+        };
+        const iJen  = col(['jenjang','level']);
+        const iProg = col(['program','mapel','mata pelajaran','nama program']);
+        const iTipe = col(['tipe','type']);
+        const i1    = col(['1 bulan','1bln','1_bulan','harga 1','harga1']);
+        const i3    = col(['3 bulan','3bln','3_bulan','harga 3','harga3']);
+        const i6    = col(['6 bulan','6bln','6_bulan','harga 6','harga6']);
 
-  const { subtotal, total } = calculateTotals();
-  const invoiceData = {
-    action: 'saveInvoice',
-    invoiceNumber: document.getElementById('invoiceNumber').value,
-    studentId: state.currentStudent.id,
-    studentName: state.currentStudent.name,
-    invoiceDate: document.getElementById('invoiceDate').value,
-    dueDate: document.getElementById('dueDate').value,
-    programs: state.programs,
-    regFeeActive: state.regFeeActive,
-    subtotal: subtotal,
-    tax: 0,
-    total: total,
-    createdBy: document.getElementById('createdBy').value,
-    notes: ''
-  };
+        const newProgs={};
+        const newPrices={};
+        for(let r=1;r<rows.length;r++){
+          const row=rows[r];
+          const jen=(iJen>=0?row[iJen]:'').trim();
+          const prog=(iProg>=0?row[iProg]:'').trim();
+          const tipe=(iTipe>=0?row[iTipe]:'Reguler').trim();
+          if(!jen||!prog)continue;
+          if(!newProgs[jen])newProgs[jen]=[];
+          if(!newProgs[jen].includes(prog))newProgs[jen].push(prog);
+          if(!newPrices[jen])newPrices[jen]={};
+          if(!newPrices[jen][tipe])newPrices[jen][tipe]={};
+          const parse=(idx)=>idx>=0?parseInt((row[idx]||'0').replace(/[^0-9]/g,''))||0:0;
+          newPrices[jen][tipe][1]=parse(i1);
+          newPrices[jen][tipe][3]=parse(i3);
+          newPrices[jen][tipe][6]=parse(i6);
+        }
+        if(Object.keys(newProgs).length>0){PROGS=newProgs;PRICES=newPrices;}
+        else setDefaultPrograms();
+      }catch(e){
+        setDefaultPrograms();
+        console.warn('Sheet2 error (pakai default):',e);
+      }
+    }
 
-  const result = await callAPI('saveInvoice', invoiceData);
-  if (result.success) {
-    showToast('✓ Invoice berhasil disimpan ke Google Sheets!', 'success');
-    resetForm();
-  } else {
-    showToast('Error: ' + (result.message || 'Unknown error'), 'error');
-  }
-}
+    function setDefaultPrograms(){
+      PROGS={
+        Preschool:["Calistung","Tahfidz","English Kids"],
+        Elementary:["MTK","Mapel","Tahfidz","English"],
+      };
+      PRICES={
+        Preschool:{Reguler:{1:130000,3:350000,6:480000},Private:{1:270000,3:690000,6:1200000}},
+        Elementary:{Reguler:{1:150000,3:390000,6:670000},Private:{1:315000,3:860000,6:1350000}},
+      };
+    }
 
-function downloadPDF() {
-  if (!state.currentStudent || state.programs.length === 0) {
-    showToast('Lengkapi invoice terlebih dahulu!', 'error');
-    return;
-  }
+    /* ════ SYNC STATUS UI ════ */
+    function setSyncStatus(state, msg){
+      const el=document.getElementById('syncStatus');
+      if(!el)return;
+      const icons={
+        ok:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+        syncing:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>',
+        warn:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+        error:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+      };
+      const colors={ok:'var(--success)',syncing:'var(--accent)',warn:'var(--warning)',error:'var(--danger)'};
+      el.style.color=colors[state]||'var(--text2)';
+      el.innerHTML=`${icons[state]||''}<span>${msg||state}</span>`;
+    }
 
-  const element = document.getElementById('previewContent').querySelector('.inv-doc');
-  const opt = {
-    margin: 5,
-    filename: document.getElementById('invoiceNumber').value + '.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-  };
+    function fmtTime(d){
+      return d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+    }
 
-  html2pdf().set(opt).from(element).save();
-  showToast('✓ PDF berhasil didownload', 'success');
-}
+    /* ════ REBUILD STUDENT SELECT ════ */
+    function rebuildStudentSelect(){
+      const sel=document.getElementById('studentSel');
+      const prevVal=sel.value;
+      sel.innerHTML='<option value="">— Pilih Siswa —</option>';
+      STUDENTS.forEach(s=>{
+        const o=document.createElement('option');
+        o.value=s.id;
+        o.textContent=`${s.name} — ${s.jenjang}`;
+        sel.appendChild(o);
+      });
+      if(prevVal)sel.value=prevVal;
+    }
 
-function sendWhatsApp() {
-  if (!state.currentStudent || state.programs.length === 0) {
-    showToast('Lengkapi invoice terlebih dahulu!', 'error');
-    return;
-  }
+    /* ════ MANUAL REFRESH ════ */
+    async function manualRefresh(){
+      setSyncStatus('syncing','Memuat ulang data...');
+      await Promise.all([loadStudents(), loadPrograms()]);
+      renderProgList();
+      showToast('Data berhasil disinkronkan!', true);
+    }
 
-  const student = state.currentStudent;
-  const { total } = calculateTotals();
-  const invoiceNum = document.getElementById('invoiceNumber').value;
-  const dueDate = document.getElementById('dueDate').value;
+    /* ════ AUTO-SYNC ════ */
+    function startAutoSync(){
+      if(syncTimer)clearInterval(syncTimer);
+      syncTimer=setInterval(async()=>{
+        await Promise.all([loadStudents(), loadPrograms()]);
+        renderProgList();
+      }, SYNC_INTERVAL_MS);
+    }
 
-  const message = `Assalamu'alaikum Bu ${student.parentName},\n\nInvoice untuk ${student.name} sudah siap:\n\n*Referensi:* ${invoiceNum}\n*Total:* Rp ${total.toLocaleString('id-ID')}\n*Jatuh Tempo:* ${formatIDDate(dueDate)}\n\n*Metode Pembayaran:*\n💳 Dana: 0838-665-830-82\n🏦 BCA: 651-065-92-26\n(A.n Elis Rosmiati)\n\nTerima kasih!`;
+    /* ════ INIT ════ */
+    async function init(){
+      setSyncStatus('syncing','Menghubungkan ke Google Sheets...');
+      
+      // Load data dari kedua sheets secara paralel
+      await Promise.all([loadStudents(), loadPrograms()]);
 
-  const phone = student.parentPhone.replace(/[^0-9]/g, '');
-  const whatsappLink = `https://wa.me/62${phone.substring(1)}?text=${encodeURIComponent(message)}`;
-  window.open(whatsappLink, '_blank');
-}
+      const sel=document.getElementById('studentSel');
+      sel.addEventListener('change',onStudent);
+      document.getElementById('notes').addEventListener('input',()=>{if(prevOpen)renderPrev();});
+      document.getElementById('createdBy').addEventListener('change',()=>{if(prevOpen)renderPrev();});
+      
+      document.getElementById('trackingSearch').addEventListener('input',renderTracking);
+      document.getElementById('trackingFilter').addEventListener('change',renderTracking);
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// UTILITY
-// ═══════════════════════════════════════════════════════════════════════════════
+      updateInvNum();
+      const today=new Date(),due7=new Date();due7.setDate(due7.getDate()+7);
+      setDate('inv',today);setDate('due',due7);
 
-function showToast(message, type = 'success') {
-  const container = document.getElementById('toastContainer');
-  const toast = document.createElement('div');
-  toast.className = 'toast ' + type;
-  toast.textContent = message;
-  container.appendChild(toast);
-  setTimeout(() => {
-    toast.style.animation = 'slideOut .3s ease forwards';
-    setTimeout(() => toast.remove(), 300);
-  }, 4000);
-}
+      renderProgList();
+      renderTracking();
+      document.addEventListener('click',e=>{
+        if(!e.target.closest('.date-wrap')){
+          document.querySelectorAll('.cal-popup').forEach(p=>p.classList.remove('open'));
+          document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('open'));
+        }
+      });
 
-// On page load, try to load data
-document.addEventListener('DOMContentLoaded', () => {
-  if (API_URL) {
-    loadStudents();
-    loadPrograms();
-  }
-});
-</script>
-</body>
+      invoices = JSON.parse(localStorage.getItem('mrkz_invoices')||'[]');
+      renderTracking();
+      
+      // Mulai auto-sync
+      startAutoSync();
+    }
+
+    /* ════ TABS ════ */
+    function switchTab(tabName, btn){
+      document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+      document.getElementById('tab-'+tabName).classList.add('active');
+      if(btn) btn.classList.add('active');
+    }
+    function switchTabById(tabName){
+      document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+      document.getElementById('tab-'+tabName).classList.add('active');
+      document.querySelector(`.nav-tab[onclick*="${tabName}"]`)?.classList.add('active');
+    }
+
+    /* ════ INV NUMBER ════ */
+    function updateInvNum(){
+      const n=new Date();
+      document.getElementById('invoiceNumber').value=`INV/${n.getFullYear()}/${String(n.getMonth()+1).padStart(2,'0')}/${String(invCnt).padStart(3,'0')}`;
+    }
+
+    /* ════ CALENDAR ════ */
+    function setDate(id,d){
+      const c=cal[id];
+      c.yr=d.getFullYear();c.mo=d.getMonth();
+      c.val=isoDate(d);
+      document.getElementById(c.valId).value=c.val;
+      const el=document.getElementById(c.txtId);
+      el.textContent=fmtLong(d);el.classList.remove('placeholder');
+    }
+
+    function openCal(id){
+      const c=cal[id];
+      const pop=document.getElementById(c.popId);
+      const btn=document.getElementById(c.btnId);
+      const wasOpen=pop.classList.contains('open');
+      document.querySelectorAll('.cal-popup').forEach(p=>p.classList.remove('open'));
+      document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('open'));
+      if(!wasOpen){buildCal(id);pop.classList.add('open');btn.classList.add('open');}
+    }
+
+    function buildCal(id){
+      const c=cal[id];
+      const pop=document.getElementById(c.popId);
+      const first=new Date(c.yr,c.mo,1).getDay();
+      const days=new Date(c.yr,c.mo+1,0).getDate();
+      const today=new Date();
+      const selDate=c.val?new Date(c.val+'T00:00:00'):null;
+      let h=`<div class="cal-nav"><button class="cal-nav-btn" onclick="movCal('${id}',-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button><span class="cal-month-lbl">${MO[c.mo]} ${c.yr}</span><button class="cal-nav-btn" onclick="movCal('${id}',1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button></div><div class="cal-grid">`;
+      DN.forEach(d=>{h+=`<div class="cal-dn">${d}</div>`;});
+      for(let i=0;i<first;i++)h+=`<div class="cal-d empty"></div>`;
+      for(let d=1;d<=days;d++){
+        const isToday=d===today.getDate()&&c.mo===today.getMonth()&&c.yr===today.getFullYear();
+        const isSel=selDate&&d===selDate.getDate()&&c.mo===selDate.getMonth()&&c.yr===selDate.getFullYear();
+        const cls=['cal-d',isToday&&!isSel?'today':'',isSel?'selected':''].filter(Boolean).join(' ');
+        const ds=`${c.yr}-${String(c.mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        h+=`<div class="${cls}" onclick="pickDate('${id}','${ds}')">${d}</div>`;
+      }
+      h+=`</div>`;
+      pop.innerHTML=h;
+    }
+
+    function movCal(id,dir){
+      const c=cal[id];c.mo+=dir;
+      if(c.mo>11){c.mo=0;c.yr++;}
+      if(c.mo<0){c.mo=11;c.yr--;}
+      buildCal(id);
+    }
+
+    function pickDate(id,ds){
+      const c=cal[id];
+      c.val=ds;c.yr=parseInt(ds.slice(0,4));c.mo=parseInt(ds.slice(5,7))-1;
+      document.getElementById(c.valId).value=ds;
+      const el=document.getElementById(c.txtId);
+      el.textContent=fmtLong(new Date(ds+'T00:00:00'));el.classList.remove('placeholder');
+      document.getElementById(c.popId).classList.remove('open');
+      document.getElementById(c.btnId).classList.remove('open');
+      if(prevOpen)renderPrev();
+    }
+
+    /* ════ STUDENT ════ */
+    function onStudent(){
+      const id=parseInt(document.getElementById('studentSel').value);
+      student=STUDENTS.find(s=>s.id===id)||null;
+      progs=[];renderStudentCard();renderProgList();
+      if(prevOpen)renderPrev();
+    }
+
+    function renderStudentCard(){
+      const el=document.getElementById('studentCard');
+      if(!student){
+        el.outerHTML='<div id="studentCard" class="student-empty">Pilih siswa untuk melihat detail.</div>';
+        return;
+      }
+      el.outerHTML=`<div id="studentCard" class="student-card"><div><div class="sf-lbl">Nama Siswa</div><div class="sf-val">${student.name}</div></div><div><div class="sf-lbl">Jenjang</div><div class="sf-val">${student.jenjang}</div></div><div><div class="sf-lbl">Guru</div><div class="sf-val">${student.guru}</div></div><div><div class="sf-lbl">Orang Tua</div><div class="sf-val">${student.parentName}</div></div><div><div class="sf-lbl">No. HP</div><div class="sf-val">${student.parentPhone}</div></div></div>`;
+    }
+
+    /* ════ REG FEE ════ */
+    function toggleReg(){
+      regOn=!regOn;
+      document.getElementById('regRow').classList.toggle('on',regOn);
+      document.getElementById('regHint').textContent=regOn?'Aktif — akan dimasukkan ke invoice':'Untuk siswa baru — Rp 150.000';
+      if(prevOpen)renderPrev();
+    }
+
+    /* ════ PROGRAMS ════ */
+    function addProg(){
+      if(!student){showToast('Pilih siswa terlebih dahulu.',false);return;}
+      pc++;
+      progs.push({id:pc,prog:PROGS[student.jenjang][0],type:student.defaultType,dur:1});
+      renderProgList();if(prevOpen)renderPrev();
+    }
+
+    function removeProg(id){progs=progs.filter(p=>p.id!==id);renderProgList();if(prevOpen)renderPrev();}
+
+    function updProg(id,f,v){
+      const p=progs.find(p=>p.id===id);
+      if(p){p[f]=f==='dur'?parseInt(v):v;}
+      renderProgList();if(prevOpen)renderPrev();
+    }
+
+    function getPrice(j,t,d){try{return PRICES[j][t][parseInt(d)]||0;}catch(e){return 0;}}
+
+    function renderProgList(){
+      const el=document.getElementById('progList');
+      const cnt=document.getElementById('progCount');
+      if(!student||progs.length===0){
+        el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>Belum ada program. Tambah setelah pilih siswa.</div>`;
+        cnt.textContent='';return;
+      }
+      cnt.textContent=progs.length+' program';
+      const j=student.jenjang;
+      el.innerHTML=progs.map((p,i)=>{
+        const price=getPrice(j,p.type,p.dur);
+        const opt=(v,c)=>`<option value="${v}"${v===c?' selected':''}>${v}</option>`;
+        return `<div class="prog-item"><div class="prog-hdr"><span class="prog-num">Program ${i+1}</span><div style="display:flex;align-items:center;gap:10px;"><span class="prog-price">${rp(price)}</span><button class="btn-icon" onclick="removeProg(${p.id})" title="Hapus"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button></div></div><div class="g3"><div><label>Program</label><select onchange="updProg(${p.id},'prog',this.value)">${PROGS[j].map(pr=>opt(pr,p.prog)).join('')}</select></div><div><label>Tipe</label><select onchange="updProg(${p.id},'type',this.value)">${['Reguler','Private'].map(t=>opt(t,p.type)).join('')}</select></div><div><label>Durasi</label><select onchange="updProg(${p.id},'dur',this.value)"><option value="1"${p.dur===1?' selected':''}>1 Bulan</option><option value="3"${p.dur===3?' selected':''}>3 Bulan</option><option value="6"${p.dur===6?' selected':''}>6 Bulan</option></select></div></div></div>`;
+      }).join('');
+    }
+
+    /* ════ PREVIEW ════ */
+    function togglePreview(){
+      prevOpen=!prevOpen;
+      const panel=document.getElementById('previewPanel');
+      const btn=document.getElementById('previewToggleBtn');
+      panel.classList.toggle('open',prevOpen);
+      btn.classList.toggle('open',prevOpen);
+      const span=btn.querySelector('.ptb-left');
+      if(prevOpen){
+        span.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Sembunyikan Preview`;
+        renderPrev();
+      }else{
+        span.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4 11 11 11 11-11 11-11-4-11-11-11-11 11-11 11z"/><circle cx="12" cy="12" r="3"/></svg> Lihat Preview Invoice`;
+      }
+    }
+
+    /* ════ BUILD INVOICE HTML ════ */
+    /* ════ SINGLE SOURCE OF TRUTH: build invoice HTML ════
+       Accepts a data object so it works for both live form AND saved invoices.
+       data = {
+         invNum, creator, notes, invDate, dueDate,
+         pName, sName, jenjang, guru,
+         items: [{label, type, dur, price}],
+         subtotal
+       }
+    */
+    function buildInvHTML(d){
+      const rows = d.items.length
+        ? d.items.map(it=>`<tr>
+            <td style="font-size:11px;">${it.label}</td>
+            <td style="font-size:11px;">${it.type||'—'}</td>
+            <td style="font-size:11px;">${it.dur?it.dur+' Bulan':'—'}</td>
+            <td style="text-align:right;font-family:'Geist Mono',monospace;font-size:11px;">${rp(it.price)}</td>
+          </tr>`).join('')
+        : `<tr><td colspan="4" style="text-align:center;color:#bbb;padding:16px;font-size:11px;">Belum ada item</td></tr>`;
+
+      return `
+<div class="inv-doc">
+  <div class="inv-top">
+    <div class="inv-top-row">
+      <div>
+        <div class="inv-brand">Markaz<span>Belajar</span></div>
+        <div class="inv-tagline">Pusat Bimbingan Belajar</div>
+      </div>
+      <div class="inv-title-block">
+        <div class="inv-title-word">Invoice</div>
+        <div class="inv-num">${d.invNum}</div>
+      </div>
+    </div>
+  </div>
+  <div class="inv-body">
+    <div class="inv-parties">
+      <div>
+        <div class="inv-plbl">Dari</div>
+        <div class="inv-pname">Markaz Belajar</div>
+        <div class="inv-psub">Jl.Raya Sirih Rt 01 Rw 05<br>Des. Kamasan, Kec. Cinangka<br>Kab. Serang – Banten<br>08366583082</div>
+      </div>
+      <div>
+        <div class="inv-plbl">Tagihan Kepada</div>
+        <div class="inv-pname">${d.pName}</div>
+        <div class="inv-psub">${d.sName}${d.jenjang?' · '+d.jenjang:''}${d.guru?' · Guru: '+d.guru:''}</div>
+      </div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-mb"><div class="inv-ml">Tanggal</div><div class="inv-mv">${fmtShort(d.invDate)}</div></div>
+      <div class="inv-mb"><div class="inv-ml">Jatuh Tempo</div><div class="inv-mv">${fmtShort(d.dueDate)}</div></div>
+      <div class="inv-mb"><div class="inv-ml">Dibuat Oleh</div><div class="inv-mv">${d.creator}</div></div>
+    </div>
+    <table class="inv-tbl">
+      <thead><tr><th>Program</th><th>Tipe</th><th>Durasi</th><th>Harga</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="inv-totals">
+      <div class="inv-trow"><span>Subtotal</span><span>${rp(d.subtotal)}</span></div>
+      <div class="inv-tfinal">
+        <span class="inv-tflbl">Total</span>
+        <span class="inv-tfval">${rp(d.subtotal)}</span>
+      </div>
+    </div>
+    <div class="inv-bank">
+      <div class="inv-bank-ttl">Informasi Pembayaran</div>
+      <div class="inv-bank-row"><span class="inv-bname">Dana</span><span class="inv-bnum">0838-665-830-82</span></div>
+      <div class="inv-bank-row"><span class="inv-bname">BCA</span><span class="inv-bnum">651-065-92-26</span></div>
+      <div class="inv-ban">a.n Elis Rosmiati</div>
+    </div>
+    ${d.notes?`<div class="inv-notes">Catatan: ${d.notes}</div>`:''}
+    <div class="inv-created">Dibuat oleh: ${d.creator} · ${fmtShort(d.invDate)}</div>
+  </div>
+  <div class="inv-footer">Terima kasih atas kepercayaan Anda — markaz.belajar@gmail.com</div>
+</div>`;
+    }
+
+    /* Collect data from live form and call buildInvHTML */
+    function buildInv(){
+      const items=[];
+      if(regOn) items.push({label:'Biaya Pendaftaran',type:'—',dur:'',price:REG_FEE});
+      if(student&&progs.length>0){
+        progs.forEach(p=>{
+          items.push({label:p.prog,type:p.type,dur:p.dur,price:getPrice(student.jenjang,p.type,p.dur)});
+        });
+      }
+      const subtotal=items.reduce((s,i)=>s+i.price,0);
+      return buildInvHTML({
+        invNum:  document.getElementById('invoiceNumber').value,
+        creator: document.getElementById('createdBy').value,
+        notes:   document.getElementById('notes').value,
+        invDate: document.getElementById('invDateVal').value,
+        dueDate: document.getElementById('dueDateVal').value,
+        pName:   student?student.parentName:'—',
+        sName:   student?student.name:'—',
+        jenjang: student?student.jenjang:'',
+        guru:    student?student.guru:'',
+        items, subtotal
+      });
+    }
+
+    function renderPrev(){
+      document.getElementById('previewDoc').innerHTML=buildInv();
+    }
+
+    /* ════ PDF — identical to preview, A4 ════ */
+    function printFromForm(){
+      if(!student&&progs.length===0&&!regOn){showToast('Lengkapi data invoice terlebih dahulu.',false);return;}
+      const html=buildInv();
+      _renderPDF(html, document.getElementById('invoiceNumber').value+'.pdf');
+    }
+
+    function _renderPDF(invHTML, filename){
+      // Build a self-contained div with ALL invoice CSS inlined.
+      // Never depends on page styles — always renders identically to preview.
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = [
+        'position:fixed','left:-9999px','top:0',
+        'width:595px',   // A4 points width at 72dpi
+        'background:#fff','font-family:Geist,system-ui,sans-serif',
+        'font-size:12px','line-height:1.5','color:#1c1c1c'
+      ].join(';');
+
+      // Inject a scoped <style> so classes work without page interference
+      const style = document.createElement('style');
+      style.textContent = `
+        .pdf-wrap *{box-sizing:border-box;margin:0;padding:0;}
+        .pdf-wrap .inv-doc{background:#fff;width:100%;color:#1c1c1c;font-family:Geist,system-ui,sans-serif;font-size:12px;}
+        .pdf-wrap .inv-top{background:#1c1c1c;color:#fff;padding:22px 28px 16px;}
+        .pdf-wrap .inv-top-row{display:flex;justify-content:space-between;align-items:flex-start;}
+        .pdf-wrap .inv-brand{font-size:18px;font-weight:700;letter-spacing:-.02em;}
+        .pdf-wrap .inv-brand span{color:#8ab4f8;}
+        .pdf-wrap .inv-tagline{font-size:8px;color:rgba(255,255,255,.35);margin-top:2px;letter-spacing:.06em;text-transform:uppercase;}
+        .pdf-wrap .inv-title-block{text-align:right;}
+        .pdf-wrap .inv-title-word{font-size:22px;font-weight:300;letter-spacing:-.04em;opacity:.75;}
+        .pdf-wrap .inv-num{font-size:10px;font-weight:600;color:#8ab4f8;margin-top:2px;font-family:monospace;}
+        .pdf-wrap .inv-body{padding:20px 28px;}
+        .pdf-wrap .inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px;}
+        .pdf-wrap .inv-plbl{font-size:8px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+        .pdf-wrap .inv-pname{font-size:13px;font-weight:700;color:#1c1c1c;}
+        .pdf-wrap .inv-psub{font-size:10px;color:#555;margin-top:3px;line-height:1.6;}
+        .pdf-wrap .inv-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+        .pdf-wrap .inv-mb{background:#f4f5f8;border-radius:5px;padding:8px 10px;}
+        .pdf-wrap .inv-ml{font-size:8px;color:#aaa;text-transform:uppercase;letter-spacing:.06em;}
+        .pdf-wrap .inv-mv{font-size:11px;font-weight:600;color:#1c1c1c;margin-top:2px;}
+        .pdf-wrap .inv-tbl{width:100%;border-collapse:collapse;margin-bottom:12px;}
+        .pdf-wrap .inv-tbl th{background:#f4f5f8;padding:7px 10px;text-align:left;font-size:8px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.07em;}
+        .pdf-wrap .inv-tbl th:last-child{text-align:right;}
+        .pdf-wrap .inv-tbl td{padding:8px 10px;border-bottom:1px solid #eef0f4;font-size:11px;color:#1c1c1c;}
+        .pdf-wrap .inv-tbl td:last-child{text-align:right;font-family:monospace;}
+        .pdf-wrap .inv-tbl tr:last-child td{border-bottom:none;}
+        .pdf-wrap .inv-totals{background:#f4f5f8;border-radius:6px;padding:12px 14px;}
+        .pdf-wrap .inv-trow{display:flex;justify-content:space-between;font-size:11px;color:#666;padding:2px 0;}
+        .pdf-wrap .inv-tfinal{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #dde0e8;}
+        .pdf-wrap .inv-tflbl{font-size:13px;font-weight:700;color:#1c1c1c;}
+        .pdf-wrap .inv-tfval{font-size:15px;font-weight:700;color:#1c1c1c;font-family:monospace;}
+        .pdf-wrap .inv-bank{margin-top:14px;padding:12px 14px;border:1px solid #eef0f4;border-radius:6px;}
+        .pdf-wrap .inv-bank-ttl{font-size:8px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+        .pdf-wrap .inv-bank-row{display:flex;justify-content:space-between;font-size:10px;margin:3px 0;}
+        .pdf-wrap .inv-bname{color:#1c1c1c;font-weight:600;}
+        .pdf-wrap .inv-bnum{color:#4a7fe0;font-family:monospace;}
+        .pdf-wrap .inv-ban{font-size:9px;color:#aaa;margin-top:4px;}
+        .pdf-wrap .inv-notes{margin-top:10px;font-size:10px;color:#888;font-style:italic;}
+        .pdf-wrap .inv-created{margin-top:6px;font-size:9px;color:#aaa;}
+        .pdf-wrap .inv-footer{padding:10px 28px;background:#f4f5f8;text-align:center;font-size:9px;color:#aaa;}
+      `;
+      document.head.appendChild(style);
+
+      wrapper.className = 'pdf-wrap';
+      wrapper.innerHTML = invHTML;
+      document.body.appendChild(wrapper);
+
+      // Small delay to allow layout
+      setTimeout(()=>{
+        const el = wrapper.querySelector('.inv-doc');
+        html2pdf().set({
+          margin:     [8,8,8,8],
+          filename:   filename,
+          image:      {type:'jpeg', quality:0.98},
+          html2canvas:{
+            scale:      2.5,
+            backgroundColor: '#ffffff',
+            useCORS:    true,
+            logging:    false,
+            removeContainer: false
+          },
+          jsPDF:{orientation:'portrait', unit:'mm', format:'a4', compress:true}
+        }).from(el).save().then(()=>{
+          document.body.removeChild(wrapper);
+          document.head.removeChild(style);
+        });
+      }, 300);
+    }
+
+    /* ════ FINISH INVOICE ════ */
+    async function finishInvoice(){
+      if(!student){showToast('Pilih siswa terlebih dahulu.',false);return;}
+      if(progs.length===0&&!regOn){showToast('Tambahkan minimal 1 item.',false);return;}
+
+      let subtotal=0;
+      if(regOn)subtotal+=REG_FEE;
+      progs.forEach(p=>{subtotal+=getPrice(student.jenjang,p.type,p.dur);});
+
+      // Build items array for PDF reconstruction
+      const invoiceItems=[];
+      if(regOn) invoiceItems.push({label:'Biaya Pendaftaran',type:'—',dur:'',price:REG_FEE});
+      progs.forEach(p=>{
+        invoiceItems.push({label:p.prog,type:p.type,dur:p.dur,price:getPrice(student.jenjang,p.type,p.dur)});
+      });
+
+      const invData={
+        invoice_number:document.getElementById('invoiceNumber').value,
+        student_name:student.name,
+        student_id:student.id,
+        student_jenjang:student.jenjang,
+        created_date:document.getElementById('invDateVal').value,
+        due_date:document.getElementById('dueDateVal').value,
+        created_by:document.getElementById('createdBy').value,
+        notes:document.getElementById('notes').value,
+        amount:subtotal,
+        invoice_items:invoiceItems,
+        status:'created',
+        payment_status:'pending',
+        payment_method:'',
+        payment_amount:0,
+        payment_date:'',
+        payment_notes:'',
+        sent_via:'',
+        sent_date:''
+      };
+
+      invData.__backendId = 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+      invoices.push(invData);
+      localStorage.setItem('mrkz_invoices', JSON.stringify(invoices));
+      showToast('Invoice berhasil dibuat!', true);
+      renderTracking();
+      setTimeout(()=>{resetForm(); switchTabById('tracking');}, 1200);
+    }
+
+    /* ════ UPDATE STATS ════ */
+    function updateStats(data){
+      const total=data.length;
+      let paid=0,partial=0,pending=0,overdue=0;
+      const today=new Date();
+      
+      data.forEach(inv=>{
+        if(inv.payment_status==='paid')paid++;
+        else if(inv.payment_status==='partial')partial++;
+        else pending++;
+        
+        const dueDate=new Date(inv.due_date+'T00:00:00');
+        if(dueDate<today&&inv.payment_status!=='paid')overdue++;
+      });
+      
+      document.getElementById('statTotal').textContent=total;
+      document.getElementById('statPaid').textContent=paid;
+      document.getElementById('statPartial').textContent=partial;
+      document.getElementById('statPending').textContent=pending;
+      document.getElementById('statOverdue').textContent=overdue;
+    }
+
+    /* ════ TRACKING ════ */
+    function renderTracking(){
+      const list=document.getElementById('trackingList');
+      if(!invoices||invoices.length===0){
+        list.innerHTML='<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:40px 20px;">Belum ada invoice.</td></tr>';
+        updateStats([]);
+        return;
+      }
+      
+      // Filter dan Search
+      const searchVal=document.getElementById('trackingSearch').value.toLowerCase();
+      const filterVal=document.getElementById('trackingFilter').value;
+      
+      let filtered=invoices.filter(inv=>{
+        const matchSearch=inv.invoice_number.toLowerCase().includes(searchVal)||inv.student_name.toLowerCase().includes(searchVal);
+        let matchFilter=true;
+        
+        if(filterVal!=='all'){
+          const today=new Date();
+          const dueDate=new Date(inv.due_date+'T00:00:00');
+          const isOverdue=dueDate<today&&inv.payment_status!=='paid';
+          
+          if(filterVal==='overdue'&&!isOverdue)matchFilter=false;
+          else if(filterVal!=='overdue'&&inv.payment_status!==filterVal)matchFilter=false;
+        }
+        
+        return matchSearch&&matchFilter;
+      });
+      
+      updateStats(invoices);
+
+      list.innerHTML=filtered.map(inv=>{
+        // Status Pengiriman
+        const statusSent=inv.sent_via?`<span class="status-badge status-sent">${inv.sent_via.toUpperCase()}</span>`:'<span class="status-badge status-pending-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12" style="display:inline;margin-right:4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending</span>';
+        
+        // Status Pembayaran dengan warna
+        let statusPay='';
+        if(inv.payment_status==='paid'){
+          statusPay='<span class="status-badge status-paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12" style="display:inline;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>Lunas</span>';
+        }else if(inv.payment_status==='partial'){
+          statusPay='<span class="status-badge status-partial"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12" style="display:inline;margin-right:4px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5m-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11m3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5"/></svg>Cicilan</span>';
+        }else{
+          statusPay='<span class="status-badge status-pending-pay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12" style="display:inline;margin-right:4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending</span>';
+        }
+
+        // Hitung status jatuh tempo
+        const today=new Date();
+        const dueDate=new Date(inv.due_date+'T00:00:00');
+        const diffDays=Math.floor((dueDate-today)/(1000*60*60*24));
+        let dueStatus='',dueColor='var(--success)';
+        if(diffDays<0){
+          dueStatus=`LEWAT ${Math.abs(diffDays)} HARI`;
+          dueColor='var(--danger)';
+        }else if(diffDays<=3){
+          dueStatus=`${diffDays} HARI LAGI`;
+          dueColor='var(--warning)';
+        }else{
+          dueStatus=fmtShort(inv.due_date);
+          dueColor='var(--success)';
+        }
+
+        const dueBadgeStyle=`background:${dueColor}20;color:${dueColor};`;
+
+        // Tombol Bukti Pembayaran - upload gambar
+        const proofBtn=inv.payment_proof?`<button class="btn-icon" onclick="viewProof('${inv.__backendId}')" title="Lihat bukti"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>`:`<button class="btn-icon" onclick="openProofUpload('${inv.__backendId}')" title="Upload bukti"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button>`;
+
+        // Waktu Bayar - tampilkan tanggal pembayaran atau "-"
+        const paymentTimeDisplay=inv.payment_date?fmtShort(inv.payment_date):'—';
+
+        return `<tr>
+          <td><strong>${inv.invoice_number}</strong></td>
+          <td>${inv.student_name}</td>
+          <td>${rp(inv.amount)}</td>
+          <td><span style="padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;${dueBadgeStyle}">${dueStatus}</span></td>
+          <td>${statusSent}</td>
+          <td>${statusPay}</td>
+          <td style="font-size:12px;color:var(--text2);">${paymentTimeDisplay}</td>
+          <td style="text-align:center;">${proofBtn}</td>
+          <td style="display:flex;gap:5px;justify-content:center;font-size:11px;">
+            <button class="btn btn-small btn-accent" onclick="openSendModal('${inv.__backendId}')">Kirim</button>
+            <button class="btn btn-small btn-ghost" onclick="openPaymentModal('${inv.__backendId}')">Bayar</button>
+            <button class="btn btn-small" style="background:rgba(248,113,113,0.12);color:var(--danger);border:1px solid rgba(248,113,113,.2);" onclick="deleteInvoice('${inv.__backendId}')">Hapus</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    /* ════ SEND MODAL ════ */
+    function openSendModal(invId){
+      currentInvoiceId=invId;
+      document.getElementById('sendModal').classList.add('open');
+    }
+
+    function sendVia(method){
+      currentSendMethod=method;
+      document.getElementById('sendNoteField').style.display='block';
+    }
+
+    async function confirmSend(){
+      if(!currentSendMethod){showToast('Pilih metode pengiriman terlebih dahulu.',false);return;}
+      if(!currentInvoiceId){return;}
+
+      const inv=invoices.find(i=>i.__backendId===currentInvoiceId);
+      if(!inv)return;
+
+      let msg='Invoice telah disiapkan.\n\nRincian:\n';
+      msg+=`No. Invoice: ${inv.invoice_number}\n`;
+      msg+=`Nama Siswa: ${inv.student_name}\n`;
+      msg+=`Total: ${rp(inv.amount)}\n`;
+      msg+=`Jatuh Tempo: ${fmtShort(inv.due_date)}\n`;
+
+      const note=document.getElementById('sendNote').value||'';
+      if(note)msg+=`\nCatatan: ${note}\n`;
+
+      msg+='\nTerima kasih! 🙏';
+
+      const idx=invoices.findIndex(i=>i.__backendId===currentInvoiceId);
+      if(idx>=0){
+        invoices[idx]={...invoices[idx],sent_via:currentSendMethod,sent_date:new Date().toISOString()};
+        localStorage.setItem('mrkz_invoices',JSON.stringify(invoices));
+        renderTracking();
+      }
+      if(currentSendMethod==='whatsapp'){
+        const s=STUDENTS.find(st=>st.id===inv.student_id);
+        if(s)window.open(`https://wa.me/62${s.parentPhone.substring(1)}?text=${encodeURIComponent(msg)}`,'_blank');
+      }else if(currentSendMethod==='email'){
+        showToast('Email ditandai sebagai dikirim.',true);
+      }
+      closeModal('sendModal');
+      resetSendForm();
+    }
+
+    function resetSendForm(){
+      document.getElementById('sendNote').value='';
+      document.getElementById('sendNoteField').style.display='none';
+      currentSendMethod=null;
+      currentInvoiceId=null;
+    }
+
+    function printCurrentInvoice(){
+      if(!currentInvoiceId)return;
+      downloadInvoicePDF(currentInvoiceId);
+    }
+
+    /* ════ PAYMENT MODAL ════ */
+    async function openPaymentModal(invId){
+      currentInvoiceId=invId;
+      const inv=invoices.find(i=>i.__backendId===invId);
+      if(!inv)return;
+      document.getElementById('paymentAmount').value=inv.amount;
+      document.getElementById('paymentDate').valueAsDate=new Date();
+      document.getElementById('paymentStatus').value=inv.payment_status||'pending';
+      document.getElementById('paymentMethod').value=inv.payment_method||'transfer';
+      document.getElementById('paymentNotes').value=inv.payment_notes||'';
+      
+      // Set up bukti pembayaran upload
+      currentProofData=inv.payment_proof||null;
+      const previewEl=document.getElementById('paymentProofPreview');
+      if(inv.payment_proof){
+        previewEl.innerHTML=`<div style="border:1px solid var(--border);border-radius:var(--r);padding:8px;background:var(--bg);"><img src="${inv.payment_proof}" style="width:100%;max-height:150px;border-radius:6px;object-fit:contain;"><div style="margin-top:6px;font-size:11px;color:var(--success);">✓ Bukti sudah ada</div></div>`;
+      }else{
+        previewEl.innerHTML='';
+      }
+      
+      // Clear file input
+      document.getElementById('paymentProofUploadInput').value='';
+      document.getElementById('paymentProofUploadInput').addEventListener('change',handlePaymentProofUpload);
+      
+      document.getElementById('paymentModal').classList.add('open');
+    }
+
+    function handlePaymentProofUpload(e){
+      const file=e.target.files[0];
+      if(!file)return;
+      
+      if(file.size>5*1024*1024){
+        showToast('Ukuran file terlalu besar (Maks 5MB)',false);
+        return;
+      }
+      
+      const reader=new FileReader();
+      reader.onload=(evt)=>{
+        currentProofData=evt.target.result;
+        const preview=document.getElementById('paymentProofPreview');
+        preview.innerHTML=`<div style="border:1px solid var(--border);border-radius:var(--r);padding:8px;background:var(--bg);"><img src="${evt.target.result}" style="width:100%;max-height:150px;border-radius:6px;object-fit:contain;"><div style="margin-top:6px;font-size:11px;color:var(--success);">✓ ${file.name}</div></div>`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function confirmPayment(){
+      if(!currentInvoiceId)return;
+      const inv=invoices.find(i=>i.__backendId===currentInvoiceId);
+      if(!inv)return;
+
+      const upd={
+        ...inv,
+        payment_status:document.getElementById('paymentStatus').value,
+        payment_amount:parseInt(document.getElementById('paymentAmount').value)||0,
+        payment_date:document.getElementById('paymentDate').value,
+        payment_method:document.getElementById('paymentMethod').value,
+        payment_notes:document.getElementById('paymentNotes').value,
+        payment_proof:currentProofData||null
+      };
+
+      const idx=invoices.findIndex(i=>i.__backendId===currentInvoiceId);
+      if(idx>=0){ invoices[idx]=upd; localStorage.setItem('mrkz_invoices',JSON.stringify(invoices)); renderTracking(); }
+      showToast('Data pembayaran berhasil disimpan!',true);
+      closeModal('paymentModal');
+    }
+
+    function viewProof(invId){
+      const inv=invoices.find(i=>i.__backendId===invId);
+      if(!inv||!inv.payment_proof){
+        showToast('Tidak ada bukti pembayaran untuk invoice ini.',false);
+        return;
+      }
+      const modal=document.createElement('div');
+      modal.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;';
+      modal.innerHTML=`<div style="position:relative;background:#fff;border-radius:12px;padding:16px;max-width:90%;max-height:90%;">
+        <button style="position:absolute;top:8px;right:8px;background:none;border:none;font-size:24px;cursor:pointer;color:#333;" onclick="this.closest('[style*=fixed]').remove();">✕</button>
+        <img src="${inv.payment_proof}" style="max-width:100%;max-height:calc(90vh - 60px);border-radius:8px;object-fit:contain;">
+      </div>`;
+      document.body.appendChild(modal);
+    }
+
+    function openProofUpload(invId){
+      currentInvoiceId=invId;
+      const inv=invoices.find(i=>i.__backendId===invId);
+      if(!inv)return;
+
+      // Buat modal upload
+      const modal=document.createElement('div');
+      modal.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9998;display:flex;align-items:center;justify-content:center;';
+      modal.className='upload-modal';
+      
+      modal.innerHTML=`
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;">
+          <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            Upload Bukti Pembayaran
+          </div>
+          <div style="margin-bottom:16px;">
+            <input type="file" id="proofUploadInput" accept="image/*" style="display:none;">
+            <button style="width:100%;background:var(--surface2);border:1px dashed var(--border2);border-radius:var(--r);padding:20px;cursor:pointer;transition:all .15s;font-family:inherit;color:var(--text2);" onclick="document.getElementById('proofUploadInput').click();">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24" style="display:block;margin:0 auto 8px;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <div style="font-size:13px;font-weight:500;margin-bottom:4px;">Pilih Gambar</div>
+              <div style="font-size:11px;color:var(--text3);">PNG, JPG, atau GIF (Maks 5MB)</div>
+            </button>
+          </div>
+          <div id="proofUploadPreview" style="margin-bottom:16px;"></div>
+          <div style="display:flex;gap:10px;margin-top:16px;">
+            <button style="flex:1;background:transparent;border:1px solid var(--border);border-radius:var(--r);padding:8px 14px;color:var(--text2);cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;transition:all .15s;" onclick="this.closest('.upload-modal').remove();currentProofData=null;">Batal</button>
+            <button style="flex:1;background:var(--success);color:#fff;border:none;border-radius:var(--r);padding:8px 14px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;transition:all .15s;" onclick="confirmProofUpload();">Simpan Bukti</button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      
+      document.getElementById('proofUploadInput').addEventListener('change',(e)=>{
+        const file=e.target.files[0];
+        if(!file)return;
+        
+        if(file.size>5*1024*1024){
+          showToast('Ukuran file terlalu besar (Maks 5MB)',false);
+          return;
+        }
+        
+        const reader=new FileReader();
+        reader.onload=(evt)=>{
+          currentProofData=evt.target.result;
+          const preview=document.getElementById('proofUploadPreview');
+          preview.innerHTML=`<div style="border:1px solid var(--border);border-radius:var(--r);padding:8px;background:var(--bg);"><img src="${evt.target.result}" style="width:100%;max-height:200px;border-radius:6px;object-fit:contain;"><div style="margin-top:6px;font-size:11px;color:var(--success);">✓ ${file.name}</div></div>`;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function confirmProofUpload(){
+      if(!currentInvoiceId||!currentProofData)return;
+      
+      const inv=invoices.find(i=>i.__backendId===currentInvoiceId);
+      if(!inv)return;
+
+      const upd={...inv,payment_proof:currentProofData};
+      const idx=invoices.findIndex(i=>i.__backendId===currentInvoiceId);
+      if(idx>=0){ invoices[idx]=upd; localStorage.setItem('mrkz_invoices',JSON.stringify(invoices)); renderTracking(); }
+      showToast('Bukti pembayaran berhasil disimpan!',true);
+      document.querySelector('.upload-modal').remove();
+      currentProofData=null;
+    }
+
+    /* ════ DELETE INVOICE ════ */
+    function deleteInvoice(invId){
+      const inv=invoices.find(i=>i.__backendId===invId);
+      if(!inv)return;
+
+      // Buat konfirmasi inline
+      const confirmDiv=document.createElement('div');
+      confirmDiv.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9998;display:flex;align-items:center;justify-content:center;';
+      confirmDiv.innerHTML=`
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:400px;width:90%;">
+          <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>
+            </svg>
+            Hapus Invoice?
+          </div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6;">
+            Apakah Anda yakin ingin menghapus invoice <strong>${inv.invoice_number}</strong> atas nama <strong>${inv.student_name}</strong>?<br><br>
+            <span style="color:var(--warning);">⚠ Tindakan ini tidak dapat dibatalkan.</span>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button style="flex:1;background:transparent;border:1px solid var(--border);border-radius:var(--r);padding:8px 14px;color:var(--text2);cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;transition:all .15s;" onclick="this.closest('[style*=fixed]').remove();">Batal</button>
+            <button style="flex:1;background:var(--danger);color:#fff;border:none;border-radius:var(--r);padding:8px 14px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;transition:all .15s;" onclick="confirmDeleteInvoice('${invId}');this.closest('[style*=fixed]').remove();">Hapus</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(confirmDiv);
+    }
+
+    async function confirmDeleteInvoice(invId){
+      const inv=invoices.find(i=>i.__backendId===invId);
+      if(!inv)return;
+
+      invoices=invoices.filter(i=>i.__backendId!==invId);
+      localStorage.setItem('mrkz_invoices',JSON.stringify(invoices));
+      showToast('Invoice berhasil dihapus!',true);
+      renderTracking();
+    }
+
+    /* ════ PDF ════ */
+    function downloadInvoicePDF(invId){
+      const inv=invoices.find(i=>i.__backendId===invId);
+      if(!inv)return;
+
+      const st=STUDENTS.find(s=>s.id===inv.student_id);
+
+      // Rebuild items from saved invoice_items if present, else show total row
+      let items=[];
+      if(inv.invoice_items&&inv.invoice_items.length>0){
+        items=inv.invoice_items;
+      } else {
+        // fallback: single total row
+        items=[{label:'Layanan Bimbingan Belajar',type:'—',dur:'',price:inv.amount}];
+      }
+
+      const html=buildInvHTML({
+        invNum:  inv.invoice_number,
+        creator: inv.created_by,
+        notes:   inv.notes||'',
+        invDate: inv.created_date,
+        dueDate: inv.due_date,
+        pName:   st?st.parentName:inv.student_name,
+        sName:   inv.student_name,
+        jenjang: inv.student_jenjang||'',
+        guru:    st?st.guru:'',
+        items,
+        subtotal:inv.amount
+      });
+      _renderPDF(html, inv.invoice_number+'.pdf');
+    }
+
+    /* ════ ACTIONS ════ */
+    function resetForm(){
+      student=null;progs=[];regOn=false;prevOpen=false;
+      document.getElementById('studentSel').value='';
+      document.getElementById('notes').value='';
+      document.getElementById('regRow').classList.remove('on');
+      document.getElementById('regHint').textContent='Untuk siswa baru — Rp 150.000';
+      invCnt++;localStorage.setItem('mrkz_cnt',invCnt);updateInvNum();
+      setDate('inv',new Date());const d=new Date();d.setDate(d.getDate()+7);setDate('due',d);
+      renderStudentCard();renderProgList();
+      document.getElementById('previewPanel').classList.remove('open');
+      document.getElementById('previewToggleBtn').classList.remove('open');
+      const span=document.querySelector('#previewToggleBtn .ptb-left');
+      span.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4 11 11 11 11-11 11-11-4-11-11-11-11 11-11 11z"/><circle cx="12" cy="12" r="3"/></svg> Lihat Preview Invoice`;
+    }
+
+    function saveDraft(){
+      if(!student){showToast('Pilih siswa terlebih dahulu.',false);return;}
+      if(progs.length===0&&!regOn){showToast('Tambahkan minimal 1 item.',false);return;}
+      const data={invoiceNumber:document.getElementById('invoiceNumber').value,invDate:document.getElementById('invDateVal').value,dueDate:document.getElementById('dueDateVal').value,createdBy:document.getElementById('createdBy').value,student,progs,regOn,notes:document.getElementById('notes').value,status:'DRAFT',createdAt:new Date().toISOString()};
+      const saved=JSON.parse(localStorage.getItem('mrkz_drafts')||'[]');
+      saved.push(data);localStorage.setItem('mrkz_drafts',JSON.stringify(saved));
+      showToast('Invoice disimpan sebagai Draft.',true);
+    }
+
+    /* ════ MODALS ════ */
+    function closeModal(id){
+      document.getElementById(id).classList.remove('open');
+      if(id==='sendModal')resetSendForm();
+    }
+
+    /* ════ TOAST ════ */
+    function showToast(msg,success){
+      const t=document.createElement('div');
+      t.style.cssText=`position:fixed;bottom:20px;right:20px;background:${success?'var(--success)':'var(--danger)'};color:#fff;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;animation:slideIn .3s ease;`;
+      t.textContent=msg;
+      document.body.appendChild(t);
+      setTimeout(()=>{t.style.animation='slideOut .3s ease';setTimeout(()=>t.remove(),300);},3000);
+    }
+
+    /* ════ HELPERS ════ */
+    function rp(n){return 'Rp '+n.toLocaleString('id-ID');}
+    function isoDate(d){return d.toISOString().split('T')[0];}
+    function fmtLong(d){return d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});}
+    function fmtShort(s){if(!s)return '—';const d=new Date(s+'T00:00:00');return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});}
+
+    /* Init */
+    init();
+  </script>
+  <style>
+    @keyframes slideIn{from{transform:translateX(400px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+    @keyframes slideOut{from{transform:translateX(0);opacity:1;}to{transform:translateX(400px);opacity:0;}}
+    @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+    .spin{animation:spin 1s linear infinite;}
+  </style>
+ </body>
 </html>
