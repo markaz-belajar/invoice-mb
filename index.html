@@ -263,6 +263,9 @@ textarea{resize:vertical;min-height:80px;}
      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
      <span>Memuat...</span>
     </div>
+    <button onclick="openSettings()" title="Pengaturan" style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 9px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-family:inherit;transition:all .15s;">
+     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
     <button onclick="manualRefresh()" title="Refresh data dari Google Sheets" style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 9px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-family:inherit;transition:all .15s;">
      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
      <span class="btn-text-label">Refresh</span>
@@ -505,12 +508,12 @@ textarea{resize:vertical;min-height:80px;}
     // Sheet 1: Data Peserta (dari Google Form)
     // Kolom yang diharapkan: Nama Siswa, Jenjang, Tipe (Reguler/Private), Guru, Nama Orang Tua, No HP
     const SHEET1_ID = '1Jt2fv8NLgBxuzdXvw0ptSreCfGBlSuXvODcg5ia9CfA';
-    // Sheet 2: Program & Harga
-    // Kolom yang diharapkan: Jenjang, Program, Tipe, 1 Bulan, 3 Bulan, 6 Bulan
     const SHEET2_ID = '1w57hxwf_2n6l89mmLWZFggucsIty2CMqKpd6Ce95kFI';
     const SHEET1_URL = `https://docs.google.com/spreadsheets/d/${SHEET1_ID}/gviz/tq?tqx=out:csv`;
     const SHEET2_URL = `https://docs.google.com/spreadsheets/d/${SHEET2_ID}/gviz/tq?tqx=out:csv`;
-    const SYNC_INTERVAL_MS = 2 * 60 * 1000; // auto-refresh tiap 2 menit
+    const SYNC_INTERVAL_MS = 2 * 60 * 1000;
+    // URL Google Apps Script untuk upload bukti ke Drive (sudah hardcode)
+    let GAS_URL = 'https://script.google.com/macros/s/AKfycbzgHcwzD17q_ysgrprIOtM_GeISREzq_k_ZI_aEa3rrgY78nXCRtCbGCxTN84oiCl3U/exec';
 
     /* ════ DATA (diisi dari Google Sheets) ════ */
     let STUDENTS = [];
@@ -1014,6 +1017,7 @@ textarea{resize:vertical;min-height:80px;}
       <div class="inv-title-block">
         <div class="inv-title-word">Invoice</div>
         <div class="inv-num">${d.invNum}</div>
+        ${d.nomorInduk?`<div style="font-size:9px;color:rgba(255,255,255,.45);font-family:'Geist Mono',monospace;margin-top:3px;letter-spacing:.03em;">${d.nomorInduk}</div>`:''}
       </div>
     </div>
   </div>
@@ -1028,7 +1032,6 @@ textarea{resize:vertical;min-height:80px;}
         <div class="inv-plbl">Tagihan Kepada</div>
         <div class="inv-pname">${d.pName}</div>
         <div class="inv-psub">${d.sName}${d.jenjang?' · '+d.jenjang:''}${d.guru?' · Guru: '+d.guru:''}</div>
-        ${d.nomorInduk?`<div class="inv-psub" style="margin-top:2px;font-family:'Geist Mono',monospace;font-size:10px;">No. Induk: ${d.nomorInduk}</div>`:''}
         ${d.alamat?`<div class="inv-psub" style="margin-top:4px;">${d.alamat}</div>`:''}
       </div>
     </div>
@@ -1559,6 +1562,12 @@ ${finalHTML}
         showToast('Tidak ada bukti pembayaran untuk invoice ini.',false);
         return;
       }
+      // Jika URL Drive → buka tab baru langsung
+      if(inv.payment_proof.startsWith('http')){
+        window.open(inv.payment_proof, '_blank');
+        return;
+      }
+      // Fallback: base64 → tampilkan modal inline
       const modal=document.createElement('div');
       modal.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;';
       modal.innerHTML=`<div style="position:relative;background:#fff;border-radius:12px;padding:16px;max-width:90%;max-height:90%;">
@@ -1625,16 +1634,78 @@ ${finalHTML}
       });
     }
 
-    async function confirmProofUpload(){
-      if(!currentInvoiceId||!currentProofData)return;
-      
-      const inv=invoices.find(i=>i.__backendId===currentInvoiceId);
-      if(!inv)return;
+    /* ════ SETTINGS ════ */
+    function openSettings(){
+      document.getElementById('gasUrlInput').value = GAS_URL;
+      document.getElementById('gasUrlStatus').textContent = GAS_URL
+        ? '✓ URL tersimpan — upload ke Drive aktif'
+        : '';
+      document.getElementById('gasUrlStatus').style.color = 'var(--success)';
+      document.getElementById('settingsModal').classList.add('open');
+    }
 
-      const upd={...inv,payment_proof:currentProofData};
-      const idx=invoices.findIndex(i=>i.__backendId===currentInvoiceId);
-      if(idx>=0){ invoices[idx]=upd; localStorage.setItem('mrkz_invoices',JSON.stringify(invoices)); renderTracking(); }
-      showToast('Bukti pembayaran berhasil disimpan!',true);
+    function saveSettings(){
+      const url = document.getElementById('gasUrlInput').value.trim();
+      GAS_URL = url;
+      localStorage.setItem('mrkz_gas_url', url);
+      closeModal('settingsModal');
+      showToast(url ? 'Pengaturan disimpan! Upload ke Drive aktif.' : 'URL dikosongkan — upload ke localStorage.', !!url);
+    }
+
+    /* ════ UPLOAD BUKTI PEMBAYARAN → GOOGLE DRIVE ════ */
+    async function confirmProofUpload(){
+      if(!currentInvoiceId || !currentProofData) return;
+
+      const inv = invoices.find(i=>i.__backendId===currentInvoiceId);
+      if(!inv) return;
+
+      const saveBtn = document.querySelector('.upload-modal button[onclick="confirmProofUpload();"]');
+      if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent='Menyimpan...'; }
+
+      let proofUrl = currentProofData; // fallback: base64 lokal
+
+      // Upload ke Google Drive jika GAS_URL sudah diset
+      if(GAS_URL){
+        try {
+          // Siapkan nama file: bukti_INV-2026-05-003_1234567890.jpg
+          const invNum = (inv.invoice_number||'inv').replace(/\//g,'-');
+          const ext    = currentProofData.match(/data:image\/(\w+)/)?.[1] || 'jpg';
+          const fname  = `bukti_${invNum}_${Date.now()}.${ext}`;
+
+          const payload = {
+            base64:   currentProofData,
+            mimeType: currentProofData.split(';')[0].replace('data:',''),
+            filename: fname
+          };
+
+          const res  = await fetch(GAS_URL, {
+            method:   'POST',
+            redirect: 'follow',
+            headers:  {'Content-Type':'text/plain'}, // GAS butuh text/plain bukan json agar tidak pre-flight
+            body:     JSON.stringify(payload)
+          });
+          const json = await res.json();
+
+          if(json.success){
+            proofUrl = json.viewUrl;   // simpan URL Drive, bukan base64
+            showToast('Bukti berhasil diunggah ke Google Drive!', true);
+          } else {
+            showToast('Gagal upload ke Drive: '+(json.error||'unknown'), false);
+          }
+        } catch(err){
+          showToast('Error upload ke Drive: '+err.message+'. Disimpan lokal.', false);
+        }
+      }
+
+      const upd = {...inv, payment_proof: proofUrl};
+      const idx  = invoices.findIndex(i=>i.__backendId===currentInvoiceId);
+      if(idx>=0){
+        invoices[idx]=upd;
+        localStorage.setItem('mrkz_invoices',JSON.stringify(invoices));
+        renderTracking();
+      }
+
+      if(!GAS_URL) showToast('Bukti pembayaran disimpan lokal.', true);
       document.querySelector('.upload-modal').remove();
       currentProofData=null;
     }
@@ -1788,5 +1859,41 @@ ${finalHTML}
     @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
     .spin{animation:spin 1s linear infinite;}
   </style>
+
+  <!-- MODAL: SETTINGS -->
+  <div class="modal-overlay" id="settingsModal">
+   <div class="modal" style="max-width:480px;">
+    <div class="modal-title">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+     Pengaturan
+    </div>
+    <div class="modal-body">
+     <!-- Google Drive Upload via Apps Script -->
+     <div style="background:var(--surface2);border-radius:var(--r);padding:14px;margin-bottom:4px;">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+       Upload Bukti → Google Drive
+      </div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:10px;">
+       Bukti pembayaran akan otomatis tersimpan ke Google Drive Anda.<br>
+       Langkah setup (sekali saja):
+       <ol style="margin:6px 0 0 16px;color:var(--text3);font-size:11px;line-height:2;">
+         <li>Buka <strong style="color:var(--text);">script.google.com</strong> → New Project</li>
+         <li>Paste kode Apps Script yang sudah disiapkan</li>
+         <li>Deploy → Web App → Anyone → Copy URL</li>
+         <li>Paste URL di bawah ini</li>
+       </ol>
+      </div>
+      <label>URL Google Apps Script</label>
+      <input type="url" id="gasUrlInput" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:12px;font-family:'Geist Mono',monospace;">
+      <div id="gasUrlStatus" style="font-size:11px;margin-top:6px;"></div>
+     </div>
+    </div>
+    <div class="modal-actions">
+     <button class="btn btn-ghost" onclick="closeModal('settingsModal')">Batal</button>
+     <button class="btn btn-success" onclick="saveSettings()">Simpan</button>
+    </div>
+   </div>
+  </div>
  </body>
 </html>
