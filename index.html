@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Markaz Belajar — Invoice &amp; Tracking</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <style>
 :root {
@@ -476,9 +475,9 @@ textarea{resize:vertical;min-height:80px;}
      </div>
      <div class="modal-field" id="sendNoteField" style="display:none;"><label>Catatan (Opsional)</label> <textarea id="sendNote" placeholder="Masukkan catatan tambahan..."></textarea>
      </div>
-     <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;"><button class="btn btn-ghost" onclick="printCurrentInvoice()" style="width:100%;justify-content:center;">
+     <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;"><button id="printInvoiceBtn" class="btn btn-ghost" onclick="printCurrentInvoice()" style="width:100%;justify-content:center;">
        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9" /><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><rect x="6" y="14" width="12" height="8" />
-       </svg> Cetak PDF </button>
+       </svg> <span id="printInvoiceBtnLabel">Cetak PDF</span> </button>
      </div>
     </div>
     <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('sendModal')">Batal</button> <button class="btn btn-success" onclick="confirmSend()">Kirim</button>
@@ -1113,59 +1112,21 @@ textarea{resize:vertical;min-height:80px;}
       _renderPDF(html, document.getElementById('invoiceNumber').value+'.pdf', false);
     }
 
-    /* ════ PDF RENDER — ukuran mengikuti konten, bukan A4 ════ */
+    /* ════ PDF RENDER — print window approach (paling reliable) ════
+       Tidak pakai html2pdf/html2canvas sama sekali.
+       Buka jendela baru → inject CSS lengkap → window.print()
+       Browser native print: background color, font, layout semua benar.
+    ════ */
     function _renderPDF(invHTML, filename, paidStamp=false){
-      const wrapper = document.createElement('div');
-      wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;width:520px;background:#fff;font-family:Geist,system-ui,sans-serif;font-size:12px;line-height:1.5;color:#1c1c1c;';
-
-      const style = document.createElement('style');
-      style.textContent = `
-        .pdf-wrap *{box-sizing:border-box;margin:0;padding:0;}
-        .pdf-wrap .inv-doc{background:#fff;width:100%;color:#1c1c1c;font-family:Geist,system-ui,sans-serif;font-size:12px;position:relative;}
-        .pdf-wrap .inv-top{background:#1c1c1c;color:#fff;padding:20px 24px 14px;}
-        .pdf-wrap .inv-top-row{display:flex;justify-content:space-between;align-items:flex-start;}
-        .pdf-wrap .inv-brand{font-size:17px;font-weight:700;letter-spacing:-.02em;}
-        .pdf-wrap .inv-brand span{color:#8ab4f8;}
-        .pdf-wrap .inv-tagline{font-size:8px;color:rgba(255,255,255,.35);margin-top:2px;letter-spacing:.06em;text-transform:uppercase;}
-        .pdf-wrap .inv-title-block{text-align:right;}
-        .pdf-wrap .inv-title-word{font-size:20px;font-weight:300;letter-spacing:-.04em;opacity:.75;}
-        .pdf-wrap .inv-num{font-size:10px;font-weight:600;color:#8ab4f8;margin-top:2px;font-family:monospace;}
-        .pdf-wrap .inv-body{padding:16px 24px 20px;}
-        .pdf-wrap .inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}
-        .pdf-wrap .inv-plbl{font-size:8px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
-        .pdf-wrap .inv-pname{font-size:13px;font-weight:700;color:#1c1c1c;}
-        .pdf-wrap .inv-psub{font-size:10px;color:#555;margin-top:3px;line-height:1.55;}
-        .pdf-wrap .inv-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px;}
-        .pdf-wrap .inv-mb{background:#f4f5f8;border-radius:5px;padding:7px 10px;}
-        .pdf-wrap .inv-ml{font-size:8px;color:#aaa;text-transform:uppercase;letter-spacing:.06em;}
-        .pdf-wrap .inv-mv{font-size:11px;font-weight:600;color:#1c1c1c;margin-top:2px;}
-        .pdf-wrap .inv-tbl{width:100%;border-collapse:collapse;margin-bottom:10px;}
-        .pdf-wrap .inv-tbl th{background:#f4f5f8;padding:6px 10px;text-align:left;font-size:8px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.07em;}
-        .pdf-wrap .inv-tbl th:last-child{text-align:right;}
-        .pdf-wrap .inv-tbl td{padding:8px 10px;border-bottom:1px solid #eef0f4;font-size:11px;color:#1c1c1c;}
-        .pdf-wrap .inv-tbl td:last-child{text-align:right;font-family:monospace;}
-        .pdf-wrap .inv-tbl tr:last-child td{border-bottom:none;}
-        .pdf-wrap .inv-totals{background:#f4f5f8;border-radius:6px;padding:10px 13px;}
-        .pdf-wrap .inv-trow{display:flex;justify-content:space-between;font-size:11px;color:#666;padding:2px 0;}
-        .pdf-wrap .inv-tfinal{display:flex;justify-content:space-between;margin-top:7px;padding-top:7px;border-top:1px solid #dde0e8;}
-        .pdf-wrap .inv-tflbl{font-size:12px;font-weight:700;color:#1c1c1c;}
-        .pdf-wrap .inv-tfval{font-size:14px;font-weight:700;color:#1c1c1c;font-family:monospace;}
-        .pdf-wrap .inv-bank{margin-top:12px;padding:10px 13px;border:1px solid #eef0f4;border-radius:6px;}
-        .pdf-wrap .inv-bank-ttl{font-size:8px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;}
-        .pdf-wrap .inv-bank-row{display:flex;justify-content:space-between;font-size:10px;margin:3px 0;}
-        .pdf-wrap .inv-bname{color:#1c1c1c;font-weight:600;}
-        .pdf-wrap .inv-bnum{color:#4a7fe0;font-family:monospace;}
-        .pdf-wrap .inv-ban{font-size:9px;color:#aaa;margin-top:4px;}
-        .pdf-wrap .inv-notes{margin-top:9px;font-size:10px;color:#888;font-style:italic;}
-        .pdf-wrap .inv-created{margin-top:5px;font-size:9px;color:#aaa;}
-        .pdf-wrap .inv-footer{padding:9px 24px;background:#f4f5f8;text-align:center;font-size:9px;color:#aaa;}
-        /* ── PAID STAMP ── */
-        .pdf-wrap .paid-stamp{
-          position:absolute;top:50%;left:50%;
-          transform:translate(-50%,-50%) rotate(-30deg);
-          font-size:72px;font-weight:900;
-          color:rgba(220,38,38,0.18);
-          border:8px solid rgba(220,38,38,0.18);
+      // Sisipkan stempel LUNAS ke HTML string sebelum dikirim ke window
+      let finalHTML = invHTML;
+      if(paidStamp){
+        const stampHTML = `<div style="
+          position:absolute;top:45%;left:50%;
+          transform:translate(-50%,-50%) rotate(-28deg);
+          font-size:64px;font-weight:900;
+          color:rgba(220,38,38,0.20);
+          border:7px solid rgba(220,38,38,0.20);
           border-radius:10px;
           padding:4px 18px;
           letter-spacing:.12em;
@@ -1174,58 +1135,133 @@ textarea{resize:vertical;min-height:80px;}
           z-index:10;
           font-family:Arial,sans-serif;
           text-transform:uppercase;
+          user-select:none;
+        ">LUNAS</div>`;
+        // Sisipkan sebelum </div> penutup .inv-doc
+        finalHTML = finalHTML.replace('</div>\n  <div class="inv-footer">', stampHTML + '</div>\n  <div class="inv-footer">');
+        if(finalHTML === invHTML){
+          // fallback: sisipkan via string sederhana
+          finalHTML = invHTML.replace(/(<div class="inv-footer")/, stampHTML + '$1');
         }
-      `;
-      document.head.appendChild(style);
-
-      wrapper.className = 'pdf-wrap';
-      wrapper.innerHTML = invHTML;
-
-      // Sisipkan stempel PAID jika lunas
-      if(paidStamp){
-        const stamp = document.createElement('div');
-        stamp.className = 'paid-stamp';
-        stamp.textContent = 'LUNAS';
-        const doc = wrapper.querySelector('.inv-doc');
-        if(doc){ doc.style.position='relative'; doc.appendChild(stamp); }
       }
 
-      document.body.appendChild(wrapper);
+      const pw = window.open('', '_blank', 'width=620,height=800');
+      if(!pw){ showToast('Popup diblokir browser. Izinkan popup untuk mencetak.',false); return; }
 
-      setTimeout(()=>{
-        const el = wrapper.querySelector('.inv-doc');
-        // Ukur tinggi konten aktual setelah render
-        const contentH = el.offsetHeight;
-        const contentW = el.offsetWidth;
-        // Konversi px → mm (96dpi: 1px = 0.2646mm)
-        const mmW = Math.ceil(contentW * 0.2646) + 2;
-        const mmH = Math.ceil(contentH * 0.2646) + 2;
+      pw.document.write(`<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${filename.replace('.pdf','')}</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Reset ── */
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#fff;font-family:'Geist',system-ui,sans-serif;}
 
-        html2pdf().set({
-          margin:     0,
-          filename:   filename,
-          image:      {type:'jpeg', quality:0.99},
-          html2canvas:{
-            scale:           2.5,
-            backgroundColor: '#ffffff',
-            useCORS:         true,
-            logging:         false,
-            removeContainer: false,
-            width:           contentW,
-            height:          contentH,
-            windowWidth:     contentW,
-          },
-          jsPDF:{
-            orientation: 'portrait',
-            unit:        'mm',
-            format:      [mmW, mmH],   // ukuran custom = pas konten
-            compress:    true
-          }
-        }).from(el).save().then(()=>{
-          document.body.removeChild(wrapper);
-          document.head.removeChild(style);
-        });
-      }, 400);
+/* ── Wrapper ── */
+body{display:flex;justify-content:center;padding:24px 0 40px;}
+.inv-doc{background:#fff;border-radius:10px;overflow:hidden;
+  font-family:'Geist',sans-serif;color:#1c1c1c;font-size:11.5px;
+  width:520px;position:relative;}
+
+/* ── Header hitam ── */
+.inv-top{background:#1c1c1c !important;color:#fff !important;padding:20px 24px 16px;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.inv-top-row{display:flex;justify-content:space-between;align-items:flex-start;}
+.inv-brand{font-size:16px;font-weight:700;letter-spacing:-.03em;color:#fff;}
+.inv-brand span{color:#8ab4f8 !important;}
+.inv-tagline{font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;
+  letter-spacing:.06em;text-transform:uppercase;}
+.inv-title-block{text-align:right;}
+.inv-title-word{font-size:20px;font-weight:300;letter-spacing:-.04em;
+  opacity:.75;color:#fff;}
+.inv-num{font-size:10px;font-weight:600;color:#8ab4f8 !important;
+  font-family:'Geist Mono',monospace;margin-top:2px;}
+
+/* ── Body ── */
+.inv-body{padding:18px 24px;}
+.inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}
+.inv-plbl{font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;
+  letter-spacing:.08em;margin-bottom:3px;}
+.inv-pname{font-size:12px;font-weight:700;color:#1c1c1c;}
+.inv-psub{font-size:10px;color:#666;margin-top:2px;line-height:1.55;}
+
+/* ── Meta boxes ── */
+.inv-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.inv-mb{background:#f4f5f8 !important;border-radius:6px;padding:8px 10px;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.inv-ml{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.06em;}
+.inv-mv{font-size:11px;font-weight:600;color:#1c1c1c;margin-top:2px;}
+
+/* ── Tabel ── */
+.inv-tbl{width:100%;border-collapse:collapse;margin-bottom:12px;}
+.inv-tbl th{background:#f4f5f8 !important;padding:7px 10px;text-align:left;
+  font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;
+  letter-spacing:.07em;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.inv-tbl th:last-child,.inv-tbl td:last-child{text-align:right;}
+.inv-tbl td{padding:8px 10px;border-bottom:1px solid #eef0f4;
+  font-size:11px;color:#1c1c1c;}
+.inv-tbl tr:last-child td{border-bottom:none;}
+
+/* ── Totals ── */
+.inv-totals{background:#f4f5f8 !important;border-radius:8px;padding:12px 14px;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.inv-trow{display:flex;justify-content:space-between;font-size:11px;
+  color:#666;padding:2px 0;}
+.inv-tfinal{display:flex;justify-content:space-between;margin-top:8px;
+  padding-top:8px;border-top:1px solid #dde0e8;}
+.inv-tflbl{font-size:12px;font-weight:700;color:#1c1c1c;}
+.inv-tfval{font-size:14px;font-weight:700;color:#1c1c1c;
+  font-family:'Geist Mono',monospace;}
+
+/* ── Bank info ── */
+.inv-bank{margin-top:14px;padding:12px 14px;border:1px solid #eef0f4;border-radius:8px;}
+.inv-bank-ttl{font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;
+  letter-spacing:.08em;margin-bottom:8px;}
+.inv-bank-row{display:flex;justify-content:space-between;font-size:10px;margin:3px 0;}
+.inv-bname{color:#1c1c1c;font-weight:600;}
+.inv-bnum{color:#4a7fe0;font-family:'Geist Mono',monospace;}
+.inv-ban{font-size:9px;color:#aaa;margin-top:4px;}
+
+/* ── Notes & footer ── */
+.inv-notes{margin-top:10px;font-size:10px;color:#888;font-style:italic;}
+.inv-created{margin-top:6px;font-size:9px;color:#aaa;}
+.inv-footer{padding:10px 24px;background:#f4f5f8 !important;text-align:center;
+  font-size:9px;color:#aaa;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+/* ── PRINT ── */
+@page{
+  size: auto;
+  margin: 8mm 10mm;
+}
+@media print{
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
+  html,body{background:#fff !important;padding:0;margin:0;}
+  body{display:block;}
+  .inv-doc{width:100%;border-radius:0;box-shadow:none;}
+  .inv-top{background:#1c1c1c !important;}
+  .no-print{display:none !important;}
+}
+</style>
+</head>
+<body>
+${finalHTML}
+<div class="no-print" style="text-align:center;margin-top:24px;font-family:system-ui;font-size:13px;color:#888;">
+  <p style="margin-bottom:10px;">Klik <strong>Cetak / Save as PDF</strong> di dialog print browser Anda.</p>
+  <button onclick="window.print()" style="padding:10px 24px;background:#1c1c1c;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:system-ui;">🖨️ Cetak / Save PDF</button>
+</div>
+<script>
+  // Auto-print setelah font & gambar selesai load
+  window.addEventListener('load', function(){
+    setTimeout(function(){ window.print(); }, 800);
+  });
+<\/script>
+</body>
+</html>`);
+      pw.document.close();
     }
 
     /* ════ FINISH INVOICE ════ */
@@ -1388,6 +1424,19 @@ textarea{resize:vertical;min-height:80px;}
     /* ════ SEND MODAL ════ */
     function openSendModal(invId){
       currentInvoiceId=invId;
+      // Update label tombol cetak sesuai status invoice
+      const inv=invoices.find(i=>i.__backendId===invId);
+      const lbl=document.getElementById('printInvoiceBtnLabel');
+      if(lbl && inv){
+        const isLunas = inv.payment_status==='paid';
+        lbl.textContent = isLunas ? 'Cetak Invoice LUNAS' : 'Cetak PDF';
+        // Beri warna hijau kalau lunas agar lebih jelas
+        const btn=document.getElementById('printInvoiceBtn');
+        if(btn){
+          btn.style.color = isLunas ? 'var(--success)' : '';
+          btn.style.borderColor = isLunas ? 'var(--success)' : '';
+        }
+      }
       document.getElementById('sendModal').classList.add('open');
     }
 
@@ -1446,7 +1495,9 @@ textarea{resize:vertical;min-height:80px;}
     function printCurrentInvoice(){
       if(!currentInvoiceId)return;
       const inv=invoices.find(i=>i.__backendId===currentInvoiceId);
-      downloadInvoicePDF(currentInvoiceId);
+      if(!inv)return;
+      const isLunas = inv.payment_status==='paid';
+      downloadInvoicePDF(currentInvoiceId, isLunas);
     }
 
     /* ════ PAYMENT MODAL ════ */
