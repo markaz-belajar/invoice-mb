@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markaz Belajar — Invoice</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:         #212121;
+  --surface:    #2f2f2f;
+  --surface2:   #3a3a3a;
+  --border:     #424242;
+  --border2:    #525252;
+  --text:       #ececec;
+  --text2:      #a8a8a8;
+  --text3:      #6a6a6a;
+  --accent:     #8ab4f8;
+  --accent-dim: rgba(138,180,248,0.12);
+  --success:    #6ee7b7;
+  --success-dim:rgba(110,231,183,0.10);
+  --danger:     #f87171;
+  --danger-dim: rgba(248,113,113,0.10);
+  --r:8px; --rl:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:200;background:var(--bg);border-bottom:1px solid var(--border);padding:0 28px;height:52px;display:flex;align-items:center;justify-content:space-between;}
+.hdr-brand{display:flex;align-items:center;gap:10px;}
+.hdr-logo{width:26px;height:26px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;}
+.hdr-logo svg{width:14px;height:14px;color:#1a1a1a;}
+.hdr-name{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.02em;}
+.hdr-sub{font-size:12px;color:var(--text3);margin-left:6px;}
+.badge{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--success);background:var(--success-dim);padding:4px 10px;border-radius:99px;}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--success);}
+.badge.loading{color:var(--accent);background:var(--accent-dim);}
+.badge.error{color:var(--danger);background:var(--danger-dim);}
+
+/* LAYOUT */
+.wrap{max-width:1400px;margin:0 auto;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:calc(100vh - 52px);}
+
+@media (max-width:1024px){
+  .wrap{grid-template-columns:1fr;min-height:auto;}
+  .form-panel{padding:28px 24px;}
+  .preview-panel-wrapper{display:none;}
+  .preview-panel-wrapper.mobile-show{display:block;padding:0 24px 80px;}
+  .preview-toggle-btn{display:block;}
+}
+@media (min-width:1025px){
+  .form-panel{padding:28px 24px;border-right:1px solid var(--border);max-height:calc(100vh - 52px);overflow-y:auto;}
+  .preview-panel-wrapper{padding:28px 24px;max-height:calc(100vh - 52px);overflow-y:auto;}
+  .preview-toggle-btn{display:none;}
+}
+
+/* LOGO SPACE */
+.logo-area{background:var(--surface);border:2px dashed var(--border2);border-radius:var(--rl);padding:40px;text-align:center;margin-bottom:20px;cursor:pointer;transition:all .2s;}
+.logo-area:hover{border-color:var(--accent);background:var(--accent-dim);}
+.logo-area input[type="file"]{display:none;}
+.logo-area-text{color:var(--text3);font-size:13px;}
+.logo-area-icon{font-size:24px;margin-bottom:8px;}
+.logo-preview{width:100%;max-width:120px;margin:0 auto;height:auto;border-radius:6px;}
+.logo-area.has-logo{padding:20px;}
+
+/* SECTION */
+.sec{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px;margin-bottom:12px;}
+.sec-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:7px;margin-bottom:16px;}
+.sec-title svg{width:13px;height:13px;flex-shrink:0;}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+label{display:block;font-size:12px;color:var(--text2);margin-bottom:5px;font-weight:500;}
+
+/* INPUTS */
+input,select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:8px 11px;color:var(--text);font-family:inherit;font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none;}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+input[readonly]{color:var(--text2);cursor:default;}
+input:disabled,select:disabled{opacity:.5;cursor:not-allowed;}
+select option{background:var(--surface2);}
+
+/* STUDENT CARD */
+.student-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin-top:10px;}
+.sf-lbl{font-size:11px;color:var(--text3);margin-bottom:2px;}
+.sf-val{font-size:13px;color:var(--text);font-weight:500;}
+.student-empty{padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);color:var(--text3);font-size:13px;margin-top:10px;}
+
+/* REG FEE TOGGLE */
+.reg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:border-color .15s,background .15s;user-select:none;}
+.reg-row:hover{border-color:var(--border2);}
+.reg-row.on{border-color:var(--accent);background:var(--accent-dim);}
+.reg-left{display:flex;align-items:center;gap:10px;}
+.reg-left svg{width:15px;height:15px;color:var(--text3);}
+.reg-row.on .reg-left svg{color:var(--accent);}
+.reg-info{font-size:13px;font-weight:500;}
+.reg-hint{font-size:11px;color:var(--text3);}
+.reg-row.on .reg-hint{color:var(--accent);}
+.reg-price{font-size:13px;font-weight:600;color:var(--text2);font-family:'Geist Mono',monospace;}
+.reg-row.on .reg-price{color:var(--accent);}
+.sw{width:36px;height:20px;background:var(--border2);border-radius:99px;position:relative;transition:background .2s;flex-shrink:0;}
+.sw::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s;}
+.reg-row.on .sw{background:var(--accent);}
+.reg-row.on .sw::after{transform:translateX(16px);}
+
+/* PROGRAMS */
+.prog-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px;}
+.prog-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.prog-num{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
+.prog-price{font-size:13px;font-weight:600;color:var(--accent);font-family:'Geist Mono',monospace;}
+.empty-state{text-align:center;padding:28px;color:var(--text3);font-size:13px;border:1px dashed var(--border);border-radius:var(--r);}
+.empty-state svg{width:24px;height:24px;margin:0 auto 8px;display:block;opacity:.25;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;border:none;outline:none;transition:all .15s;white-space:nowrap;}
+.btn svg{width:14px;height:14px;flex-shrink:0;}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+.btn-accent{background:var(--accent);color:#1a1a1a;}
+.btn-accent:hover{opacity:.9;}
+.btn-success{background:var(--success-dim);color:var(--success);border:1px solid rgba(110,231,183,.2);}
+.btn-success:hover{background:rgba(110,231,183,.2);}
+.btn-icon{background:none;border:none;padding:5px;border-radius:6px;color:var(--text3);cursor:pointer;transition:all .15s;display:flex;align-items:center;}
+.btn-icon:hover{background:var(--danger-dim);color:var(--danger);}
+.btn-dashed{width:100%;background:transparent;border:1px dashed var(--border2);color:var(--text3);border-radius:var(--r);padding:10px;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;font-size:13px;cursor:pointer;transition:all .15s;}
+.btn-dashed:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.btn-dashed svg{width:14px;height:14px;}
+.btn-dashed:disabled{opacity:.5;cursor:not-allowed;border-color:var(--border);}
+.btn-add-program{width:100%;margin-top:8px;}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.actions .btn{flex:1;justify-content:center;min-width:90px;}
+
+/* PREVIEW TOGGLE */
+.preview-toggle-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;font-family:inherit;color:var(--text2);font-size:13px;transition:all .15s;margin-top:12px;}
+.preview-toggle-btn:hover{border-color:var(--border2);color:var(--text);}
+.preview-toggle-btn svg{width:14px;height:14px;transition:transform .3s;}
+.preview-toggle-btn.open svg.chevron{transform:rotate(180deg);}
+.ptb-left{display:flex;align-items:center;gap:8px;}
+
+/* PREVIEW PANEL */
+.preview-panel{overflow:hidden;max-height:0;opacity:0;pointer-events:none;transition:max-height .4s ease,opacity .3s,padding .3s;padding:0 0;}
+.preview-panel.open{max-height:3000px;opacity:1;pointer-events:auto;padding:16px 0 0;}
+.preview-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px;}
+.preview-lbl{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:16px;display:flex;align-items:center;gap:7px;}
+.preview-lbl svg{width:13px;height:13px;}
+
+/* TOAST NOTIFICATION */
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:13px;z-index:999;display:flex;align-items:center;gap:8px;animation:slideIn .3s ease;}
+.toast.success{border-color:rgba(110,231,183,.3);background:var(--success-dim);}
+.toast.error{border-color:rgba(248,113,113,.3);background:var(--danger-dim);}
+@keyframes slideIn{from{transform:translateX(400px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+/* INVOICE DOCUMENT */
+.inv-doc{background:#fff;border-radius:10px;overflow:hidden;font-family:'Geist',sans-serif;color:#1c1c1c;font-size:11.5px;width:100%;max-width:520px;margin:0 auto;}
+.inv-top{background:#1c1c1c;color:#fff;padding:20px 24px 16px;}
+.inv-top-row{display:flex;justify-content:space-between;align-items:flex-start;}
+.inv-brand{font-size:16px;font-weight:700;letter-spacing:-.03em;}
+.inv-brand span{color:#8ab4f8;}
+.inv-tagline{font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;letter-spacing:.06em;text-transform:uppercase;}
+.inv-title-block{text-align:right;}
+.inv-title-word{font-size:20px;font-weight:300;letter-spacing:-.04em;opacity:.75;}
+.inv-num{font-size:10px;font-weight:600;color:#8ab4f8;font-family:'Geist Mono',monospace;margin-top:2px;}
+.inv-body{padding:18px 24px;}
+.inv-logo-area{text-align:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #eef0f4;}
+.inv-logo-img{max-width:100px;max-height:60px;display:inline-block;}
+.inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}
+.inv-plbl{font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+.inv-pname{font-size:12px;font-weight:700;color:#1c1c1c;}
+.inv-psub{font-size:10px;color:#666;margin-top:2px;line-height:1.55;}
+.inv-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.inv-mb{background:#f4f5f8;border-radius:6px;padding:8px 10px;}
+.inv-ml{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.06em;}
+.inv-mv{font-size:11px;font-weight:600;color:#1c1c1c;margin-top:2px;}
+.inv-tbl{width:100%;border-collapse:collapse;margin-bottom:12px;}
+.inv-tbl th{background:#f4f5f8;padding:7px 10px;text-align:left;font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.07em;}
+.inv-tbl th:last-child,.inv-tbl td:last-child{text-align:right;}
+.inv-tbl td{padding:8px 10px;border-bottom:1px solid #eef0f4;font-size:11px;color:#1c1c1c;}
+.inv-tbl tr:last-child td{border-bottom:none;}
+.inv-totals{background:#f4f5f8;border-radius:8px;padding:12px 14px;}
+.inv-trow{display:flex;justify-content:space-between;font-size:11px;color:#666;padding:2px 0;}
+.inv-tfinal{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #dde0e8;}
+.inv-tflbl{font-size:12px;font-weight:700;color:#1c1c1c;}
+.inv-tfval{font-size:14px;font-weight:700;color:#1c1c1c;font-family:'Geist Mono',monospace;}
+.inv-bank{margin-top:14px;padding:12px 14px;border:1px solid #eef0f4;border-radius:8px;}
+.inv-bank-ttl{font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.inv-bank-row{display:flex;justify-content:space-between;font-size:10px;margin:3px 0;}
+.inv-bname{color:#1c1c1c;font-weight:600;}
+.inv-bnum{color:#4a7fe0;font-family:'Geist Mono',monospace;}
+.inv-ban{font-size:9px;color:#aaa;margin-top:4px;}
+.inv-notes{margin-top:10px;font-size:10px;color:#888;font-style:italic;}
+.inv-created{margin-top:6px;font-size:9px;color:#aaa;}
+.inv-footer{padding:10px 24px;background:#f4f5f8;text-align:center;font-size:9px;color:#aaa;}
+
+/* SETUP CONFIG */
+.config-panel{background:var(--surface);border:2px dashed var(--border2);border-radius:var(--rl);padding:20px;margin-bottom:20px;}
+.config-title{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:12px;}
+.config-note{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:8px;}
+.config-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:8px 11px;color:var(--text);font-family:'Geist Mono',monospace;font-size:11px;}
+.config-btn{margin-top:8px;}
+
+@media (max-width:1024px){
+  .wrap{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    </div>
+    <span class="hdr-name">Markaz Belajar</span>
+    <span class="hdr-sub">Invoice</span>
+  </div>
+  <div class="badge" id="statusBadge"><div class="badge-dot"></div>Siap</div>
+</header>
+
+<div class="wrap">
+  
+  <!-- LEFT PANEL: FORM -->
+  <div class="form-panel">
+    
+    <!-- Config Section (untuk setup awal) -->
+    <div class="config-panel" id="configPanel" style="display:none;">
+      <div class="config-title">⚙️ Setup Google Sheets</div>
+      <div class="config-note">
+        Untuk mengaktifkan sinkronisasi, masukkan URL deployment Google Apps Script:
+      </div>
+      <input type="text" class="config-input" id="apiUrl" placeholder="https://script.google.com/macros/d/YOUR_SCRIPT_ID/usercache" />
+      <button type="button" class="btn btn-accent config-btn" onclick="saveApiUrl()">Simpan & Lanjutkan</button>
+      <div class="config-note" style="margin-top:12px;font-size:11px;">
+        Belum punya URL? Buka SETUP_GUIDE_LENGKAP.md untuk panduan lengkap.
+      </div>
+    </div>
+
+    <!-- Logo Upload Area -->
+    <div class="logo-area" id="logoArea" onclick="document.getElementById('logoInput').click()">
+      <input type="file" id="logoInput" accept="image/*">
+      <div class="logo-area-icon">📷</div>
+      <div class="logo-area-text">Klik untuk upload logo Markaz Belajar</div>
+      <div class="logo-area-text" style="font-size:11px;color:var(--text3);margin-top:4px;">(JPG, PNG, optimal 120x60px)</div>
+    </div>
+
+    <!-- Invoice Info -->
+    <div class="sec">
+      <div class="sec-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+        Informasi Invoice
+      </div>
+      <div class="g2" style="margin-bottom:12px;">
+        <div>
+          <label>Nomor Invoice</label>
+          <input id="invoiceNumber" type="text" readonly>
+        </div>
+        <div>
+          <label>Dibuat Oleh</label>
+          <select id="createdBy">
+            <option>Elis</option>
+            <option>Yessi</option>
+            <option>Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="g2">
+        <div>
+          <label>Tanggal Invoice</label>
+          <input type="date" id="invoiceDate">
+        </div>
+        <div>
+          <label>Jatuh Tempo</label>
+          <input type="date" id="dueDate">
+        </div>
+      </div>
+    </div>
+
+    <!-- Siswa -->
+    <div class="sec">
+      <div class="sec-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Tagihan Kepada
+      </div>
+      <label>Pilih Siswa</label>
+      <select id="studentSelect" onchange="onSelectStudent()">
+        <option value="">-- Loading... --</option>
+      </select>
+      <div id="studentInfo" class="student-empty">Pilih siswa untuk melihat detail</div>
+    </div>
+
+    <!-- Registration Fee -->
+    <div class="sec">
+      <div class="sec-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8m-3-3h6"/></svg>
+        Biaya Tambahan
+      </div>
+      <div class="reg-row" id="regFeeRow" onclick="toggleRegFee()">
+        <div class="reg-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <div>
+            <div class="reg-info">Biaya Pendaftaran</div>
+            <div class="reg-hint">(Dikenakan sekali saat pertama kali daftar)</div>
+          </div>
+        </div>
+        <div>
+          <div class="reg-price" id="regPrice">Rp 150.000</div>
+          <div class="sw"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Programs -->
+    <div class="sec">
+      <div class="sec-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z"/><path d="M9 3h6v4H9z"/></svg>
+        Produk / Program
+      </div>
+      <div id="programsContainer"></div>
+      <button type="button" class="btn btn-dashed btn-add-program" onclick="addProgram()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Tambah Program
+      </button>
+    </div>
+
+    <!-- Actions -->
+    <div class="sec">
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" onclick="resetForm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36M20.49 15a9 9 0 0 1-14.85 3.36"/></svg>
+          Reset
+        </button>
+        <button type="button" class="btn btn-success" onclick="saveDraft()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Simpan
+        </button>
+        <button type="button" class="btn btn-accent" onclick="downloadPDF()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </button>
+        <button type="button" class="btn btn-success" onclick="sendWhatsApp()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          WhatsApp
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL: PREVIEW -->
+  <div class="preview-panel-wrapper" id="previewWrapper">
+    <button type="button" class="preview-toggle-btn" onclick="togglePreview()" id="toggleBtn">
+      <div class="ptb-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Preview Invoice
+      </div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="preview-panel" id="previewPanel">
+      <div class="preview-inner">
+        <div class="preview-lbl">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          Preview Invoice
+        </div>
+        <div id="previewContent" style="text-align:center;color:var(--text3);font-size:13px;">Buat invoice untuk melihat preview</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div id="toastContainer"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════════════════════
+
+let API_URL = localStorage.getItem('markaz_api_url') || '';
+const CONFIG = {
+  regFee: 150000,
+  banks: [
+    { name: 'Dana', num: '0838-665-830-82' },
+    { name: 'BCA', num: '651-065-92-26' }
+  ],
+  bankOwner: 'Elis Rosmiati'
+};
+
+let PROGRAMS_DATA = {};
+let STUDENTS = [];
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+let state = {
+  programs: [],
+  regFeeActive: false,
+  logoData: null,
+  invoiceNo: 1,
+  currentStudent: null
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // Check if API URL is set
+  if (!API_URL) {
+    document.getElementById('configPanel').style.display = 'block';
+    showToast('Setup diperlukan: Masukkan URL deployment Google Apps Script', 'error');
+    return;
+  }
+
+  // Initialize
+  await loadStudents();
+  await loadPrograms();
+  setDefaultDates();
+  updateInvoiceNum();
+  renderPrograms();
+  updatePreview();
+
+  // Logo upload handler
+  document.getElementById('logoInput').addEventListener('change', handleLogoUpload);
+
+  // Responsive preview
+  if (window.innerWidth <= 1024) {
+    document.getElementById('previewWrapper').classList.add('mobile-show');
+  }
+  window.addEventListener('resize', () => {
+    if (window.innerWidth <= 1024) {
+      document.getElementById('previewPanel').classList.remove('open');
+      document.getElementById('toggleBtn').classList.remove('open');
+    }
+  });
+});
+
+function saveApiUrl() {
+  const url = document.getElementById('apiUrl').value.trim();
+  if (!url) {
+    showToast('URL tidak boleh kosong', 'error');
+    return;
+  }
+  localStorage.setItem('markaz_api_url', url);
+  API_URL = url;
+  document.getElementById('configPanel').style.display = 'none';
+  location.reload();
+}
+
+function updateStatusBadge(status, type = 'success') {
+  const badge = document.getElementById('statusBadge');
+  badge.className = 'badge';
+  if (type === 'loading') badge.classList.add('loading');
+  if (type === 'error') badge.classList.add('error');
+  badge.innerHTML = (type === 'loading' ? '⏳ ' : '✓ ') + status;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GOOGLE SHEETS API CALLS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function callAPI(action, data = {}) {
+  try {
+    updateStatusBadge('Loading...', 'loading');
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action, ...data })
+    });
+    const result = await response.json();
+    updateStatusBadge('Siap', 'success');
+    return result;
+  } catch(err) {
+    console.error('API Error:', err);
+    updateStatusBadge('Error', 'error');
+    showToast('Error: ' + err.message, 'error');
+    return { success: false, error: err.message };
+  }
+}
+
+async function loadStudents() {
+  const result = await callAPI('getStudents');
+  if (result.success && result.data) {
+    STUDENTS = result.data;
+    populateStudents();
+  }
+}
+
+async function loadPrograms() {
+  const result = await callAPI('getPrograms');
+  if (result.success && result.data) {
+    PROGRAMS_DATA = result.data;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STUDENTS MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function populateStudents() {
+  const select = document.getElementById('studentSelect');
+  select.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+  STUDENTS.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = `${s.name} (${s.jenjang} - ${s.program})`;
+    select.appendChild(opt);
+  });
+}
+
+function onSelectStudent() {
+  const id = document.getElementById('studentSelect').value;
+  const student = STUDENTS.find(s => s.id == id);
+  if (!student) {
+    document.getElementById('studentInfo').className = 'student-empty';
+    document.getElementById('studentInfo').innerHTML = 'Pilih siswa untuk melihat detail';
+    state.currentStudent = null;
+    return;
+  }
+
+  state.currentStudent = student;
+  document.getElementById('studentInfo').className = 'student-card';
+  document.getElementById('studentInfo').innerHTML = `
+    <div><div class="sf-lbl">Jenjang</div><div class="sf-val">${student.jenjang}</div></div>
+    <div><div class="sf-lbl">Program</div><div class="sf-val">${student.program}</div></div>
+    <div><div class="sf-lbl">Tipe</div><div class="sf-val">${student.type === 'reguler' ? 'Reguler' : 'Private'}</div></div>
+    <div><div class="sf-lbl">Guru</div><div class="sf-val">${student.guru}</div></div>
+    <div><div class="sf-lbl">Parent</div><div class="sf-val">${student.parentName}</div></div>
+    <div><div class="sf-lbl">No. HP</div><div class="sf-val">${student.parentPhone}</div></div>
+  `;
+  updatePreview();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function setDefaultDates() {
+  const today = new Date();
+  const dueDate = new Date(today);
+  dueDate.setDate(dueDate.getDate() + 30);
+  
+  document.getElementById('invoiceDate').valueAsDate = today;
+  document.getElementById('dueDate').valueAsDate = dueDate;
+}
+
+function formatIDDate(date) {
+  if (!date) return '-';
+  if (typeof date === 'string') date = new Date(date + 'T00:00:00');
+  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// REGISTRATION FEE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function toggleRegFee() {
+  state.regFeeActive = !state.regFeeActive;
+  document.getElementById('regFeeRow').classList.toggle('on', state.regFeeActive);
+  updatePreview();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PROGRAMS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function addProgram() {
+  if (!state.currentStudent) {
+    showToast('Pilih siswa terlebih dahulu!', 'error');
+    return;
+  }
+
+  const student = state.currentStudent;
+  state.programs.push({
+    id: Date.now(),
+    program: student.program,
+    type: student.type,
+    jenjang: student.jenjang,
+    duration: 1,
+    price: PROGRAMS_DATA[student.jenjang]?.[student.program]?.[student.type]?.[1] || 0
+  });
+
+  renderPrograms();
+  updatePreview();
+}
+
+function renderPrograms() {
+  const cont = document.getElementById('programsContainer');
+  if (state.programs.length === 0) {
+    cont.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20m10-10H2"/></svg>Belum ada program. Klik "Tambah Program" untuk mulai</div>';
+    return;
+  }
+
+  cont.innerHTML = state.programs.map((p, i) => {
+    const pricesByDuration = PROGRAMS_DATA[p.jenjang]?.[p.program]?.[p.type] || {};
+    return `
+      <div class="prog-item">
+        <div class="prog-hdr">
+          <div class="prog-num">Program ${i + 1}</div>
+          <button type="button" class="btn-icon" onclick="removeProgram(${p.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          </button>
+        </div>
+        <div class="g3" style="margin-bottom:12px;">
+          <div>
+            <label>Program</label>
+            <select disabled style="opacity:.6;">
+              <option>${p.program}</option>
+            </select>
+          </div>
+          <div>
+            <label>Tipe</label>
+            <select disabled style="opacity:.6;">
+              <option>${p.type === 'reguler' ? 'Reguler' : 'Private'}</option>
+            </select>
+          </div>
+          <div>
+            <label>Durasi</label>
+            <select onchange="changeDuration(${p.id}, this.value)">
+              <option value="1" ${p.duration == 1 ? 'selected' : ''}>1 Bulan</option>
+              <option value="3" ${p.duration == 3 ? 'selected' : ''}>3 Bulan</option>
+              <option value="6" ${p.duration == 6 ? 'selected' : ''}>6 Bulan</option>
+            </select>
+          </div>
+        </div>
+        <div style="text-align:right;font-size:13px;color:var(--text2);font-family:'Geist Mono';font-weight:600;">
+          Rp ${(pricesByDuration[p.duration] || 0).toLocaleString('id-ID')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function changeDuration(id, duration) {
+  const prog = state.programs.find(p => p.id === id);
+  if (prog) {
+    prog.duration = parseInt(duration);
+    prog.price = PROGRAMS_DATA[prog.jenjang]?.[prog.program]?.[prog.type]?.[prog.duration] || 0;
+    renderPrograms();
+    updatePreview();
+  }
+}
+
+function removeProgram(id) {
+  state.programs = state.programs.filter(p => p.id !== id);
+  renderPrograms();
+  updatePreview();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INVOICE NUMBER & CALCULATIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function updateInvoiceNum() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const num = String(state.invoiceNo).padStart(3, '0');
+  document.getElementById('invoiceNumber').value = `INV/${year}/${month}/${num}`;
+}
+
+function calculateTotals() {
+  let subtotal = 0;
+  state.programs.forEach(p => {
+    subtotal += p.price;
+  });
+  if (state.regFeeActive) {
+    subtotal += CONFIG.regFee;
+  }
+  return { subtotal, tax: 0, total: subtotal };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PREVIEW
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function updatePreview() {
+  const student = state.currentStudent;
+  const { subtotal, tax, total } = calculateTotals();
+  const invDate = document.getElementById('invoiceDate').value;
+  const dueDate = document.getElementById('dueDate').value;
+  const createdBy = document.getElementById('createdBy').value;
+  const invoiceNum = document.getElementById('invoiceNumber').value;
+
+  if (!student || state.programs.length === 0) {
+    document.getElementById('previewContent').innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px;">Buat invoice untuk melihat preview</div>';
+    return;
+  }
+
+  let itemsHtml = '';
+  state.programs.forEach(p => {
+    itemsHtml += `
+      <tr>
+        <td>${p.program}</td>
+        <td style="text-align:center;">${p.duration} Bulan</td>
+        <td style="text-align:right;">Rp ${p.price.toLocaleString('id-ID')}</td>
+      </tr>
+    `;
+  });
+  if (state.regFeeActive) {
+    itemsHtml += `
+      <tr>
+        <td>Biaya Pendaftaran</td>
+        <td style="text-align:center;">1x</td>
+        <td style="text-align:right;">Rp ${CONFIG.regFee.toLocaleString('id-ID')}</td>
+      </tr>
+    `;
+  }
+
+  const logoHtml = state.logoData ? `<div class="inv-logo-area"><img class="inv-logo-img" src="${state.logoData}" alt="Logo"></div>` : '';
+
+  const invDoc = `
+    <div class="inv-doc">
+      <div class="inv-top">
+        <div class="inv-top-row">
+          <div>
+            <div class="inv-brand">📚 <span>MARKAZ</span></div>
+            <div class="inv-tagline">Invoice System</div>
+          </div>
+          <div class="inv-title-block">
+            <div class="inv-title-word">Invoice</div>
+            <div class="inv-num">${invoiceNum}</div>
+          </div>
+        </div>
+      </div>
+      <div class="inv-body">
+        ${logoHtml}
+        <div class="inv-parties">
+          <div>
+            <div class="inv-plbl">Dari</div>
+            <div class="inv-pname">Markaz Belajar</div>
+            <div class="inv-psub">Jl.Raya Sirih - Rt 01 Rw 05, des.Kamasan<br/>kec.Cinangka, Kab.serang - Banten<br/>Indonesia<br/>Telp: 08366583082<br/>Email: markaz.belajar@gmail.com</div>
+          </div>
+          <div>
+            <div class="inv-plbl">Tagihan Kepada</div>
+            <div class="inv-pname">${student.name}</div>
+            <div class="inv-psub">${student.parentName}<br/>${student.parentPhone}<br/>Program: ${student.program}<br/>Guru: ${student.guru}</div>
+          </div>
+        </div>
+        <div class="inv-meta">
+          <div class="inv-mb">
+            <div class="inv-ml">Referensi</div>
+            <div class="inv-mv">${invoiceNum}</div>
+          </div>
+          <div class="inv-mb">
+            <div class="inv-ml">Tanggal</div>
+            <div class="inv-mv">${formatIDDate(invDate)}</div>
+          </div>
+          <div class="inv-mb">
+            <div class="inv-ml">Jatuh Tempo</div>
+            <div class="inv-mv">${formatIDDate(dueDate)}</div>
+          </div>
+        </div>
+        <table class="inv-tbl">
+          <thead>
+            <tr>
+              <th>Produk / Program</th>
+              <th style="text-align:center;">Durasi</th>
+              <th style="text-align:right;">Harga</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+        </table>
+        <div class="inv-totals">
+          <div class="inv-trow">
+            <span>Subtotal</span>
+            <span>Rp ${subtotal.toLocaleString('id-ID')}</span>
+          </div>
+          <div class="inv-trow">
+            <span>Pajak (0%)</span>
+            <span>Rp ${tax.toLocaleString('id-ID')}</span>
+          </div>
+          <div class="inv-tfinal">
+            <span class="inv-tflbl">TOTAL</span>
+            <span class="inv-tfval">Rp ${total.toLocaleString('id-ID')}</span>
+          </div>
+        </div>
+        <div class="inv-bank">
+          <div class="inv-bank-ttl">Metode Pembayaran</div>
+          ${CONFIG.banks.map(b => `
+            <div class="inv-bank-row">
+              <span class="inv-bname">${b.name}</span>
+              <span class="inv-bnum">${b.num}</span>
+            </div>
+          `).join('')}
+          <div class="inv-ban">Atas Nama: ${CONFIG.bankOwner}</div>
+        </div>
+        <div class="inv-notes">Terima kasih telah mempercayai Markaz Belajar</div>
+        <div class="inv-created">Dibuat oleh: ${createdBy}</div>
+      </div>
+      <div class="inv-footer">Markaz Belajar — Invoice System</div>
+    </div>
+  `;
+
+  document.getElementById('previewContent').innerHTML = invDoc;
+}
+
+function togglePreview() {
+  const panel = document.getElementById('previewPanel');
+  const btn = document.getElementById('toggleBtn');
+  panel.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LOGO
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function handleLogoUpload(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      state.logoData = evt.target.result;
+      const logoArea = document.getElementById('logoArea');
+      logoArea.innerHTML = `<img class="logo-preview" src="${state.logoData}" alt="Logo"><div style="margin-top:8px;"><button type="button" class="btn btn-ghost" style="font-size:11px;padding:5px 10px;" onclick="removeLogo()">Hapus Logo</button></div>`;
+      logoArea.classList.add('has-logo');
+      updatePreview();
+      showToast('Logo berhasil diupload', 'success');
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function removeLogo() {
+  state.logoData = null;
+  const logoArea = document.getElementById('logoArea');
+  logoArea.innerHTML = `<div class="logo-area-icon">📷</div><div class="logo-area-text">Klik untuk upload logo Markaz Belajar</div><div class="logo-area-text" style="font-size:11px;color:var(--text3);margin-top:4px;">(JPG, PNG, optimal 120x60px)</div>`;
+  logoArea.classList.remove('has-logo');
+  updatePreview();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function resetForm() {
+  state.programs = [];
+  state.regFeeActive = false;
+  document.getElementById('studentSelect').value = '';
+  document.getElementById('createdBy').value = 'Elis';
+  document.getElementById('regFeeRow').classList.remove('on');
+  setDefaultDates();
+  state.invoiceNo++;
+  updateInvoiceNum();
+  renderPrograms();
+  onSelectStudent();
+  updatePreview();
+  showToast('Form direset', 'success');
+}
+
+async function saveDraft() {
+  if (!state.currentStudent || state.programs.length === 0) {
+    showToast('Lengkapi invoice terlebih dahulu!', 'error');
+    return;
+  }
+
+  const { subtotal, total } = calculateTotals();
+  const invoiceData = {
+    action: 'saveInvoice',
+    invoiceNumber: document.getElementById('invoiceNumber').value,
+    studentId: state.currentStudent.id,
+    studentName: state.currentStudent.name,
+    invoiceDate: document.getElementById('invoiceDate').value,
+    dueDate: document.getElementById('dueDate').value,
+    programs: state.programs,
+    regFeeActive: state.regFeeActive,
+    subtotal: subtotal,
+    tax: 0,
+    total: total,
+    createdBy: document.getElementById('createdBy').value,
+    notes: ''
+  };
+
+  const result = await callAPI('saveInvoice', invoiceData);
+  if (result.success) {
+    showToast('✓ Invoice berhasil disimpan ke Google Sheets!', 'success');
+    resetForm();
+  } else {
+    showToast('Error: ' + (result.message || 'Unknown error'), 'error');
+  }
+}
+
+function downloadPDF() {
+  if (!state.currentStudent || state.programs.length === 0) {
+    showToast('Lengkapi invoice terlebih dahulu!', 'error');
+    return;
+  }
+
+  const element = document.getElementById('previewContent').querySelector('.inv-doc');
+  const opt = {
+    margin: 5,
+    filename: document.getElementById('invoiceNumber').value + '.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+  };
+
+  html2pdf().set(opt).from(element).save();
+  showToast('✓ PDF berhasil didownload', 'success');
+}
+
+function sendWhatsApp() {
+  if (!state.currentStudent || state.programs.length === 0) {
+    showToast('Lengkapi invoice terlebih dahulu!', 'error');
+    return;
+  }
+
+  const student = state.currentStudent;
+  const { total } = calculateTotals();
+  const invoiceNum = document.getElementById('invoiceNumber').value;
+  const dueDate = document.getElementById('dueDate').value;
+
+  const message = `Assalamu'alaikum Bu ${student.parentName},\n\nInvoice untuk ${student.name} sudah siap:\n\n*Referensi:* ${invoiceNum}\n*Total:* Rp ${total.toLocaleString('id-ID')}\n*Jatuh Tempo:* ${formatIDDate(dueDate)}\n\n*Metode Pembayaran:*\n💳 Dana: 0838-665-830-82\n🏦 BCA: 651-065-92-26\n(A.n Elis Rosmiati)\n\nTerima kasih!`;
+
+  const phone = student.parentPhone.replace(/[^0-9]/g, '');
+  const whatsappLink = `https://wa.me/62${phone.substring(1)}?text=${encodeURIComponent(message)}`;
+  window.open(whatsappLink, '_blank');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UTILITY
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.animation = 'slideOut .3s ease forwards';
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// On page load, try to load data
+document.addEventListener('DOMContentLoaded', () => {
+  if (API_URL) {
+    loadStudents();
+    loadPrograms();
+  }
+});
+</script>
+</body>
+</html>
