@@ -575,6 +575,40 @@ textarea{resize:vertical;min-height:80px;}
       return rows.filter(r=>r.some(c=>c.trim()));
     }
 
+    /* ════ PARSE PROGRAM KELAS ════
+       Contoh nilai: "Perschool - Calistung", "Elementary - MTK"
+       → jenjang: "Preschool", program: "Calistung"
+    */
+    function parseProgramKelas(val){
+      if(!val)return{jenjang:'Elementary',program:''};
+      const parts=val.split('-');
+      let jenjang=(parts[0]||'').trim();
+      const program=(parts[1]||'').trim();
+      // Normalkan typo "Perschool" → "Preschool"
+      if(jenjang.toLowerCase().includes('preschool')||jenjang.toLowerCase().includes('perschool'))
+        jenjang='Preschool';
+      else if(jenjang.toLowerCase().includes('elementary')||jenjang.toLowerCase().includes('sd'))
+        jenjang='Elementary';
+      else if(jenjang.toLowerCase().includes('middle')||jenjang.toLowerCase().includes('smp'))
+        jenjang='Middle';
+      return{jenjang,program};
+    }
+
+    /* ════ PARSE JENIS PROGRAM ════
+       Contoh: "PRIVATE - Paket 3 Bulan", "REGULER - Perbulan"
+       → tipe: "Private", dur: 3
+    */
+    function parseJenisProgram(val){
+      if(!val)return{tipe:'Reguler',dur:1};
+      const upper=val.toUpperCase();
+      const tipe=upper.includes('PRIVATE')?'Private':'Reguler';
+      let dur=1;
+      if(upper.includes('6'))dur=6;
+      else if(upper.includes('3'))dur=3;
+      else dur=1;
+      return{tipe,dur};
+    }
+
     /* ════ LOAD STUDENTS FROM SHEET 1 ════ */
     async function loadStudents(){
       try{
@@ -584,39 +618,78 @@ textarea{resize:vertical;min-height:80px;}
         const text=await resp.text();
         const rows=parseCSV(text);
         if(rows.length<2){setSyncStatus('warn','Sheet 1 kosong atau tidak terbaca');return;}
-        
-        // Deteksi header — cari kolom penting (case-insensitive)
+
+        // Mapping header berdasarkan struktur Google Form Markaz Belajar
         const hdr=rows[0].map(h=>h.trim().toLowerCase());
         const col=(names)=>{
           for(const n of names){const i=hdr.findIndex(h=>h.includes(n));if(i>=0)return i;}
           return -1;
         };
-        const iName   = col(['nama siswa','nama_siswa','student','nama']);
-        const iJenjang= col(['jenjang','level','kelas']);
-        const iTipe   = col(['tipe','type','kelas_tipe','reguler']);
-        const iGuru   = col(['guru','teacher','pengajar']);
-        const iParent = col(['orang tua','ortu','wali','nama orang tua','parent']);
-        const iPhone  = col(['no hp','nomor hp','phone','whatsapp','no. hp','no.hp','kontak']);
+
+        // Kolom utama sesuai Google Form
+        const iNamaSiswa    = col(['nama lengkap (peserta)','nama lengkap','nama siswa','nama peserta']);
+        const iNamaIbu      = col(['nama ibu']);
+        const iAlamat       = col(['alamat lengkap','alamat']);
+        const iHP           = col(['whatsapp (ibu)','whatsapp ibu','no hp','nomor hp','whatsapp']);
+        const iProgramKelas = col(['program kelas']);
+        const iJenisProgram = col(['jenis program']);
+        const iGuru         = col(['guru','teacher','pengajar']);
+        const iNomorInduk   = col(['nomor induk']);
 
         const newStudents=[];
+        // Dinamis: kumpulkan semua program & jenjang unik untuk PROGS
+        const progMap={};
+
         for(let r=1;r<rows.length;r++){
           const row=rows[r];
-          const name=(iName>=0?row[iName]:'').trim();
-          if(!name)continue;
+          const namaSiswa=(iNamaSiswa>=0?row[iNamaSiswa]:'').trim();
+          if(!namaSiswa||namaSiswa==='-')continue;
+
+          const programKelasRaw = iProgramKelas>=0?row[iProgramKelas].trim():'';
+          const jenisProgRaw    = iJenisProgram>=0?row[iJenisProgram].trim():'';
+          const {jenjang, program} = parseProgramKelas(programKelasRaw);
+          const {tipe, dur}        = parseJenisProgram(jenisProgRaw);
+
+          // Kumpulkan program unik per jenjang
+          if(jenjang && program){
+            if(!progMap[jenjang]) progMap[jenjang]=new Set();
+            progMap[jenjang].add(program);
+          }
+
+          const namaIbu   = (iNamaIbu>=0?row[iNamaIbu]:'').trim()||namaSiswa;
+          const alamat    = (iAlamat>=0?row[iAlamat]:'').trim();
+          const hp        = (iHP>=0?row[iHP]:'').trim().replace(/\s+/g,'');
+          const guru      = (iGuru>=0?row[iGuru]:'').trim();
+          const nomorInduk= (iNomorInduk>=0?row[iNomorInduk]:'').trim();
+
           newStudents.push({
             id: r,
-            name,
-            jenjang: iJenjang>=0?row[iJenjang].trim():'Elementary',
-            defaultType: iTipe>=0?row[iTipe].trim():'Reguler',
-            guru: iGuru>=0?row[iGuru].trim():'',
-            parentName: iParent>=0?row[iParent].trim():name,
-            parentPhone: iPhone>=0?row[iPhone].trim().replace(/\s+/g,''):'',
+            name:        namaSiswa,
+            jenjang:     jenjang||'Elementary',
+            program:     program,           // program utama dari form
+            defaultType: tipe,              // Reguler / Private
+            defaultDur:  dur,               // 1 / 3 / 6
+            guru:        guru,
+            parentName:  namaIbu,           // ← Nama Ibu = Tagihan Kepada
+            parentPhone: hp,
+            alamat:      alamat,            // ← Alamat untuk invoice
+            nomorInduk:  nomorInduk,
             _row: r
           });
         }
-        STUDENTS=newStudents;
+
+        STUDENTS = newStudents;
+
+        // Update PROGS dari data form (gabung dengan default)
+        if(Object.keys(progMap).length>0){
+          for(const [jen, set] of Object.entries(progMap)){
+            if(!PROGS[jen]) PROGS[jen]=[];
+            set.forEach(p=>{if(!PROGS[jen].includes(p))PROGS[jen].push(p);});
+          }
+        }
+
         lastSyncTime=new Date();
-        setSyncStatus('ok', `${STUDENTS.length} siswa · sync ${fmtTime(lastSyncTime)}`);
+        setSyncStatus('ok',`${STUDENTS.length} siswa · sync ${fmtTime(lastSyncTime)}`);
         rebuildStudentSelect();
         return true;
       }catch(e){
@@ -864,7 +937,7 @@ textarea{resize:vertical;min-height:80px;}
         el.outerHTML='<div id="studentCard" class="student-empty">Pilih siswa untuk melihat detail.</div>';
         return;
       }
-      el.outerHTML=`<div id="studentCard" class="student-card"><div><div class="sf-lbl">Nama Siswa</div><div class="sf-val">${student.name}</div></div><div><div class="sf-lbl">Jenjang</div><div class="sf-val">${student.jenjang}</div></div><div><div class="sf-lbl">Guru</div><div class="sf-val">${student.guru}</div></div><div><div class="sf-lbl">Orang Tua</div><div class="sf-val">${student.parentName}</div></div><div><div class="sf-lbl">No. HP</div><div class="sf-val">${student.parentPhone}</div></div></div>`;
+      el.outerHTML=`<div id="studentCard" class="student-card"><div><div class="sf-lbl">Nama Siswa</div><div class="sf-val">${student.name}</div></div><div><div class="sf-lbl">Jenjang</div><div class="sf-val">${student.jenjang}</div></div><div><div class="sf-lbl">Program</div><div class="sf-val">${student.program||'—'}</div></div><div><div class="sf-lbl">Tipe</div><div class="sf-val">${student.defaultType||'Reguler'}</div></div><div><div class="sf-lbl">Nama Ibu (Tagihan Kepada)</div><div class="sf-val">${student.parentName}</div></div><div><div class="sf-lbl">No. HP Ibu</div><div class="sf-val">${student.parentPhone||'—'}</div></div>${student.alamat?`<div style="grid-column:1/-1"><div class="sf-lbl">Alamat</div><div class="sf-val" style="font-size:12px;">${student.alamat}</div></div>`:''}</div>`;
     }
 
     /* ════ REG FEE ════ */
@@ -879,7 +952,9 @@ textarea{resize:vertical;min-height:80px;}
     function addProg(){
       if(!student){showToast('Pilih siswa terlebih dahulu.',false);return;}
       pc++;
-      progs.push({id:pc,prog:PROGS[student.jenjang][0],type:student.defaultType,dur:1});
+      const jenProgs=PROGS[student.jenjang]||['Program'];
+      const defaultProg=student.program&&jenProgs.includes(student.program)?student.program:jenProgs[0];
+      progs.push({id:pc,prog:defaultProg,type:student.defaultType||'Reguler',dur:student.defaultDur||1});
       renderProgList();if(prevOpen)renderPrev();
     }
 
@@ -970,6 +1045,7 @@ textarea{resize:vertical;min-height:80px;}
         <div class="inv-plbl">Tagihan Kepada</div>
         <div class="inv-pname">${d.pName}</div>
         <div class="inv-psub">${d.sName}${d.jenjang?' · '+d.jenjang:''}${d.guru?' · Guru: '+d.guru:''}</div>
+        ${d.alamat?`<div class="inv-psub" style="margin-top:4px;">${d.alamat}</div>`:''}
       </div>
     </div>
     <div class="inv-meta">
@@ -1021,6 +1097,7 @@ textarea{resize:vertical;min-height:80px;}
         sName:   student?student.name:'—',
         jenjang: student?student.jenjang:'',
         guru:    student?student.guru:'',
+        alamat:  student?student.alamat:'',
         items, subtotal
       });
     }
@@ -1139,6 +1216,9 @@ textarea{resize:vertical;min-height:80px;}
         student_name:student.name,
         student_id:student.id,
         student_jenjang:student.jenjang,
+        student_parent:student.parentName,
+        student_alamat:student.alamat||'',
+        student_phone:student.parentPhone||'',
         created_date:document.getElementById('invDateVal').value,
         due_date:document.getElementById('dueDateVal').value,
         created_by:document.getElementById('createdBy').value,
@@ -1309,7 +1389,13 @@ textarea{resize:vertical;min-height:80px;}
       }
       if(currentSendMethod==='whatsapp'){
         const s=STUDENTS.find(st=>st.id===inv.student_id);
-        if(s)window.open(`https://wa.me/62${s.parentPhone.substring(1)}?text=${encodeURIComponent(msg)}`,'_blank');
+        const phone=inv.student_phone||(s?s.parentPhone:'');
+        if(phone){
+          const num=phone.startsWith('0')?'62'+phone.substring(1):phone.replace(/^\+/,'');
+          window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`,'_blank');
+        } else {
+          showToast('Nomor HP tidak ditemukan.',false);
+        }
       }else if(currentSendMethod==='email'){
         showToast('Email ditandai sebagai dikirim.',true);
       }
@@ -1542,10 +1628,11 @@ textarea{resize:vertical;min-height:80px;}
         notes:   inv.notes||'',
         invDate: inv.created_date,
         dueDate: inv.due_date,
-        pName:   st?st.parentName:inv.student_name,
+        pName:   inv.student_parent||(st?st.parentName:inv.student_name),
         sName:   inv.student_name,
         jenjang: inv.student_jenjang||'',
         guru:    st?st.guru:'',
+        alamat:  inv.student_alamat||(st?st.alamat:''),
         items,
         subtotal:inv.amount
       });
