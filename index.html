@@ -278,18 +278,7 @@ textarea{resize:vertical;min-height:80px;}
     </svg>Tracking </button>
   </div>
   <div class="wrap"><!-- SETUP BANNER -->
-   <div id="setupBanner" style="background:rgba(138,180,248,0.08);border:1px solid rgba(138,180,248,0.25);border-radius:var(--rl);padding:14px 16px;margin-bottom:12px;display:flex;align-items:flex-start;gap:12px;">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <div style="flex:1;">
-     <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:4px;">Pengaturan Google Sheets</div>
-     <div style="font-size:12px;color:var(--text2);line-height:1.7;">
-      Agar data otomatis terbaca, pastikan kedua Google Sheets sudah disetel ke <strong style="color:var(--text);">Anyone with the link → Viewer</strong>.<br>
-      <span style="color:var(--text3);">Sheet 1 (Siswa): kolom → <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:11px;">Nama Siswa, Jenjang, Tipe, Guru, Nama Orang Tua, No HP</code></span><br>
-      <span style="color:var(--text3);">Sheet 2 (Program): kolom → <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:11px;">Jenjang, Program, Tipe, 1 Bulan, 3 Bulan, 6 Bulan</code></span>
-     </div>
-    </div>
-    <button onclick="document.getElementById('setupBanner').style.display='none'" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1;padding:0 2px;flex-shrink:0;" title="Tutup">×</button>
-   </div><!-- TAB: CREATE INVOICE -->
+<!-- TAB: CREATE INVOICE -->
    <div id="tab-create" class="tab-content active"><!-- Invoice Info -->
     <div class="sec">
      <div class="sec-title">
@@ -298,7 +287,7 @@ textarea{resize:vertical;min-height:80px;}
      </div>
      <div class="g2" style="margin-bottom:12px;">
       <div>
-       <label>Nomor Invoice</label> <input id="invoiceNumber" type="text" readonly>
+       <label>Nomor Invoice</label> <input id="invoiceNumber" type="text" style="font-family:'Geist Mono',monospace;font-size:12px;" title="Bisa diedit manual">
       </div>
       <div>
        <label>Dibuat Oleh</label> <select id="createdBy"> <option>Elis Rosmiati</option> <option>Yessi Marlina</option> <option>Annisa Zahrotun J</option> </select>
@@ -410,11 +399,18 @@ textarea{resize:vertical;min-height:80px;}
    </div><!-- TAB: TRACKING -->
    <div id="tab-tracking" class="tab-content">
     <div class="sec">
-     <div class="sec-title" style="justify-content:space-between;margin-bottom:16px;"><span style="display:flex;align-items:center;gap:7px;">
+     <div class="sec-title" style="justify-content:space-between;margin-bottom:12px;"><span style="display:flex;align-items:center;gap:7px;">
        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" />
        </svg> Tracking Invoice </span>
       <div style="display:flex;gap:8px;align-items:center;"><input type="text" id="trackingSearch" placeholder="Cari invoice..." style="width:200px;padding:6px 10px;font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);"> <select id="trackingFilter" style="padding:6px 10px;font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);"> <option value="all">Semua Status</option> <option value="pending">Belum Bayar</option> <option value="partial">Cicilan</option> <option value="paid">Lunas</option> <option value="overdue">Lewat Jatuh Tempo</option> </select>
       </div>
+     </div>
+     <div style="margin-bottom:14px;padding:10px 14px;background:var(--surface2);border-radius:var(--r);display:flex;justify-content:space-around;font-size:12px;gap:6px;flex-wrap:wrap;">
+      <div style="text-align:center;"><div style="font-size:18px;font-weight:700;line-height:1;" id="statTotal">0</div><div style="color:var(--text3);margin-top:2px;">Total</div></div>
+      <div style="text-align:center;"><div style="font-size:18px;font-weight:700;line-height:1;color:var(--success);" id="statPaid">0</div><div style="color:var(--text3);margin-top:2px;">Lunas</div></div>
+      <div style="text-align:center;"><div style="font-size:18px;font-weight:700;line-height:1;color:#fbbf24;" id="statPartial">0</div><div style="color:var(--text3);margin-top:2px;">Cicilan</div></div>
+      <div style="text-align:center;"><div style="font-size:18px;font-weight:700;line-height:1;color:var(--danger);" id="statPending">0</div><div style="color:var(--text3);margin-top:2px;">Belum Bayar</div></div>
+      <div style="text-align:center;"><div style="font-size:18px;font-weight:700;line-height:1;color:var(--danger);" id="statOverdue">0</div><div style="color:var(--text3);margin-top:2px;">Lewat Tempo</div></div>
      </div>
      <div style="overflow-x:auto;">
       <table class="track-table">
@@ -437,23 +433,6 @@ textarea{resize:vertical;min-height:80px;}
         </tr>
        </tbody>
       </table>
-     </div>
-     <div style="margin-top:16px;padding:12px;background:var(--surface2);border-radius:var(--r);display:flex;justify-content:space-around;font-size:12px;">
-      <div>
-       <strong id="statTotal">0</strong> Total Invoice
-      </div>
-      <div>
-       <strong id="statPaid" style="color:var(--success);">0</strong> Lunas
-      </div>
-      <div>
-       <strong id="statPartial" style="color:#fbbf24;">0</strong> Cicilan
-      </div>
-      <div>
-       <strong id="statPending" style="color:var(--danger);">0</strong> Belum Bayar
-      </div>
-      <div>
-       <strong id="statOverdue" style="color:var(--danger);">0</strong> Lewat Tempo
-      </div>
      </div>
     </div>
    </div>
@@ -543,9 +522,14 @@ textarea{resize:vertical;min-height:80px;}
 
     /* ════ STATE ════ */
     let student=null, progs=[], pc=0, regOn=false, prevOpen=false;
-    let invCnt=parseInt(localStorage.getItem('mrkz_cnt')||'0')+1;
-    let currentInvoiceId=null;
     let invoices=JSON.parse(localStorage.getItem('mrkz_invoices')||'[]');
+    // invCnt dihitung dari data aktual: angka tertinggi dari invoice tersimpan + 1
+    let invCnt=(()=>{
+      if(invoices.length===0) return parseInt(localStorage.getItem('mrkz_cnt')||'0')+1;
+      const nums=invoices.map(i=>{const p=(i.invoice_number||'').split('/');return parseInt(p[p.length-1])||0;});
+      return Math.max(...nums)+1;
+    })();
+    let currentInvoiceId=null;
     let currentSendMethod=null;
     let currentProofData=null;
     let syncTimer=null;
@@ -936,7 +920,7 @@ textarea{resize:vertical;min-height:80px;}
         el.outerHTML='<div id="studentCard" class="student-empty">Pilih siswa untuk melihat detail.</div>';
         return;
       }
-      el.outerHTML=`<div id="studentCard" class="student-card"><div><div class="sf-lbl">Nama Siswa</div><div class="sf-val">${student.name}</div></div><div><div class="sf-lbl">Jenjang</div><div class="sf-val">${student.jenjang}</div></div><div><div class="sf-lbl">Program</div><div class="sf-val">${student.program||'—'}</div></div><div><div class="sf-lbl">Tipe</div><div class="sf-val">${student.defaultType||'Reguler'}</div></div><div><div class="sf-lbl">Nama Ibu (Tagihan Kepada)</div><div class="sf-val">${student.parentName}</div></div><div><div class="sf-lbl">No. HP Ibu</div><div class="sf-val">${student.parentPhone||'—'}</div></div>${student.alamat?`<div style="grid-column:1/-1"><div class="sf-lbl">Alamat</div><div class="sf-val" style="font-size:12px;">${student.alamat}</div></div>`:''}</div>`;
+      el.outerHTML=`<div id="studentCard" class="student-card"><div><div class="sf-lbl">Nama Siswa</div><div class="sf-val">${student.name}</div></div><div><div class="sf-lbl">Nomor Induk</div><div class="sf-val" style="font-family:'Geist Mono',monospace;font-size:12px;">${student.nomorInduk||'—'}</div></div><div><div class="sf-lbl">Jenjang</div><div class="sf-val">${student.jenjang}</div></div><div><div class="sf-lbl">Program</div><div class="sf-val">${student.program||'—'}</div></div><div><div class="sf-lbl">Tipe</div><div class="sf-val">${student.defaultType||'Reguler'}</div></div><div><div class="sf-lbl">Nama Ibu (Tagihan Kepada)</div><div class="sf-val">${student.parentName}</div></div><div><div class="sf-lbl">No. HP Ibu</div><div class="sf-val">${student.parentPhone||'—'}</div></div>${student.alamat?`<div style="grid-column:1/-1"><div class="sf-lbl">Alamat</div><div class="sf-val" style="font-size:12px;">${student.alamat}</div></div>`:''}</div>`;
     }
 
     /* ════ REG FEE ════ */
@@ -1024,7 +1008,7 @@ textarea{resize:vertical;min-height:80px;}
   <div class="inv-top">
     <div class="inv-top-row">
       <div>
-        <div class="inv-brand">Markaz<span>Belajar</span></div>
+        <div class="inv-brand">Markaz <span>Belajar</span></div>
         <div class="inv-tagline">Pusat Bimbingan Belajar</div>
       </div>
       <div class="inv-title-block">
@@ -1044,12 +1028,13 @@ textarea{resize:vertical;min-height:80px;}
         <div class="inv-plbl">Tagihan Kepada</div>
         <div class="inv-pname">${d.pName}</div>
         <div class="inv-psub">${d.sName}${d.jenjang?' · '+d.jenjang:''}${d.guru?' · Guru: '+d.guru:''}</div>
+        ${d.nomorInduk?`<div class="inv-psub" style="margin-top:2px;font-family:'Geist Mono',monospace;font-size:10px;">No. Induk: ${d.nomorInduk}</div>`:''}
         ${d.alamat?`<div class="inv-psub" style="margin-top:4px;">${d.alamat}</div>`:''}
       </div>
     </div>
     <div class="inv-meta">
       <div class="inv-mb"><div class="inv-ml">Tanggal</div><div class="inv-mv">${fmtShort(d.invDate)}</div></div>
-      <div class="inv-mb"><div class="inv-ml">Jatuh Tempo</div><div class="inv-mv">${fmtShort(d.dueDate)}</div></div>
+      <div class="inv-mb"><div class="inv-ml">Jatuh Tempo</div><div class="inv-mv" style="color:#dc2626;">${fmtShort(d.dueDate)}</div></div>
       <div class="inv-mb"><div class="inv-ml">Dibuat Oleh</div><div class="inv-mv">${d.creator}</div></div>
     </div>
     <table class="inv-tbl">
@@ -1097,6 +1082,7 @@ textarea{resize:vertical;min-height:80px;}
         jenjang: student?student.jenjang:'',
         guru:    student?student.guru:'',
         alamat:  student?student.alamat:'',
+        nomorInduk: student?student.nomorInduk:'',
         items, subtotal
       });
     }
@@ -1288,6 +1274,7 @@ ${finalHTML}
         student_parent:student.parentName,
         student_alamat:student.alamat||'',
         student_phone:student.parentPhone||'',
+        student_nomor_induk:student.nomorInduk||'',
         created_date:document.getElementById('invDateVal').value,
         due_date:document.getElementById('dueDateVal').value,
         created_by:document.getElementById('createdBy').value,
@@ -1687,6 +1674,21 @@ ${finalHTML}
 
       invoices=invoices.filter(i=>i.__backendId!==invId);
       localStorage.setItem('mrkz_invoices',JSON.stringify(invoices));
+
+      // Hitung ulang invCnt: ambil angka tertinggi dari semua invoice yang tersisa
+      // format INV/YYYY/MM/NNN — ambil bagian akhir
+      if(invoices.length===0){
+        invCnt=0;
+      } else {
+        const nums = invoices.map(i=>{
+          const parts=(i.invoice_number||'').split('/');
+          return parseInt(parts[parts.length-1])||0;
+        });
+        invCnt = Math.max(...nums);
+      }
+      localStorage.setItem('mrkz_cnt', invCnt);
+      updateInvNum();
+
       showToast('Invoice berhasil dihapus!',true);
       renderTracking();
     }
@@ -1718,6 +1720,7 @@ ${finalHTML}
         jenjang: inv.student_jenjang||'',
         guru:    st?st.guru:'',
         alamat:  inv.student_alamat||(st?st.alamat:''),
+        nomorInduk: inv.student_nomor_induk||(st?st.nomorInduk:''),
         items,
         subtotal:inv.amount
       });
@@ -1731,7 +1734,13 @@ ${finalHTML}
       document.getElementById('notes').value='';
       document.getElementById('regRow').classList.remove('on');
       document.getElementById('regHint').textContent='Untuk siswa baru — Rp 150.000';
-      invCnt++;localStorage.setItem('mrkz_cnt',invCnt);updateInvNum();
+      // Hitung invCnt dari data aktual (bukan naik sembarangan)
+      const allNums = invoices.map(i=>{
+        const parts=(i.invoice_number||'').split('/');
+        return parseInt(parts[parts.length-1])||0;
+      });
+      invCnt = allNums.length>0 ? Math.max(...allNums)+1 : 1;
+      localStorage.setItem('mrkz_cnt',invCnt);updateInvNum();
       setDate('inv',new Date());const d=new Date();d.setDate(d.getDate()+7);setDate('due',d);
       renderStudentCard();renderProgList();
       document.getElementById('previewPanel').classList.remove('open');
