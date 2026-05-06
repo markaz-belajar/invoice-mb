@@ -3,47 +3,62 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Markaz Belajar — Invoice &amp; Tracking</title>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <title>Markaz Belajar — Invoice</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Baloo+2:wght@600;800&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <style>
 :root {
-  --bg:         #212121;
-  --surface:    #2f2f2f;
-  --surface2:   #3a3a3a;
-  --border:     #424242;
-  --border2:    #525252;
-  --text:       #ececec;
-  --text2:      #a8a8a8;
-  --text3:      #6a6a6a;
-  --accent:     #8ab4f8;
-  --accent-dim: rgba(138,180,248,0.12);
-  --success:    #6ee7b7;
-  --success-dim:rgba(110,231,183,0.10);
-  --danger:     #f87171;
-  --danger-dim: rgba(248,113,113,0.10);
-  --warning:    #fbbf24;
-  --warning-dim:rgba(251,191,36,0.10);
-  --r:8px; --rl:12px;
+  --bg:         #FDFAF4;
+  --surface:    #FFFFFF;
+  --surface2:   #F0EBE3;
+  --border:     #EDE9DF;
+  --border2:    #D8D1C7;
+  --text:       #1C2B3A;
+  --text2:      #4A6070;
+  --text3:      #8FA4B4;
+  --accent:     #1B6CA8;
+  --accent-dim: rgba(27,108,168,0.10);
+  --success:    #2E9E5B;
+  --success-dim:rgba(46,158,91,0.10);
+  --danger:     #DC3545;
+  --danger-dim: rgba(220,53,69,0.10);
+  --warning:    #F59F00;
+  --warning-dim:rgba(245,159,0,0.12);
+  --r:10px; --rl:16px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;width:100%;}
-body{font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
+html,body{height:100%;width:100%;} .page-wrap{max-width:1280px;margin:0 auto;}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#E9EEF3;color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
 ::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;} ::-webkit-scrollbar{width:4px;}
 
 /* HEADER */
-.hdr{position:sticky;top:0;z-index:200;background:var(--bg);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;}
+.hdr{position:sticky;top:0;z-index:200;background:#1B6CA8;border-bottom:none;overflow:hidden;}
 .hdr-brand{display:flex;align-items:center;gap:10px;}
-.hdr-logo{width:26px;height:26px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;}
-.hdr-logo svg{width:14px;height:14px;color:#1a1a1a;}
-.hdr-name{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.02em;}
-.hdr-sub{font-size:12px;color:var(--text3);margin-left:6px;}
+.hdr-logo{width:28px;height:28px;background:rgba(255,255,255,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.hdr-logo svg{width:14px;height:14px;color:#fff;}
+.hdr-name{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.02em;font-family:'Baloo 2',sans-serif;}
+.hdr-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-left:6px;}
+
+/* NEW PWA-style header */
+.hdr-bubbles{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;}
+.hdr-b1{position:absolute;top:-30px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.07);}
+.hdr-b2{position:absolute;bottom:-50px;left:-30px;width:130px;height:130px;border-radius:50%;background:rgba(243,213,101,0.12);}
+.hdr-b3{position:absolute;top:40px;left:30%;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,0.05);}
+.hdr-inner{position:relative;z-index:2;padding:28px 20px 52px;display:flex;flex-direction:column;align-items:center;}
+.hdr-logo-img{width:90px;margin-bottom:0;}
+.hdr-greeting{margin:0 16px;margin-top:-28px;position:relative;z-index:10;}
+.hdr-greeting-card{background:#fff;border-radius:20px;box-shadow:0 4px 24px rgba(28,43,58,0.12);padding:15px 18px;display:flex;align-items:center;justify-content:space-between;}
+.hdr-greeting-card h2{font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:800;color:#1C2B3A;line-height:1.2;}
+.hdr-greeting-card p{font-size:12px;color:#8FA4B4;margin-top:2px;}
+.hdr-greeting-badge{background:#E8F4FD;color:#1B6CA8;font-size:11px;font-weight:600;padding:5px 12px;border-radius:50px;white-space:nowrap;}
+.hdr-topbar{position:absolute;top:0;left:0;right:0;z-index:3;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+.hdr-topbar-left{display:flex;align-items:center;gap:8px;}
 .badge{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--success);background:var(--success-dim);padding:4px 10px;border-radius:99px;}
 .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--success);}
 
 /* NAV TABS */
-.nav-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--surface);padding:0 20px;margin-bottom:0;}
-.nav-tab{padding:12px 16px;font-size:13px;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;font-weight:500;}
+.nav-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);background:var(--surface);padding:0 20px;margin-bottom:0;margin-top:14px;box-shadow:0 2px 10px rgba(28,43,58,0.06);}
+.nav-tab{padding:13px 18px;font-size:13px;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;font-weight:600;}
 .nav-tab:hover{color:var(--text);}
 .nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 @media(max-width:640px){
@@ -52,12 +67,12 @@ body{font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--t
 }
 
 /* LAYOUT */
-.wrap{max-width:1200px;margin:0 auto;padding:20px;overflow-y:auto;height:calc(100% - 52px);}
+.wrap{max-width:1200px;margin:0 auto;padding:20px 20px 40px;}
 .tab-content{display:none;}
 .tab-content.active{display:block;}
 
 /* SECTION */
-.sec{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:16px;margin-bottom:12px;}
+.sec{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(28,43,58,0.05);}
 .sec-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:7px;margin-bottom:14px;}
 .sec-title svg{width:13px;height:13px;flex-shrink:0;}
 
@@ -80,9 +95,9 @@ textarea{resize:vertical;min-height:80px;}
 
 /* TRACKING TABLE */
 .track-table{width:100%;border-collapse:collapse;margin-top:12px;}
-.track-table th{background:var(--surface2);padding:10px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);}
+.track-table th{background:#EBF4FD;padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #B8D9F0;}
 .track-table td{padding:12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);}
-.track-table tr:hover{background:rgba(138,180,248,0.05);}
+.track-table tr:hover{background:rgba(27,108,168,0.04);}
 .track-table tr:last-child td{border-bottom:none;}
 
 /* STATUS BADGES */
@@ -95,7 +110,7 @@ textarea{resize:vertical;min-height:80px;}
 .status-pending-pay{background:rgba(248,113,113,0.12);color:var(--danger);}
 
 /* MODAL */
-.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:500;align-items:center;justify-content:center;}
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(28,43,58,0.6);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;}
 .modal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
@@ -111,10 +126,10 @@ textarea{resize:vertical;min-height:80px;}
 .btn svg{width:14px;height:14px;flex-shrink:0;}
 .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}
 .btn-ghost:hover{background:var(--surface2);color:var(--text);border-color:var(--border2);}
-.btn-accent{background:var(--accent);color:#1a1a1a;}
+.btn-accent{background:var(--accent);color:#fff;}
 .btn-accent:hover{opacity:.9;}
-.btn-success{background:var(--success-dim);color:var(--success);border:1px solid rgba(110,231,183,.2);}
-.btn-success:hover{background:rgba(110,231,183,.2);}
+.btn-success{background:var(--success);color:#fff;border:none;}
+.btn-success:hover{opacity:0.88;}
 .btn-small{padding:6px 10px;font-size:11px;}
 .btn-icon{background:none;border:none;padding:5px;border-radius:6px;color:var(--text3);cursor:pointer;transition:all .15s;display:flex;align-items:center;}
 .btn-icon:hover{background:var(--danger-dim);color:var(--danger);}
@@ -172,16 +187,16 @@ textarea{resize:vertical;min-height:80px;}
 .inv-footer{padding:10px 24px;background:#f4f5f8;text-align:center;font-size:9px;color:#aaa;}
 
 /* STUDENT CARD */
-.student-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin-top:10px;}
+.student-card{background:#EBF4FD;border:1.5px solid #B8D9F0;border-radius:var(--r);padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin-top:10px;}
 .sf-lbl{font-size:11px;color:var(--text3);margin-bottom:2px;}
 .sf-val{font-size:13px;color:var(--text);font-weight:500;}
-.student-empty{padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);color:var(--text3);font-size:13px;margin-top:10px;}
+.student-empty{padding:11px 14px;background:var(--surface2);border:1.5px dashed var(--border2);border-radius:var(--r);color:var(--text3);font-size:13px;margin-top:10px;}
 @media(max-width:640px){
   .student-card{grid-template-columns:1fr;gap:8px 0;}
 }
 
 /* REG FEE TOGGLE */
-.reg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:border-color .15s,background .15s;user-select:none;}
+.reg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;transition:border-color .15s,background .15s;user-select:none;}
 .reg-row:hover{border-color:var(--border2);}
 .reg-row.on{border-color:var(--accent);background:var(--accent-dim);}
 .reg-left{display:flex;align-items:center;gap:10px;}
@@ -198,7 +213,7 @@ textarea{resize:vertical;min-height:80px;}
 .reg-row.on .sw::after{transform:translateX(16px);}
 
 /* PROGRAMS */
-.prog-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:8px;}
+.prog-item{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r);padding:13px;margin-bottom:8px;}
 .prog-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
 .prog-num{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
 .prog-price{font-size:13px;font-weight:600;color:var(--accent);font-family:'Geist Mono',monospace;}
@@ -227,7 +242,7 @@ textarea{resize:vertical;min-height:80px;}
 .date-btn-text{color:var(--text);}
 .date-btn-text.placeholder{color:var(--text3);}
 .date-btn svg{width:14px;height:14px;color:var(--text3);flex-shrink:0;}
-.cal-popup{position:absolute;top:calc(100% + 6px);left:0;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);box-shadow:0 12px 32px rgba(0,0,0,.6);padding:16px;width:272px;display:none;}
+.cal-popup{position:absolute;top:calc(100% + 6px);left:0;z-index:400;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);box-shadow:0 12px 32px rgba(28,43,58,.18);padding:16px;width:272px;display:none;}
 .cal-popup.open{display:block;}
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .cal-nav-btn{background:none;border:none;cursor:pointer;color:var(--text2);padding:5px 8px;border-radius:6px;display:flex;align-items:center;transition:background .1s;}
@@ -251,27 +266,50 @@ textarea{resize:vertical;min-height:80px;}
   <style>body { box-sizing: border-box; }</style>
  </head>
  <body>
+  <div style="max-width:1200px;margin:0 auto;min-height:100vh;background:#FDFAF4;box-shadow:0 0 40px rgba(28,43,58,0.1);">
   <header class="hdr">
-   <div class="hdr-brand">
-    <div class="hdr-logo">
-     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-     </svg>
-    </div><span class="hdr-name">Markaz Belajar</span> <span class="hdr-sub">Invoice &amp; Tracking</span>
-   </div>
-   <div style="display:flex;align-items:center;gap:8px;">
-    <div id="syncStatus" style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);max-width:240px;overflow:hidden;">
-     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
-     <span>Memuat...</span>
+    <!-- Decorative bubbles (same as PWA) -->
+    <div class="hdr-bubbles">
+      <div class="hdr-b1"></div>
+      <div class="hdr-b2"></div>
+      <div class="hdr-b3"></div>
     </div>
-    <button onclick="openSettings()" title="Pengaturan" style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 9px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-family:inherit;transition:all .15s;">
-     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    </button>
-    <button onclick="manualRefresh()" title="Refresh data dari Google Sheets" style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 9px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-family:inherit;transition:all .15s;">
-     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
-     <span class="btn-text-label">Refresh</span>
-    </button>
-   </div>
-  </header><!-- NAV TABS -->
+    <!-- Top action bar -->
+    <div class="hdr-topbar">
+      <div class="hdr-topbar-left">
+        <div id="syncStatus" style="display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,0.8);max-width:200px;overflow:hidden;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+          <span>Memuat...</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="manualRefresh()" title="Refresh" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:5px 9px;color:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-family:inherit;transition:all .15s;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+          <span class="btn-text-label">Refresh</span>
+        </button>
+        <button onclick="openSettings()" title="Pengaturan" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:5px 9px;color:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-family:inherit;transition:all .15s;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+    <!-- Center logo (same as PWA) -->
+    <div class="hdr-inner">
+      <img class="hdr-logo-img" src="Open_MB_Icon.png" alt="Markaz Belajar" onerror="this.style.display='none';document.getElementById('hdr-logo-fallback').style.display='flex';" />
+      <div id="hdr-logo-fallback" style="display:none;width:80px;height:80px;background:rgba(255,255,255,0.15);border-radius:20px;align-items:center;justify-content:center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="36" height="36"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+    </div>
+  </header>
+  <!-- Greeting card (overlaps header bottom, same as PWA) -->
+  <div class="hdr-greeting">
+    <div class="hdr-greeting-card">
+      <div>
+        <h2 id="hdrCardTitle">Buat Invoice</h2>
+        <p id="hdrCardSub">Tagihan &amp; pembayaran siswa</p>
+      </div>
+      <div class="hdr-greeting-badge" id="hdrCardBadge">● Aktif</div>
+    </div>
+  </div><!-- NAV TABS -->
   <div class="nav-tabs"><button class="nav-tab active" onclick="switchTab('create',this)">
     <svg style="display:inline;width:14px;height:14px;margin-right:6px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
      <path d="M12 5v14M5 12h14" />
@@ -408,7 +446,7 @@ textarea{resize:vertical;min-height:80px;}
       <div style="display:flex;gap:8px;align-items:center;"><input type="text" id="trackingSearch" placeholder="Cari invoice..." style="width:200px;padding:6px 10px;font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);"> <select id="trackingFilter" style="padding:6px 10px;font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);"> <option value="all">Semua Status</option> <option value="pending">Belum Bayar</option> <option value="partial">Cicilan</option> <option value="paid">Lunas</option> <option value="overdue">Lewat Jatuh Tempo</option> </select>
       </div>
      </div>
-     <div style="margin-bottom:14px;padding:10px 14px;background:var(--surface2);border-radius:var(--r);display:flex;justify-content:space-around;font-size:12px;gap:6px;flex-wrap:wrap;">
+     <div style="margin-bottom:14px;padding:12px 16px;background:#EBF4FD;border-radius:var(--r);border:1.5px solid #B8D9F0;display:flex;justify-content:space-around;font-size:12px;gap:6px;flex-wrap:wrap;">
       <div style="text-align:center;"><div style="font-size:18px;font-weight:700;line-height:1;" id="statTotal">0</div><div style="color:var(--text3);margin-top:2px;">Total</div></div>
       <div style="text-align:center;"><div style="font-size:18px;font-weight:700;line-height:1;color:var(--success);" id="statPaid">0</div><div style="color:var(--text3);margin-top:2px;">Lunas</div></div>
       <div style="text-align:center;"><div style="font-size:18px;font-weight:700;line-height:1;color:#fbbf24;" id="statPartial">0</div><div style="color:var(--text3);margin-top:2px;">Cicilan</div></div>
@@ -831,17 +869,42 @@ textarea{resize:vertical;min-height:80px;}
     }
 
     /* ════ TABS ════ */
+    const HDR_TABS = {
+      create:   {title:'Buat Invoice',   sub:'Tagihan &amp; pembayaran siswa',  badge:'● Aktif'},
+      tracking: {title:'Tracking',       sub:'Riwayat &amp; status pembayaran', badge:'● Live'},
+    };
+    function updateHeaderCard(tabName){
+      const d = HDR_TABS[tabName]||HDR_TABS.create;
+      const title = document.getElementById('hdrCardTitle');
+      const sub   = document.getElementById('hdrCardSub');
+      const badge = document.getElementById('hdrCardBadge');
+      if(!title) return;
+      // Smooth text swap
+      title.style.transition = 'opacity .2s';
+      sub.style.transition   = 'opacity .2s';
+      title.style.opacity = '0';
+      sub.style.opacity   = '0';
+      setTimeout(()=>{
+        title.innerHTML = d.title;
+        sub.innerHTML   = d.sub;
+        if(badge) badge.textContent = d.badge;
+        title.style.opacity = '1';
+        sub.style.opacity   = '1';
+      }, 180);
+    }
     function switchTab(tabName, btn){
       document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
       document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
       document.getElementById('tab-'+tabName).classList.add('active');
       if(btn) btn.classList.add('active');
+      updateHeaderCard(tabName);
     }
     function switchTabById(tabName){
       document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
       document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
       document.getElementById('tab-'+tabName).classList.add('active');
       document.querySelector(`.nav-tab[onclick*="${tabName}"]`)?.classList.add('active');
+      updateHeaderCard(tabName);
     }
 
     /* ════ INV NUMBER ════ */
@@ -1838,7 +1901,7 @@ ${finalHTML}
     /* ════ TOAST ════ */
     function showToast(msg,success){
       const t=document.createElement('div');
-      t.style.cssText=`position:fixed;bottom:20px;right:20px;background:${success?'var(--success)':'var(--danger)'};color:#fff;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;animation:slideIn .3s ease;`;
+      t.style.cssText=`position:fixed;bottom:20px;right:20px;background:${success?'#2E9E5B':'#DC3545'};color:#fff;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;animation:slideIn .3s ease;`;
       t.textContent=msg;
       document.body.appendChild(t);
       setTimeout(()=>{t.style.animation='slideOut .3s ease';setTimeout(()=>t.remove(),300);},3000);
