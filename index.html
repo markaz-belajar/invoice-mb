@@ -82,17 +82,17 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--outer
 .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--success);}
 
 /* NAV TABS */
-.nav-tabs{display:flex;gap:0;border-bottom:none;background:rgba(255,255,255,0.18);padding:0 16px;margin-bottom:0;margin-top:12px;}
-.nav-tab{padding:13px 18px;font-size:13px;color:rgba(255,255,255,0.7);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;font-weight:600;}
-.nav-tab:hover{color:#fff;}
-.nav-tab.active{color:#fff;border-bottom-color:#fff;}
+.nav-tabs{padding:12px 14px 0;margin-top:0;}
+.tab-bar-pill{background:rgba(255,255,255,0.18);border-radius:50px;padding:4px;display:flex;gap:2px;border:1.5px solid rgba(255,255,255,0.2);backdrop-filter:blur(8px);}.nav-tab{flex:1;padding:9px 0;border:none;background:transparent;border-radius:50px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.65);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
+.nav-tab:hover{color:#fff;background:rgba(255,255,255,0.1);}
+.nav-tab.active{background:#fff;color:#1B6CA8;box-shadow:0 2px 8px rgba(0,0,0,0.15);}
 @media(max-width:640px){
-  .nav-tabs{padding:0 10px;gap:0;}
-  .nav-tab{padding:10px 14px;font-size:12px;}
+  .nav-tabs{padding:10px 12px 0;}
+  .nav-tab{font-size:12px;}
 }
 
 /* LAYOUT */
-.wrap{max-width:1200px;margin:0 auto;padding:16px 14px 40px;}
+.wrap{max-width:1200px;margin:0 auto;padding:16px 14px 40px;} .nav-tabs{padding-bottom:12px;}
 .tab-content{display:none;}
 .tab-content.active{display:block;}
 
@@ -288,6 +288,7 @@ textarea{resize:vertical;min-height:80px;}
   .inv-doc{max-width:100%;border-radius:0;}
 }
 /* Dark mode overrides */
+[data-theme="dark"] .nav-tab.active{background:rgba(255,255,255,0.15);color:#fff;}
 [data-theme="dark"] .hdr-greeting-card{background:var(--surface);box-shadow:0 4px 24px rgba(0,0,0,0.4);}
 [data-theme="dark"] .hdr-greeting-card h2{color:var(--text);}
 [data-theme="dark"] .hdr-greeting-card p{color:var(--text3);}
@@ -331,16 +332,15 @@ textarea{resize:vertical;min-height:80px;}
           <span>Memuat...</span>
         </div>
       </div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="toggleDark()" id="darkToggleBtn" title="Dark/Light mode" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:5px 9px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;font-family:inherit;transition:all .15s;">
-          <svg id="darkIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <div style="display:flex;gap:7px;align-items:center;">
+        <button onclick="toggleDark()" id="darkToggleBtn" title="Dark/Light mode" style="width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex-shrink:0;">
+          <svg id="darkIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
-        <button onclick="manualRefresh()" title="Refresh" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:5px 9px;color:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-family:inherit;transition:all .15s;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
-          <span class="btn-text-label">Refresh</span>
+        <button onclick="manualRefresh()" title="Refresh" style="width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex-shrink:0;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
         </button>
-        <button onclick="openSettings()" title="Pengaturan" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:5px 9px;color:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-family:inherit;transition:all .15s;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <button onclick="openSettings()" title="Pengaturan" style="width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex-shrink:0;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
     </div>
@@ -362,13 +362,17 @@ textarea{resize:vertical;min-height:80px;}
       <div class="hdr-greeting-badge" id="hdrCardBadge">● Aktif</div>
     </div>
   </div><!-- greeting end --><!-- NAV TABS -->
-  <div class="nav-tabs"><button class="nav-tab active" onclick="switchTab('create',this)">
-    <svg style="display:inline;width:14px;height:14px;margin-right:6px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-     <path d="M12 5v14M5 12h14" />
-    </svg>Buat Invoice </button> <button class="nav-tab" onclick="switchTab('tracking',this)">
-    <svg style="display:inline;width:14px;height:14px;margin-right:6px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>Tracking </button>
+  <div class="nav-tabs">
+    <div class="tab-bar-pill">
+      <button class="nav-tab active" onclick="switchTab('create',this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        Buat Invoice
+      </button>
+      <button class="nav-tab" onclick="switchTab('tracking',this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Tracking
+      </button>
+    </div>
   </div>
   </div><!-- /sticky header wrapper -->
   <div class="wrap"><!-- SETUP BANNER -->
