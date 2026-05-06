@@ -27,12 +27,12 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;width:100%;} .page-wrap{max-width:1280px;margin:0 auto;}
-body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#E9EEF3;color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#1B6CA8;color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;} ::-webkit-scrollbar{width:4px;}
 
 /* HEADER */
-.hdr{position:sticky;top:0;z-index:200;background:#1B6CA8;border-bottom:none;overflow:hidden;}
+.hdr{background:#1B6CA8;border-bottom:none;overflow:hidden;}
 .hdr-brand{display:flex;align-items:center;gap:10px;}
 .hdr-logo{width:28px;height:28px;background:rgba(255,255,255,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;}
 .hdr-logo svg{width:14px;height:14px;color:#fff;}
@@ -40,34 +40,34 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#E9EEF3;col
 .hdr-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-left:6px;}
 
 /* NEW PWA-style header */
-.hdr-bubbles{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;}
+.hdr-bubbles{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:1;}
 .hdr-b1{position:absolute;top:-30px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.07);}
 .hdr-b2{position:absolute;bottom:-50px;left:-30px;width:130px;height:130px;border-radius:50%;background:rgba(243,213,101,0.12);}
 .hdr-b3{position:absolute;top:40px;left:30%;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,0.05);}
-.hdr-inner{position:relative;z-index:2;padding:28px 20px 52px;display:flex;flex-direction:column;align-items:center;}
+.hdr-inner{position:relative;z-index:2;padding:28px 20px 46px;display:flex;flex-direction:column;align-items:center;}
 .hdr-logo-img{width:90px;margin-bottom:0;}
-.hdr-greeting{margin:0 16px;margin-top:-28px;position:relative;z-index:10;}
+.hdr-greeting{margin:0 14px;margin-top:-24px;position:relative;z-index:10;}
 .hdr-greeting-card{background:#fff;border-radius:20px;box-shadow:0 4px 24px rgba(28,43,58,0.12);padding:15px 18px;display:flex;align-items:center;justify-content:space-between;}
 .hdr-greeting-card h2{font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:800;color:#1C2B3A;line-height:1.2;}
 .hdr-greeting-card p{font-size:12px;color:#8FA4B4;margin-top:2px;}
-.hdr-greeting-badge{background:#E8F4FD;color:#1B6CA8;font-size:11px;font-weight:600;padding:5px 12px;border-radius:50px;white-space:nowrap;}
-.hdr-topbar{position:absolute;top:0;left:0;right:0;z-index:3;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+.hdr-greeting-badge{background:#E8F4FD;color:#1B6CA8;font-size:11px;font-weight:600;padding:5px 12px;border-radius:50px;white-space:nowrap;} .hdr-greeting-badge.live{background:#E6F7EE;color:#2E9E5B;}
+.hdr-topbar{position:absolute;top:0;left:0;right:0;z-index:10;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
 .hdr-topbar-left{display:flex;align-items:center;gap:8px;}
 .badge{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--success);background:var(--success-dim);padding:4px 10px;border-radius:99px;}
 .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--success);}
 
 /* NAV TABS */
-.nav-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);background:var(--surface);padding:0 20px;margin-bottom:0;margin-top:14px;box-shadow:0 2px 10px rgba(28,43,58,0.06);}
-.nav-tab{padding:13px 18px;font-size:13px;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;font-weight:600;}
-.nav-tab:hover{color:var(--text);}
-.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.nav-tabs{display:flex;gap:0;border-bottom:none;background:rgba(255,255,255,0.18);padding:0 16px;margin-bottom:0;margin-top:12px;}
+.nav-tab{padding:13px 18px;font-size:13px;color:rgba(255,255,255,0.7);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;font-weight:600;}
+.nav-tab:hover{color:#fff;}
+.nav-tab.active{color:#fff;border-bottom-color:#fff;}
 @media(max-width:640px){
-  .nav-tabs{padding:0 12px;gap:2px;}
-  .nav-tab{padding:10px 12px;font-size:12px;}
+  .nav-tabs{padding:0 10px;gap:0;}
+  .nav-tab{padding:10px 14px;font-size:12px;}
 }
 
 /* LAYOUT */
-.wrap{max-width:1200px;margin:0 auto;padding:20px 20px 40px;}
+.wrap{max-width:1200px;margin:0 auto;padding:16px 14px 40px;}
 .tab-content{display:none;}
 .tab-content.active{display:block;}
 
@@ -95,8 +95,8 @@ textarea{resize:vertical;min-height:80px;}
 
 /* TRACKING TABLE */
 .track-table{width:100%;border-collapse:collapse;margin-top:12px;}
-.track-table th{background:#EBF4FD;padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #B8D9F0;}
-.track-table td{padding:12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);}
+.track-table th{background:#EBF4FD;padding:8px;text-align:left;font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #B8D9F0;}
+.track-table td{padding:9px 8px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);vertical-align:middle;}
 .track-table tr:hover{background:rgba(27,108,168,0.04);}
 .track-table tr:last-child td{border-bottom:none;}
 
@@ -130,8 +130,8 @@ textarea{resize:vertical;min-height:80px;}
 .btn-accent:hover{opacity:.9;}
 .btn-success{background:var(--success);color:#fff;border:none;}
 .btn-success:hover{opacity:0.88;}
-.btn-small{padding:6px 10px;font-size:11px;}
-.btn-icon{background:none;border:none;padding:5px;border-radius:6px;color:var(--text3);cursor:pointer;transition:all .15s;display:flex;align-items:center;}
+.btn-small{padding:5px 9px;font-size:11px;border-radius:8px;}
+.btn-icon{background:var(--surface2);border:1px solid var(--border);padding:6px;border-radius:8px;color:var(--text3);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;}
 .btn-icon:hover{background:var(--danger-dim);color:var(--danger);}
 .btn-dashed{width:100%;background:transparent;border:1px dashed var(--border2);color:var(--text3);border-radius:var(--r);padding:9px 12px;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;font-size:13px;cursor:pointer;transition:all .15s;margin-top:8px;}
 .btn-dashed:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
@@ -266,7 +266,8 @@ textarea{resize:vertical;min-height:80px;}
   <style>body { box-sizing: border-box; }</style>
  </head>
  <body>
-  <div style="max-width:1200px;margin:0 auto;min-height:100vh;background:#FDFAF4;box-shadow:0 0 40px rgba(28,43,58,0.1);">
+  <div style="max-width:1200px;margin:0 auto;min-height:100vh;background:linear-gradient(to bottom, #1B6CA8 0%, #1B6CA8 60%, #FDFAF4 100%);box-shadow:0 0 40px rgba(28,43,58,0.15);">
+  <div style="position:sticky;top:0;z-index:200;">
   <header class="hdr">
     <!-- Decorative bubbles (same as PWA) -->
     <div class="hdr-bubbles">
@@ -277,7 +278,7 @@ textarea{resize:vertical;min-height:80px;}
     <!-- Top action bar -->
     <div class="hdr-topbar">
       <div class="hdr-topbar-left">
-        <div id="syncStatus" style="display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,0.8);max-width:200px;overflow:hidden;">
+        <div id="syncStatus" style="display:flex;align-items:center;gap:5px;font-size:11px;color:#fff;max-width:200px;overflow:hidden;font-weight:500;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
           <span>Memuat...</span>
         </div>
@@ -309,7 +310,7 @@ textarea{resize:vertical;min-height:80px;}
       </div>
       <div class="hdr-greeting-badge" id="hdrCardBadge">● Aktif</div>
     </div>
-  </div><!-- NAV TABS -->
+  </div><!-- greeting end --><!-- NAV TABS -->
   <div class="nav-tabs"><button class="nav-tab active" onclick="switchTab('create',this)">
     <svg style="display:inline;width:14px;height:14px;margin-right:6px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
      <path d="M12 5v14M5 12h14" />
@@ -318,6 +319,7 @@ textarea{resize:vertical;min-height:80px;}
      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </svg>Tracking </button>
   </div>
+  </div><!-- /sticky header wrapper -->
   <div class="wrap"><!-- SETUP BANNER -->
 <!-- TAB: CREATE INVOICE -->
    <div id="tab-create" class="tab-content active"><!-- Invoice Info -->
@@ -440,18 +442,15 @@ textarea{resize:vertical;min-height:80px;}
    </div><!-- TAB: TRACKING -->
    <div id="tab-tracking" class="tab-content">
     <div class="sec">
-     <div class="sec-title" style="justify-content:space-between;margin-bottom:12px;"><span style="display:flex;align-items:center;gap:7px;">
-       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" />
-       </svg> Tracking Invoice </span>
-      <div style="display:flex;gap:8px;align-items:center;"><input type="text" id="trackingSearch" placeholder="Cari invoice..." style="width:200px;padding:6px 10px;font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);"> <select id="trackingFilter" style="padding:6px 10px;font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);"> <option value="all">Semua Status</option> <option value="pending">Belum Bayar</option> <option value="partial">Cicilan</option> <option value="paid">Lunas</option> <option value="overdue">Lewat Jatuh Tempo</option> </select>
-      </div>
+     <div class="sec-title" style="flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:12px;"><span style="display:flex;align-items:center;gap:7px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg> Tracking Invoice</span>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;width:100%;margin-top:8px;"><input type="text" id="trackingSearch" placeholder="Cari invoice..." style="flex:1;min-width:0;padding:7px 10px;font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);"> <select id="trackingFilter" style="width:130px;flex-shrink:0;padding:7px 10px;font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);"> <option value="all">Semua</option> <option value="pending">Belum Bayar</option> <option value="partial">Cicilan</option> <option value="paid">Lunas</option> <option value="overdue">Lewat Tempo</option> </select></div>
      </div>
-     <div style="margin-bottom:14px;padding:12px 16px;background:#EBF4FD;border-radius:var(--r);border:1.5px solid #B8D9F0;display:flex;justify-content:space-around;font-size:12px;gap:6px;flex-wrap:wrap;">
-      <div style="text-align:center;"><div style="font-size:18px;font-weight:700;line-height:1;" id="statTotal">0</div><div style="color:var(--text3);margin-top:2px;">Total</div></div>
-      <div style="text-align:center;"><div style="font-size:18px;font-weight:700;line-height:1;color:var(--success);" id="statPaid">0</div><div style="color:var(--text3);margin-top:2px;">Lunas</div></div>
-      <div style="text-align:center;"><div style="font-size:18px;font-weight:700;line-height:1;color:#fbbf24;" id="statPartial">0</div><div style="color:var(--text3);margin-top:2px;">Cicilan</div></div>
-      <div style="text-align:center;"><div style="font-size:18px;font-weight:700;line-height:1;color:var(--danger);" id="statPending">0</div><div style="color:var(--text3);margin-top:2px;">Belum Bayar</div></div>
-      <div style="text-align:center;"><div style="font-size:18px;font-weight:700;line-height:1;color:var(--danger);" id="statOverdue">0</div><div style="color:var(--text3);margin-top:2px;">Lewat Tempo</div></div>
+     <div style="margin-bottom:14px;padding:10px 8px;background:#EBF4FD;border-radius:var(--r);border:1.5px solid #B8D9F0;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;font-size:12px;">
+      <div style="text-align:center;padding:4px 0;"><div style="font-size:16px;font-weight:800;line-height:1;color:var(--text);font-family:'Baloo 2',sans-serif;" id="statTotal">0</div><div style="color:var(--text3);margin-top:2px;font-size:10px;">Total</div></div>
+      <div style="text-align:center;"><div style="font-size:16px;font-weight:800;line-height:1;color:var(--success);font-family:'Baloo 2',sans-serif;" id="statPaid">0</div><div style="color:var(--text3);margin-top:2px;font-size:10px;">Lunas</div></div>
+      <div style="text-align:center;"><div style="font-size:16px;font-weight:800;line-height:1;color:var(--warning);font-family:'Baloo 2',sans-serif;" id="statPartial">0</div><div style="color:var(--text3);margin-top:2px;font-size:10px;">Cicilan</div></div>
+      <div style="text-align:center;"><div style="font-size:16px;font-weight:800;line-height:1;color:var(--danger);font-family:'Baloo 2',sans-serif;" id="statPending">0</div><div style="color:var(--text3);margin-top:2px;font-size:10px;">Belum</div></div>
+      <div style="text-align:center;"><div style="font-size:16px;font-weight:800;line-height:1;color:var(--danger);font-family:'Baloo 2',sans-serif;" id="statOverdue">0</div><div style="color:var(--text3);margin-top:2px;font-size:10px;">Lewat</div></div>
      </div>
      <div style="overflow-x:auto;">
       <table class="track-table">
@@ -887,7 +886,7 @@ textarea{resize:vertical;min-height:80px;}
       setTimeout(()=>{
         title.innerHTML = d.title;
         sub.innerHTML   = d.sub;
-        if(badge) badge.textContent = d.badge;
+        if(badge){badge.textContent=d.badge;badge.className='hdr-greeting-badge'+(tabName==='tracking'?' live':'');}
         title.style.opacity = '1';
         sub.style.opacity   = '1';
       }, 180);
@@ -1464,12 +1463,8 @@ ${finalHTML}
           <td>${statusSent}</td>
           <td>${statusPay}</td>
           <td style="font-size:12px;color:var(--text2);">${paymentTimeDisplay}</td>
-          <td style="text-align:center;">${proofBtn}</td>
-          <td style="display:flex;gap:5px;justify-content:center;font-size:11px;">
-            <button class="btn btn-small btn-accent" onclick="openSendModal('${inv.__backendId}')">Kirim</button>
-            <button class="btn btn-small btn-ghost" onclick="openPaymentModal('${inv.__backendId}')">Bayar</button>
-            <button class="btn btn-small" style="background:rgba(248,113,113,0.12);color:var(--danger);border:1px solid rgba(248,113,113,.2);" onclick="deleteInvoice('${inv.__backendId}')">Hapus</button>
-          </td>
+          <td style="text-align:center;width:44px;">${proofBtn}</td>
+          <td style="white-space:nowrap;"><div style="display:flex;gap:4px;align-items:center;justify-content:flex-end;"><button class="btn btn-small btn-accent" onclick="openSendModal('${inv.__backendId}')">Kirim</button><button class="btn btn-small btn-ghost" onclick="openPaymentModal('${inv.__backendId}')">Bayar</button><button class="btn btn-small" style="background:rgba(220,53,69,0.10);color:var(--danger);border:1px solid rgba(220,53,69,.15);border-radius:8px;padding:5px 9px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:500;" onclick="deleteInvoice('${inv.__backendId}')">Hapus</button></div></td>
         </tr>`;
       }).join('');
     }
