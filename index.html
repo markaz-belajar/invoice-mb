@@ -24,15 +24,40 @@
   --warning:    #F59F00;
   --warning-dim:rgba(245,159,0,0.12);
   --r:10px; --rl:16px;
+  --hdr-bg:     #1B6CA8;
+  --page-grad:  linear-gradient(to bottom, #1B6CA8 0%, #1B6CA8 60%, #FDFAF4 100%);
+  --outer-bg:   #1B6CA8;
+}
+
+[data-theme="dark"] {
+  --bg:         #0F1923;
+  --surface:    #1A2535;
+  --surface2:   #222F40;
+  --border:     #2A3A4E;
+  --border2:    #344A60;
+  --text:       #E8EEF4;
+  --text2:      #8FA4B4;
+  --text3:      #506070;
+  --accent:     #4DA3D4;
+  --accent-dim: rgba(77,163,212,0.12);
+  --success:    #3BBF6E;
+  --success-dim:rgba(59,191,110,0.12);
+  --danger:     #F06070;
+  --danger-dim: rgba(240,96,112,0.12);
+  --warning:    #F59F00;
+  --warning-dim:rgba(245,159,0,0.12);
+  --hdr-bg:     #0D1520;
+  --page-grad:  linear-gradient(to bottom, #0D1520 0%, #0D1520 60%, #0F1923 100%);
+  --outer-bg:   #0D1520;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;width:100%;} .page-wrap{max-width:1280px;margin:0 auto;}
-body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#1B6CA8;color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--outer-bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;transition:background .3s,color .3s;}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;} ::-webkit-scrollbar{width:4px;}
 
 /* HEADER */
-.hdr{background:#1B6CA8;border-bottom:none;overflow:hidden;}
+.hdr{background:var(--hdr-bg);border-bottom:none;overflow:hidden;transition:background .3s;}
 .hdr-brand{display:flex;align-items:center;gap:10px;}
 .hdr-logo{width:28px;height:28px;background:rgba(255,255,255,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;}
 .hdr-logo svg{width:14px;height:14px;color:#fff;}
@@ -72,7 +97,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#1B6CA8;col
 .tab-content.active{display:block;}
 
 /* SECTION */
-.sec{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(28,43,58,0.05);}
+.sec{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,0.08);transition:background .3s,border-color .3s;}
 .sec-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:7px;margin-bottom:14px;}
 .sec-title svg{width:13px;height:13px;flex-shrink:0;}
 
@@ -95,7 +120,7 @@ textarea{resize:vertical;min-height:80px;}
 
 /* TRACKING TABLE */
 .track-table{width:100%;border-collapse:collapse;margin-top:12px;}
-.track-table th{background:#EBF4FD;padding:8px;text-align:left;font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #B8D9F0;}
+.track-table th{background:var(--accent-dim);padding:8px;text-align:left;font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);}
 .track-table td{padding:9px 8px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);vertical-align:middle;}
 .track-table tr:hover{background:rgba(27,108,168,0.04);}
 .track-table tr:last-child td{border-bottom:none;}
@@ -112,7 +137,7 @@ textarea{resize:vertical;min-height:80px;}
 /* MODAL */
 .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(28,43,58,0.6);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;}
+.modal{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);padding:20px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;}
 .modal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
 .modal-title svg{width:16px;height:16px;color:var(--accent);}
 .modal-close{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;}
@@ -187,7 +212,7 @@ textarea{resize:vertical;min-height:80px;}
 .inv-footer{padding:10px 24px;background:#f4f5f8;text-align:center;font-size:9px;color:#aaa;}
 
 /* STUDENT CARD */
-.student-card{background:#EBF4FD;border:1.5px solid #B8D9F0;border-radius:var(--r);padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin-top:10px;}
+.student-card{background:var(--accent-dim);border:1.5px solid var(--border2);border-radius:var(--r);padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin-top:10px;}
 .sf-lbl{font-size:11px;color:var(--text3);margin-bottom:2px;}
 .sf-val{font-size:13px;color:var(--text);font-weight:500;}
 .student-empty{padding:11px 14px;background:var(--surface2);border:1.5px dashed var(--border2);border-radius:var(--r);color:var(--text3);font-size:13px;margin-top:10px;}
@@ -262,11 +287,34 @@ textarea{resize:vertical;min-height:80px;}
   .wrap{padding:0;max-width:100%;}
   .inv-doc{max-width:100%;border-radius:0;}
 }
+/* Dark mode overrides */
+[data-theme="dark"] .hdr-greeting-card{background:var(--surface);box-shadow:0 4px 24px rgba(0,0,0,0.4);}
+[data-theme="dark"] .hdr-greeting-card h2{color:var(--text);}
+[data-theme="dark"] .hdr-greeting-card p{color:var(--text3);}
+[data-theme="dark"] .hdr-greeting-badge{background:var(--accent-dim);color:var(--accent);}
+[data-theme="dark"] .hdr-greeting-badge.live{background:var(--success-dim);color:var(--success);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);border-color:var(--border);color:var(--text);}
+[data-theme="dark"] select option{background:var(--surface2);color:var(--text);}
+[data-theme="dark"] .date-btn{background:var(--surface2);border-color:var(--border);color:var(--text);}
+[data-theme="dark"] .cal-popup{background:var(--surface);border-color:var(--border);box-shadow:0 12px 32px rgba(0,0,0,.5);}
+[data-theme="dark"] .cal-d:hover{background:var(--surface2);}
+[data-theme="dark"] .cal-d.selected{background:var(--accent);color:#fff;}
+[data-theme="dark"] .reg-row{background:var(--surface2);}
+[data-theme="dark"] .prog-item{background:var(--surface2);}
+[data-theme="dark"] .preview-toggle-btn{background:var(--surface);border-color:var(--border);color:var(--text2);}
+[data-theme="dark"] .preview-inner{background:var(--surface);border-color:var(--border);}
+[data-theme="dark"] .modal{background:var(--surface);}
+[data-theme="dark"] .track-table tr:hover{background:rgba(77,163,212,0.06);}
+[data-theme="dark"] .btn-ghost{border-color:var(--border);color:var(--text2);}
+[data-theme="dark"] .btn-ghost:hover{background:var(--surface2);color:var(--text);}
+[data-theme="dark"] ::-webkit-scrollbar-thumb{background:var(--border2);}
+[data-theme="dark"] .outer-wrapper{background:var(--page-grad);}
+
 </style>
   <style>body { box-sizing: border-box; }</style>
  </head>
  <body>
-  <div style="max-width:1200px;margin:0 auto;min-height:100vh;background:linear-gradient(to bottom, #1B6CA8 0%, #1B6CA8 60%, #FDFAF4 100%);box-shadow:0 0 40px rgba(28,43,58,0.15);">
+  <div style="max-width:1200px;margin:0 auto;min-height:100vh;background:var(--page-grad);box-shadow:0 0 40px rgba(28,43,58,0.15);">
   <div style="position:sticky;top:0;z-index:200;">
   <header class="hdr">
     <!-- Decorative bubbles (same as PWA) -->
@@ -284,6 +332,9 @@ textarea{resize:vertical;min-height:80px;}
         </div>
       </div>
       <div style="display:flex;gap:8px;">
+        <button onclick="toggleDark()" id="darkToggleBtn" title="Dark/Light mode" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:5px 9px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;font-family:inherit;transition:all .15s;">
+          <svg id="darkIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
         <button onclick="manualRefresh()" title="Refresh" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:5px 9px;color:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-family:inherit;transition:all .15s;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
           <span class="btn-text-label">Refresh</span>
@@ -445,7 +496,7 @@ textarea{resize:vertical;min-height:80px;}
      <div class="sec-title" style="flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:12px;"><span style="display:flex;align-items:center;gap:7px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg> Tracking Invoice</span>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;width:100%;margin-top:8px;"><input type="text" id="trackingSearch" placeholder="Cari invoice..." style="flex:1;min-width:0;padding:7px 10px;font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);"> <select id="trackingFilter" style="width:130px;flex-shrink:0;padding:7px 10px;font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);"> <option value="all">Semua</option> <option value="pending">Belum Bayar</option> <option value="partial">Cicilan</option> <option value="paid">Lunas</option> <option value="overdue">Lewat Tempo</option> </select></div>
      </div>
-     <div style="margin-bottom:14px;padding:10px 8px;background:#EBF4FD;border-radius:var(--r);border:1.5px solid #B8D9F0;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;font-size:12px;">
+     <div style="margin-bottom:14px;padding:10px 8px;background:var(--accent-dim);border-radius:var(--r);border:1.5px solid var(--border2);display:grid;grid-template-columns:repeat(5,1fr);gap:4px;font-size:12px;">
       <div style="text-align:center;padding:4px 0;"><div style="font-size:16px;font-weight:800;line-height:1;color:var(--text);font-family:'Baloo 2',sans-serif;" id="statTotal">0</div><div style="color:var(--text3);margin-top:2px;font-size:10px;">Total</div></div>
       <div style="text-align:center;"><div style="font-size:16px;font-weight:800;line-height:1;color:var(--success);font-family:'Baloo 2',sans-serif;" id="statPaid">0</div><div style="color:var(--text3);margin-top:2px;font-size:10px;">Lunas</div></div>
       <div style="text-align:center;"><div style="font-size:16px;font-weight:800;line-height:1;color:var(--warning);font-family:'Baloo 2',sans-serif;" id="statPartial">0</div><div style="color:var(--text3);margin-top:2px;font-size:10px;">Cicilan</div></div>
@@ -1907,6 +1958,35 @@ ${finalHTML}
     function isoDate(d){return d.toISOString().split('T')[0];}
     function fmtLong(d){return d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});}
     function fmtShort(s){if(!s)return '—';const d=new Date(s+'T00:00:00');return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});}
+
+    /* ════ DARK MODE ════ */
+    (function(){
+      const saved = localStorage.getItem('mrkz_theme');
+      if(saved === 'dark') document.documentElement.setAttribute('data-theme','dark');
+      updateDarkIcon();
+    })();
+
+    function toggleDark(){
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if(isDark){
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('mrkz_theme','light');
+      } else {
+        document.documentElement.setAttribute('data-theme','dark');
+        localStorage.setItem('mrkz_theme','dark');
+      }
+      updateDarkIcon();
+    }
+
+    function updateDarkIcon(){
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const icon = document.getElementById('darkIcon');
+      if(!icon) return;
+      // Sun icon for dark mode (click to go light), Moon for light mode
+      icon.innerHTML = isDark
+        ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+        : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+    }
 
     /* Init */
     init();
