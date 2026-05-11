@@ -60,7 +60,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--outer
 .notif-close svg{width:16px;height:16px;}
 
 /* NAV TABS */
-.nav-tabs{padding:12px 14px 0;}
+.nav-tabs{padding:12px 14px 10px;background:var(--hdr-bg);transition:background .3s;}
 .tab-bar-pill{background:rgba(255,255,255,0.18);border-radius:50px;padding:4px;display:flex;gap:2px;border:1.5px solid rgba(255,255,255,0.2);backdrop-filter:blur(8px);}
 .nav-tab{flex:1;padding:9px 0;border:none;background:transparent;border-radius:50px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.65);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
 .nav-tab:hover{color:#fff;background:rgba(255,255,255,0.1);}
@@ -267,6 +267,8 @@ textarea{resize:vertical;min-height:80px;}
 [data-theme="dark"] .btn-ghost:hover{background:var(--surface2);}
 [data-theme="dark"] .notif-card{background:var(--surface);}
 
+[data-theme="dark"] .notif-card{box-shadow:0 8px 32px rgba(0,0,0,0.5);}
+[data-theme="dark"] #hamburgerMenu{box-shadow:0 8px 32px rgba(0,0,0,0.5);}
 @keyframes slideDown{from{transform:translateX(-50%) translateY(-100%);opacity:0;}to{transform:translateX(-50%) translateY(0);opacity:1;}}
 @keyframes slideIn{from{transform:translateX(400px);opacity:0;}to{transform:translateX(0);opacity:1;}}
 @keyframes slideOut{from{transform:translateX(0);opacity:1;}to{transform:translateX(400px);opacity:0;}}
@@ -294,9 +296,8 @@ textarea{resize:vertical;min-height:80px;}
   </div>
 </div>
 
-<div style="position:sticky;top:0;z-index:200;">
+<div>
 <header class="hdr">
-  <div class="hdr-bubbles"><div class="hdr-b1"></div><div class="hdr-b2"></div><div class="hdr-b3"></div></div>
   <div class="hdr-topbar">
     <div class="hdr-topbar-left">
       <div id="syncStatus" style="display:flex;align-items:center;gap:5px;font-size:11px;color:#fff;max-width:200px;overflow:hidden;font-weight:500;">
@@ -305,17 +306,32 @@ textarea{resize:vertical;min-height:80px;}
       </div>
     </div>
     <div style="display:flex;gap:7px;align-items:center;">
-      <!-- NOTIF BELL -->
-      <button onclick="toggleNotifPermission()" id="notifBtn" title="Aktifkan Notifikasi" style="position:relative;width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex-shrink:0;">
-        <svg id="notifBellIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span id="notifBadge" style="display:none;position:absolute;top:4px;right:4px;width:8px;height:8px;background:#ff4444;border-radius:50%;border:2px solid var(--hdr-bg);"></span>
-      </button>
-      <button onclick="toggleDark()" title="Dark/Light" style="width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex-shrink:0;">
-        <svg id="darkIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
-      <button onclick="manualRefresh()" title="Refresh" style="width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex-shrink:0;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
-      </button>
+      <div style="position:relative;">
+        <button onclick="toggleHamburger()" id="hamburgerBtn" title="Menu" style="position:relative;width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex-shrink:0;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          <span id="notifBadge" style="display:none;position:absolute;top:4px;right:4px;width:8px;height:8px;background:#ff4444;border-radius:50%;border:2px solid var(--hdr-bg);"></span>
+        </button>
+        <div id="hamburgerMenu" style="display:none;position:absolute;top:42px;right:0;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.18);overflow:hidden;min-width:190px;z-index:999;">
+          <button onclick="toggleNotifPermission();closeHamburger()" id="notifBtn" style="width:100%;padding:11px 16px;background:none;border:none;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text);font-family:inherit;font-size:13px;font-weight:500;">
+            <span style="width:30px;height:30px;border-radius:8px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg id="notifBellIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </span>
+            <span>Notifikasi</span>
+          </button>
+          <button onclick="toggleDark();updateDarkLabel();closeHamburger()" style="width:100%;padding:11px 16px;background:none;border:none;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text);font-family:inherit;font-size:13px;font-weight:500;">
+            <span style="width:30px;height:30px;border-radius:8px;background:var(--warning-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg id="darkIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </span>
+            <span id="darkModeLabel">Mode Gelap</span>
+          </button>
+          <button onclick="manualRefresh();closeHamburger()" style="width:100%;padding:11px 16px;background:none;border:none;display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text);font-family:inherit;font-size:13px;font-weight:500;">
+            <span style="width:30px;height:30px;border-radius:8px;background:var(--success-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+            </span>
+            <span>Reload Data</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="hdr-inner">
@@ -333,6 +349,7 @@ textarea{resize:vertical;min-height:80px;}
   </div>
 </div>
 
+<div style="position:sticky;top:0;z-index:200;">
 <div class="nav-tabs">
   <div class="tab-bar-pill">
     <button class="nav-tab active" onclick="switchTab('create',this)">
@@ -419,13 +436,42 @@ textarea{resize:vertical;min-height:80px;}
 
   <!-- Siswa -->
   <div class="sec">
-    <div class="sec-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-      Tagihan Kepada
+    <div class="sec-title" style="justify-content:space-between;">
+      <span style="display:flex;align-items:center;gap:7px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Tagihan Kepada
+      </span>
+      <button onclick="toggleManualStudent()" id="btnManualToggle" style="font-size:11px;font-weight:600;padding:5px 12px;border-radius:50px;border:1.5px solid var(--accent);background:var(--accent-dim);color:var(--accent);cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;gap:5px;">
+        <svg id="btnManualIcon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span id="btnManualLabel">Input Manual</span>
+      </button>
     </div>
-    <div>
+    <!-- Pilih dari Sheet -->
+    <div id="studentSelWrap">
       <label>Pilih Siswa</label>
       <select id="studentSel"></select>
+    </div>
+    <!-- Form manual (hidden by default) -->
+    <div id="manualStudentCard" style="display:none;">
+      <div class="g2" style="margin-bottom:10px;">
+        <div><label>Nama Siswa *</label><input type="text" id="manNamaSiswa" placeholder="Nama lengkap siswa" oninput="updateManualStudent()"></div>
+        <div><label>Nama Orang Tua</label><input type="text" id="manNamaOrangtua" placeholder="Nama ibu/ayah" oninput="updateManualStudent()"></div>
+      </div>
+      <div class="g2" style="margin-bottom:10px;">
+        <div><label>No. HP / WA</label><input type="text" id="manHP" placeholder="08xx-xxxx-xxxx" oninput="updateManualStudent()" inputmode="tel"></div>
+        <div><label>Nomor Induk</label><input type="text" id="manNomorInduk" placeholder="Nomor induk siswa" oninput="updateManualStudent()"></div>
+      </div>
+      <div class="g2" style="margin-bottom:10px;">
+        <div>
+          <label>Jenjang</label>
+          <select id="manJenjang" onchange="updateManualStudent()">
+            <option value="Preschool">Preschool</option>
+            <option value="Elementary" selected>Elementary</option>
+            <option value="Middle">Middle</option>
+          </select>
+        </div>
+        <div><label>Alamat</label><input type="text" id="manAlamat" placeholder="Alamat siswa (opsional)" oninput="updateManualStudent()"></div>
+      </div>
     </div>
     <div id="studentCard" class="student-empty">Pilih siswa untuk melihat detail.</div>
   </div>
@@ -632,6 +678,67 @@ textarea{resize:vertical;min-height:80px;}
   </div>
 </div>
 
+<!-- MODAL: EDIT INVOICE -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Edit Invoice
+    </div>
+    <div class="modal-body">
+      <div class="g2" style="margin-bottom:12px;">
+        <div class="modal-field"><label>No. Invoice</label><input type="text" id="editInvNum" readonly style="opacity:.6;cursor:not-allowed;font-family:'Geist Mono',monospace;font-size:12px;"></div>
+        <div class="modal-field"><label>Dibuat Oleh</label>
+          <select id="editCreatedBy">
+            <option>Elis Rosmiati</option>
+            <option>Yessi Marlina</option>
+            <option>Annisa Zahrotun J</option>
+          </select>
+        </div>
+      </div>
+      <div class="g2" style="margin-bottom:12px;">
+        <div class="modal-field"><label>Tanggal Invoice</label><input type="date" id="editInvDate" onchange="editAutoSetDue()"></div>
+        <div class="modal-field"><label>Jatuh Tempo</label><input type="date" id="editDueDate"></div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:12px;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">Data Siswa</div>
+        <div class="g2" style="margin-bottom:10px;">
+          <div class="modal-field"><label>Nama Siswa</label><input type="text" id="editStudentName" placeholder="Nama siswa"></div>
+          <div class="modal-field"><label>Nama Orang Tua</label><input type="text" id="editParentName" placeholder="Nama orang tua"></div>
+        </div>
+        <div class="g2" style="margin-bottom:10px;">
+          <div class="modal-field"><label>Jenjang</label>
+            <select id="editJenjang">
+              <option value="Preschool">Preschool</option>
+              <option value="Elementary">Elementary</option>
+              <option value="Middle">Middle</option>
+            </select>
+          </div>
+          <div class="modal-field"><label>No. HP</label><input type="text" id="editPhone" placeholder="08xx-xxxx-xxxx" inputmode="tel"></div>
+        </div>
+        <div class="modal-field"><label>Alamat</label><input type="text" id="editAlamat" placeholder="Alamat siswa (opsional)"></div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:12px;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">Item / Program</div>
+        <div id="editItemsList"></div>
+        <button onclick="addEditItem()" style="width:100%;margin-top:8px;background:transparent;border:1.5px dashed var(--border2);border-radius:var(--r);padding:10px;cursor:pointer;color:var(--text2);font-family:inherit;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Tambah Item
+        </button>
+      </div>
+      <div class="modal-field"><label>Total (Rp)</label>
+        <input type="number" id="editTotal" placeholder="0" style="font-family:'Geist Mono',monospace;">
+        <div style="font-size:10px;color:var(--text3);margin-top:4px;">Kosongkan untuk hitung otomatis dari item di atas</div>
+      </div>
+      <div class="modal-field"><label>Catatan</label><input type="text" id="editNotes" placeholder="Catatan tambahan (opsional)"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('editModal')">Batal</button>
+      <button class="btn btn-success" onclick="confirmEdit()" id="btnConfirmEdit">Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ═══════════════════════════════════════════════════════════
    MARKAZ BELAJAR — Invoice Web App
@@ -639,8 +746,8 @@ textarea{resize:vertical;min-height:80px;}
 ═══════════════════════════════════════════════════════════ */
 
 /* ── KONFIGURASI ─────────────────────────────────────── */
-// WAJIB diisi: URL Google Apps Script yang sudah di-deploy
-let GAS_URL = localStorage.getItem('mrkz_gas_url') || '';
+// URL Google Apps Script — sudah di-hardcode, otomatis di semua device
+let GAS_URL = 'https://script.google.com/macros/s/AKfycbz1j1hQnuiBDLJWe_a8YHNXJdzKE3CxJRFQotq2D7koWQhNxYw6TbaIvpwybx9BEWLBbA/exec';
 
 // Sheet siswa (hanya baca, tidak berubah)
 const SHEET1_ID = '1Jt2fv8NLgBxuzdXvw0ptSreCfGBlSuXvODcg5ia9CfA';
@@ -659,6 +766,8 @@ const DN=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
 
 /* ── STATE ───────────────────────────────────────────── */
 let student=null, progs=[], pc=0, regOn=false, prevOpen=false;
+let isManualStudent=false;
+let manualStudentData={name:'',parentName:'',phone:'',alamat:'',jenjang:'Elementary',nomorInduk:''};
 let invoices=[];          // sumber utama: dari Google Sheets
 let knownInvoiceIds=new Set(); // untuk deteksi invoice baru
 let currentInvoiceId=null;
@@ -1080,6 +1189,7 @@ async function init(){
   const saved=localStorage.getItem('mrkz_theme');
   if(saved==='dark')document.documentElement.setAttribute('data-theme','dark');
   updateDarkIcon();
+  updateDarkLabel();
 
   // Cek GAS_URL
   if(!hasGasUrl()){
@@ -1110,8 +1220,8 @@ async function init(){
 
   // Kalender
   updateInvNum();
-  const today=new Date(),due7=new Date();due7.setDate(due7.getDate()+7);
-  setDate('inv',today);setDate('due',due7);
+  const today=new Date(),due30=new Date();due30.setDate(due30.getDate()+30);
+  setDate('inv',today);setDate('due',due30);
 
   document.addEventListener('click', e=>{
     if(!e.target.closest('.date-wrap')){
@@ -1243,6 +1353,13 @@ function pickDate(id,ds){
   document.getElementById(c.valId).value=ds;
   const el=document.getElementById(c.txtId);el.textContent=fmtLong(new Date(ds+'T00:00:00'));el.classList.remove('placeholder');
   document.getElementById(c.popId).classList.remove('open');document.getElementById(c.btnId).classList.remove('open');
+  // Jika yang dipilih adalah tanggal invoice, otomatis set jatuh tempo +30 hari
+  if(id==='inv'){
+    const invDate=new Date(ds+'T00:00:00');
+    const dueDate=new Date(invDate);
+    dueDate.setDate(dueDate.getDate()+30);
+    setDate('due',dueDate);
+  }
   if(prevOpen)renderPrev();
 }
 
@@ -1254,10 +1371,67 @@ function onStudent(){
   student=STUDENTS.find(s=>s.id===id)||null;
   progs=[];renderStudentCard();renderProgList();if(prevOpen)renderPrev();
 }
+
+function toggleManualStudent(){
+  isManualStudent=!isManualStudent;
+  const manualCard=document.getElementById('manualStudentCard');
+  const selWrap=document.getElementById('studentSelWrap');
+  const btn=document.getElementById('btnManualToggle');
+  const icon=document.getElementById('btnManualIcon');
+  const label=document.getElementById('btnManualLabel');
+  if(isManualStudent){
+    manualCard.style.display='block';
+    selWrap.style.display='none';
+    icon.innerHTML='<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>';
+    label.textContent='Dari Daftar';
+    btn.style.borderColor='var(--success)';
+    btn.style.background='var(--success-dim)';
+    btn.style.color='var(--success)';
+    student=null;
+    manualStudentData={name:'',parentName:'',phone:'',alamat:'',jenjang:'Elementary',nomorInduk:''};
+  } else {
+    manualCard.style.display='none';
+    selWrap.style.display='block';
+    icon.innerHTML='<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>';
+    label.textContent='Input Manual';
+    btn.style.borderColor='var(--accent)';
+    btn.style.background='var(--accent-dim)';
+    btn.style.color='var(--accent)';
+    isManualStudent=false;
+  }
+  progs=[];renderStudentCard();renderProgList();if(prevOpen)renderPrev();
+}
+
+function updateManualStudent(){
+  manualStudentData={
+    name:(document.getElementById('manNamaSiswa')?.value||'').trim(),
+    parentName:(document.getElementById('manNamaOrangtua')?.value||'').trim(),
+    phone:(document.getElementById('manHP')?.value||'').trim(),
+    nomorInduk:(document.getElementById('manNomorInduk')?.value||'').trim(),
+    jenjang:document.getElementById('manJenjang')?.value||'Elementary',
+    alamat:(document.getElementById('manAlamat')?.value||'').trim(),
+  };
+  renderStudentCard();
+  renderProgList();
+  if(prevOpen)renderPrev();
+}
 function renderStudentCard(){
   const el=document.getElementById('studentCard');
-  if(!student){el.outerHTML='<div id="studentCard" class="student-empty">Pilih siswa untuk melihat detail.</div>';return;}
-  el.outerHTML=`<div id="studentCard" class="student-card"><div><div class="sf-lbl">Nama Siswa</div><div class="sf-val">${student.name}</div></div><div><div class="sf-lbl">Nomor Induk</div><div class="sf-val" style="font-family:'Geist Mono',monospace;font-size:12px;">${student.nomorInduk||'—'}</div></div><div><div class="sf-lbl">Jenjang</div><div class="sf-val">${student.jenjang}</div></div><div><div class="sf-lbl">Program</div><div class="sf-val">${student.program||'—'}</div></div><div><div class="sf-lbl">Tipe</div><div class="sf-val">${student.defaultType||'Reguler'}</div></div><div><div class="sf-lbl">Nama Ibu</div><div class="sf-val">${student.parentName}</div></div><div><div class="sf-lbl">No. HP</div><div class="sf-val">${student.parentPhone||'—'}</div></div>${student.alamat?`<div style="grid-column:1/-1"><div class="sf-lbl">Alamat</div><div class="sf-val" style="font-size:12px;">${student.alamat}</div></div>`:''}</div>`;
+  const activeStudent = isManualStudent ? manualStudentData : student;
+  if(!activeStudent||!activeStudent.name){
+    el.outerHTML='<div id="studentCard" class="student-empty">'+(isManualStudent?'Isi data siswa di atas.':'Pilih siswa untuk melihat detail.')+'</div>';
+    return;
+  }
+  const s=activeStudent;
+  el.outerHTML=`<div id="studentCard" class="student-card">
+    <div><div class="sf-lbl">Nama Siswa</div><div class="sf-val">${s.name}</div></div>
+    <div><div class="sf-lbl">Nomor Induk</div><div class="sf-val" style="font-family:'Geist Mono',monospace;font-size:12px;">${s.nomorInduk||'—'}</div></div>
+    <div><div class="sf-lbl">Jenjang</div><div class="sf-val">${s.jenjang||'—'}</div></div>
+    <div><div class="sf-lbl">Nama Orang Tua</div><div class="sf-val">${s.parentName||'—'}</div></div>
+    <div><div class="sf-lbl">No. HP</div><div class="sf-val">${s.phone||s.parentPhone||'—'}</div></div>
+    ${s.alamat?`<div style="grid-column:1/-1"><div class="sf-lbl">Alamat</div><div class="sf-val" style="font-size:12px;">${s.alamat}</div></div>`:''}
+    ${isManualStudent?`<div style="grid-column:1/-1"><div style="font-size:10px;color:var(--warning);font-weight:600;">✏️ Data Manual</div></div>`:''}
+  </div>`;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1274,25 +1448,65 @@ function toggleReg(){
    PROGRAMS
 ═══════════════════════════════════════════════════════ */
 function addProg(){
-  if(!student){showToast('Pilih siswa terlebih dahulu.',false);return;}
+  const activeStudent = isManualStudent ? manualStudentData : student;
+  if(!activeStudent||(!activeStudent.name)){showToast('Pilih atau isi data siswa terlebih dahulu.',false);return;}
   pc++;
-  const jenProgs=PROGS[student.jenjang]||['Program'];
-  const defaultProg=student.program&&jenProgs.includes(student.program)?student.program:jenProgs[0];
-  progs.push({id:pc,prog:defaultProg,type:student.defaultType||'Reguler',dur:student.defaultDur||1});
+  const jenjang = activeStudent.jenjang || 'Elementary';
+  const jenProgs=PROGS[jenjang]||['Program'];
+  const defaultProg=(!isManualStudent&&student&&student.program&&jenProgs.includes(student.program))?student.program:jenProgs[0];
+  progs.push({id:pc,prog:defaultProg,type:'Reguler',dur:1,manualPrice:null,useManualPrice:false});
   renderProgList();if(prevOpen)renderPrev();
 }
 function removeProg(id){progs=progs.filter(p=>p.id!==id);renderProgList();if(prevOpen)renderPrev();}
-function updProg(id,f,v){const p=progs.find(p=>p.id===id);if(p){p[f]=f==='dur'?parseInt(v):v;}renderProgList();if(prevOpen)renderPrev();}
+function updProg(id,f,v){
+  const p=progs.find(p=>p.id===id);
+  if(p){
+    if(f==='dur')p[f]=parseInt(v);
+    else if(f==='manualPrice'){p.manualPrice=v===''?null:parseInt(v.replace(/\D/g,''))||0;p.useManualPrice=true;}
+    else if(f==='useManualPrice'){p.useManualPrice=v;if(!v)p.manualPrice=null;}
+    else p[f]=v;
+  }
+  renderProgList();if(prevOpen)renderPrev();
+}
 function getPrice(j,t,d){try{return PRICES[j][t][parseInt(d)]||0;}catch(e){return 0;}}
+function getProgPrice(p){
+  if(p.useManualPrice&&p.manualPrice!==null)return p.manualPrice;
+  const jenjang=(isManualStudent?manualStudentData.jenjang:student?.jenjang)||'Elementary';
+  return getPrice(jenjang,p.type,p.dur);
+}
 function renderProgList(){
   const el=document.getElementById('progList');const cnt=document.getElementById('progCount');
-  if(!student||progs.length===0){el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>Belum ada program.</div>`;cnt.textContent='';return;}
+  const activeStudent = isManualStudent ? manualStudentData : student;
+  if(!activeStudent||!activeStudent.name||progs.length===0){el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>Belum ada program.</div>`;cnt.textContent='';return;}
   cnt.textContent=progs.length+' program';
-  const j=student.jenjang;
+  const jenjang=activeStudent.jenjang||'Elementary';
   el.innerHTML=progs.map((p,i)=>{
-    const price=getPrice(j,p.type,p.dur);
+    const price=getProgPrice(p);
     const opt=(v,c)=>`<option value="${v}"${v===c?' selected':''}>${v}</option>`;
-    return `<div class="prog-item"><div class="prog-hdr"><span class="prog-num">Program ${i+1}</span><div style="display:flex;align-items:center;gap:10px;"><span class="prog-price">${rp(price)}</span><button class="btn-icon" onclick="removeProg(${p.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></div><div class="g3"><div><label>Program</label><select onchange="updProg(${p.id},'prog',this.value)">${(PROGS[j]||[]).map(pr=>opt(pr,p.prog)).join('')}</select></div><div><label>Tipe</label><select onchange="updProg(${p.id},'type',this.value)">${['Reguler','Private'].map(t=>opt(t,p.type)).join('')}</select></div><div><label>Durasi</label><select onchange="updProg(${p.id},'dur',this.value)"><option value="1"${p.dur===1?' selected':''}>1 Bulan</option><option value="3"${p.dur===3?' selected':''}>3 Bulan</option><option value="6"${p.dur===6?' selected':''}>6 Bulan</option></select></div></div></div>`;
+    const manualPriceInput=p.useManualPrice
+      ?`<input type="text" value="${p.manualPrice!==null?p.manualPrice:''}" placeholder="Rp manual" onchange="updProg(${p.id},'manualPrice',this.value)" style="margin-top:6px;font-size:12px;font-family:'Geist Mono',monospace;" inputmode="numeric">`
+      :'';
+    return `<div class="prog-item">
+      <div class="prog-hdr">
+        <span class="prog-num">Program ${i+1}</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="prog-price">${rp(price)}</span>
+          <button class="btn-icon" onclick="removeProg(${p.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+        </div>
+      </div>
+      <div class="g3">
+        <div><label>Program</label><select onchange="updProg(${p.id},'prog',this.value)">${(PROGS[jenjang]||['Program']).map(pr=>opt(pr,p.prog)).join('')}</select></div>
+        <div><label>Tipe</label><select onchange="updProg(${p.id},'type',this.value)">${['Reguler','Private'].map(t=>opt(t,p.type)).join('')}</select></div>
+        <div><label>Durasi</label><select onchange="updProg(${p.id},'dur',this.value)"><option value="1"${p.dur===1?' selected':''}>1 Bulan</option><option value="3"${p.dur===3?' selected':''}>3 Bulan</option><option value="6"${p.dur===6?' selected':''}>6 Bulan</option></select></div>
+      </div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--text2);font-weight:400;text-transform:none;letter-spacing:0;">
+          <input type="checkbox" ${p.useManualPrice?'checked':''} onchange="updProg(${p.id},'useManualPrice',this.checked)" style="width:14px;height:14px;accent-color:var(--accent);cursor:pointer;">
+          Harga Manual
+        </label>
+        ${manualPriceInput}
+      </div>
+    </div>`;
   }).join('');
 }
 
@@ -1314,11 +1528,25 @@ function buildInvHTML(d){
 }
 
 function buildInv(){
+  const activeStudent = isManualStudent ? manualStudentData : student;
   const items=[];
   if(regOn)items.push({label:'Biaya Pendaftaran',type:'—',dur:'',price:REG_FEE});
-  if(student&&progs.length>0)progs.forEach(p=>{items.push({label:p.prog,type:p.type,dur:p.dur,price:getPrice(student.jenjang,p.type,p.dur)});});
+  if(activeStudent&&progs.length>0)progs.forEach(p=>{items.push({label:p.prog,type:p.type,dur:p.dur,price:getProgPrice(p)});});
   const subtotal=items.reduce((s,i)=>s+i.price,0);
-  return buildInvHTML({invNum:document.getElementById('invoiceNumber').value,creator:document.getElementById('createdBy').value,notes:document.getElementById('notes').value,invDate:document.getElementById('invDateVal').value,dueDate:document.getElementById('dueDateVal').value,pName:student?student.parentName:'—',sName:student?student.name:'—',jenjang:student?student.jenjang:'',guru:student?student.guru:'',alamat:student?student.alamat:'',nomorInduk:student?student.nomorInduk:'',items,subtotal});
+  return buildInvHTML({
+    invNum:document.getElementById('invoiceNumber').value,
+    creator:document.getElementById('createdBy').value,
+    notes:document.getElementById('notes').value,
+    invDate:document.getElementById('invDateVal').value,
+    dueDate:document.getElementById('dueDateVal').value,
+    pName:activeStudent?activeStudent.parentName||activeStudent.name:'—',
+    sName:activeStudent?activeStudent.name:'—',
+    jenjang:activeStudent?activeStudent.jenjang:'',
+    guru:(!isManualStudent&&student)?student.guru:'',
+    alamat:activeStudent?activeStudent.alamat:'',
+    nomorInduk:activeStudent?activeStudent.nomorInduk:'',
+    items,subtotal
+  });
 }
 function renderPrev(){document.getElementById('previewDoc').innerHTML=buildInv();}
 function printFromForm(){if(!student&&progs.length===0&&!regOn){showToast('Lengkapi data invoice terlebih dahulu.',false);return;}_renderPDF(buildInv(),document.getElementById('invoiceNumber').value+'.pdf',false);}
@@ -1336,7 +1564,8 @@ function _renderPDF(invHTML,filename,paidStamp=false){
    FINISH INVOICE — simpan ke Sheets
 ═══════════════════════════════════════════════════════ */
 async function finishInvoice(){
-  if(!student){showToast('Pilih siswa terlebih dahulu.',false);return;}
+  const activeStudent = isManualStudent ? manualStudentData : student;
+  if(!activeStudent||!activeStudent.name){showToast('Pilih atau isi data siswa terlebih dahulu.',false);return;}
   if(progs.length===0&&!regOn){showToast('Tambahkan minimal 1 item.',false);return;}
 
   const btn = document.getElementById('btnFinish');
@@ -1345,22 +1574,22 @@ async function finishInvoice(){
 
   let subtotal=0;
   if(regOn)subtotal+=REG_FEE;
-  progs.forEach(p=>{subtotal+=getPrice(student.jenjang,p.type,p.dur);});
+  progs.forEach(p=>{subtotal+=getProgPrice(p);});
 
   const invoiceItems=[];
   if(regOn)invoiceItems.push({label:'Biaya Pendaftaran',type:'—',dur:'',price:REG_FEE});
-  progs.forEach(p=>{invoiceItems.push({label:p.prog,type:p.type,dur:p.dur,price:getPrice(student.jenjang,p.type,p.dur)});});
+  progs.forEach(p=>{invoiceItems.push({label:p.prog,type:p.type,dur:p.dur,price:getProgPrice(p)});});
 
   const invData={
     __backendId: 'gs_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
     invoice_number:       document.getElementById('invoiceNumber').value,
-    student_name:         student.name,
-    student_id:           student.id,
-    student_jenjang:      student.jenjang,
-    student_parent:       student.parentName,
-    student_alamat:       student.alamat||'',
-    student_phone:        student.parentPhone||'',
-    student_nomor_induk:  student.nomorInduk||'',
+    student_name:         activeStudent.name,
+    student_id:           isManualStudent ? 'manual' : student.id,
+    student_jenjang:      activeStudent.jenjang||'',
+    student_parent:       activeStudent.parentName||activeStudent.name,
+    student_alamat:       activeStudent.alamat||'',
+    student_phone:        activeStudent.phone||activeStudent.parentPhone||'',
+    student_nomor_induk:  activeStudent.nomorInduk||'',
     created_date:         document.getElementById('invDateVal').value,
     due_date:             document.getElementById('dueDateVal').value,
     created_by:           document.getElementById('createdBy').value,
@@ -1452,6 +1681,7 @@ function renderTracking(){
       <td><div style="display:flex;gap:4px;align-items:center;justify-content:flex-end;">
         <button class="btn btn-small btn-accent" onclick="openSendModal('${inv.__backendId}')">Kirim</button>
         <button class="btn btn-small btn-ghost" onclick="openPaymentModal('${inv.__backendId}')">Bayar</button>
+        <button class="btn btn-small" style="background:var(--accent-dim);color:var(--accent);border:1px solid rgba(27,108,168,.15);border-radius:8px;padding:5px 9px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:500;" onclick="openEditModal('${inv.__backendId}')">Edit</button>
         <button class="btn btn-small" style="background:var(--danger-dim);color:var(--danger);border:1px solid rgba(220,53,69,.15);border-radius:8px;padding:5px 9px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:500;" onclick="deleteInvoice('${inv.__backendId}')">Hapus</button>
       </div></td>
     </tr>`;
@@ -1620,6 +1850,148 @@ async function confirmDeleteInvoice(invId){
 }
 
 /* ═══════════════════════════════════════════════════════
+   EDIT INVOICE
+═══════════════════════════════════════════════════════ */
+let editItems=[];
+let editInvoiceId=null;
+
+function openEditModal(invId){
+  const inv=invoices.find(i=>i.__backendId===invId);
+  if(!inv)return;
+  editInvoiceId=invId;
+
+  // Isi field dari data invoice
+  document.getElementById('editInvNum').value=inv.invoice_number||'';
+  document.getElementById('editCreatedBy').value=inv.created_by||'';
+  document.getElementById('editInvDate').value=inv.created_date||'';
+  document.getElementById('editDueDate').value=inv.due_date||'';
+  document.getElementById('editStudentName').value=inv.student_name||'';
+  document.getElementById('editParentName').value=inv.student_parent||'';
+  document.getElementById('editJenjang').value=inv.student_jenjang||'Elementary';
+  document.getElementById('editPhone').value=inv.student_phone||'';
+  document.getElementById('editAlamat').value=inv.student_alamat||'';
+  document.getElementById('editNotes').value=inv.notes||'';
+  document.getElementById('editTotal').value=inv.amount||0;
+
+  // Load items
+  editItems=(inv.invoice_items&&inv.invoice_items.length>0)
+    ?inv.invoice_items.map((it,i)=>({id:i+1,label:it.label||'',type:it.type||'—',dur:it.dur||'',price:it.price||0}))
+    :[{id:1,label:'Layanan Bimbingan Belajar',type:'—',dur:'',price:inv.amount||0}];
+
+  renderEditItems();
+  document.getElementById('editModal').classList.add('open');
+}
+
+function renderEditItems(){
+  const el=document.getElementById('editItemsList');
+  if(!editItems||editItems.length===0){el.innerHTML='';return;}
+  el.innerHTML=editItems.map((it,i)=>`
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Item ${i+1}</span>
+        <button class="btn-icon" onclick="removeEditItem(${it.id})">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        </button>
+      </div>
+      <div class="g2" style="margin-bottom:8px;">
+        <div><label>Nama Program/Item</label><input type="text" value="${it.label}" onchange="updEditItem(${it.id},'label',this.value)" placeholder="Nama program"></div>
+        <div><label>Harga (Rp)</label><input type="number" value="${it.price}" onchange="updEditItem(${it.id},'price',parseInt(this.value)||0)" oninput="recalcEditTotal()" placeholder="0" style="font-family:'Geist Mono',monospace;" inputmode="numeric"></div>
+      </div>
+      <div class="g2">
+        <div><label>Tipe</label>
+          <select onchange="updEditItem(${it.id},'type',this.value)">
+            ${['Reguler','Private','—'].map(t=>`<option value="${t}"${it.type===t?' selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div><label>Durasi</label>
+          <select onchange="updEditItem(${it.id},'dur',this.value)">
+            ${[{v:'',l:'—'},{v:'1',l:'1 Bulan'},{v:'3',l:'3 Bulan'},{v:'6',l:'6 Bulan'}].map(o=>`<option value="${o.v}"${String(it.dur)===o.v?' selected':''}>${o.l}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addEditItem(){
+  const newId=(editItems.length>0?Math.max(...editItems.map(i=>i.id)):0)+1;
+  editItems.push({id:newId,label:'',type:'—',dur:'',price:0});
+  renderEditItems();
+}
+
+function removeEditItem(id){
+  editItems=editItems.filter(it=>it.id!==id);
+  renderEditItems();
+  recalcEditTotal();
+}
+
+function updEditItem(id,field,val){
+  const it=editItems.find(i=>i.id===id);
+  if(it)it[field]=val;
+  recalcEditTotal();
+}
+
+function recalcEditTotal(){
+  const sum=editItems.reduce((s,it)=>s+(parseInt(it.price)||0),0);
+  const totalEl=document.getElementById('editTotal');
+  if(totalEl&&!totalEl.dataset.manualOverride)totalEl.value=sum;
+}
+
+function editAutoSetDue(){
+  const invDate=document.getElementById('editInvDate').value;
+  if(!invDate)return;
+  const d=new Date(invDate+'T00:00:00');
+  d.setDate(d.getDate()+30);
+  document.getElementById('editDueDate').value=isoDate(d);
+}
+
+async function confirmEdit(){
+  if(!editInvoiceId)return;
+  const inv=invoices.find(i=>i.__backendId===editInvoiceId);
+  if(!inv)return;
+
+  const totalInput=parseInt(document.getElementById('editTotal').value)||0;
+  const autoTotal=editItems.reduce((s,it)=>s+(parseInt(it.price)||0),0);
+  const finalTotal=totalInput>0?totalInput:autoTotal;
+
+  const btn=document.getElementById('btnConfirmEdit');
+  btn.disabled=true;btn.textContent='Menyimpan...';
+
+  // Update fields yang bisa diedit via updateInvoice (notes, status, dll)
+  const updates={
+    notes:     document.getElementById('editNotes').value,
+    // Field tambahan yang perlu disimpan ulang — kirim via custom action
+  };
+
+  // Karena updateInvoice GAS hanya update beberapa field,
+  // kita kirim semua data yang berubah sebagai update extended
+  const extUpdates={
+    created_by:          document.getElementById('editCreatedBy').value,
+    created_date:        document.getElementById('editInvDate').value,
+    due_date:            document.getElementById('editDueDate').value,
+    student_name:        document.getElementById('editStudentName').value,
+    student_parent:      document.getElementById('editParentName').value,
+    student_jenjang:     document.getElementById('editJenjang').value,
+    student_phone:       document.getElementById('editPhone').value,
+    student_alamat:      document.getElementById('editAlamat').value,
+    notes:               document.getElementById('editNotes').value,
+    amount:              finalTotal,
+    invoice_items:       editItems,
+  };
+
+  try{
+    await updateInvoiceInSheets(editInvoiceId, extUpdates, document.getElementById('createdBy').value);
+    await syncFromSheets(false);
+    showToast('Invoice berhasil diperbarui! ✓',true);
+    closeModal('editModal');
+  }catch(e){
+    showToast('Gagal update: '+e.message,false);
+  }finally{
+    btn.disabled=false;btn.textContent='Simpan Perubahan';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
    PDF
 ═══════════════════════════════════════════════════════ */
 function downloadInvoicePDF(invId){
@@ -1642,7 +2014,13 @@ function resetForm(){
   if(invoices.length>0){const nums=invoices.map(i=>{const p=(i.invoice_number||'').split('/');return parseInt(p[p.length-1])||0;});invCnt=Math.max(...nums)+1;}
   else invCnt=1;
   updateInvNum();
-  setDate('inv',new Date());const d=new Date();d.setDate(d.getDate()+7);setDate('due',d);
+  setDate('inv',new Date());const d=new Date();d.setDate(d.getDate()+30);setDate('due',d);
+  // Reset mode siswa manual jika aktif
+  const manualCard=document.getElementById('manualStudentCard');
+  if(manualCard)manualCard.style.display='none';
+  const selWrap=document.getElementById('studentSelWrap');
+  if(selWrap)selWrap.style.display='block';
+  isManualStudent=false;
   renderStudentCard();renderProgList();
   document.getElementById('previewPanel').classList.remove('open');
   document.getElementById('previewToggleBtn').classList.remove('open');
@@ -1672,12 +2050,36 @@ function toggleDark(){
   if(isDark){document.documentElement.removeAttribute('data-theme');localStorage.setItem('mrkz_theme','light');}
   else{document.documentElement.setAttribute('data-theme','dark');localStorage.setItem('mrkz_theme','dark');}
   updateDarkIcon();
+  updateDarkLabel();
+}
+function updateDarkLabel(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const lbl=document.getElementById('darkModeLabel');
+  if(lbl) lbl.textContent=isDark?'Mode Terang':'Mode Gelap';
 }
 function updateDarkIcon(){
   const isDark=document.documentElement.getAttribute('data-theme')==='dark';
   const icon=document.getElementById('darkIcon');if(!icon)return;
   icon.innerHTML=isDark?'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>':'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
 }
+
+/* HAMBURGER MENU */
+function toggleHamburger(){
+  const menu=document.getElementById('hamburgerMenu');
+  const isOpen=menu.style.display==='block';
+  menu.style.display=isOpen?'none':'block';
+}
+function closeHamburger(){
+  document.getElementById('hamburgerMenu').style.display='none';
+}
+// Tutup menu kalau klik di luar
+document.addEventListener('click',function(e){
+  const btn=document.getElementById('hamburgerBtn');
+  const menu=document.getElementById('hamburgerMenu');
+  if(menu && btn && !btn.contains(e.target) && !menu.contains(e.target)){
+    menu.style.display='none';
+  }
+});
 
 /* RUN */
 init();
