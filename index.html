@@ -262,6 +262,34 @@ textarea{resize:vertical;min-height:80px;}
 [data-theme="dark"] .date-btn{background:var(--surface2);border-color:var(--border);color:var(--text);}
 [data-theme="dark"] .cal-popup{background:var(--surface);border-color:var(--border);}
 [data-theme="dark"] .cal-d.selected{background:var(--accent);color:#fff;}
+/* NOTIF PERMISSION POPUP DIALOG */
+.notif-popup-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,25,35,0.65);z-index:8000;align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:20px;}
+.notif-popup-overlay.open{display:flex;animation:fadeInBg .3s ease;}
+.notif-popup{background:var(--surface);border:1.5px solid var(--border);border-radius:24px;padding:0;max-width:360px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,0.22);overflow:hidden;animation:popupIn .4s cubic-bezier(.34,1.56,.64,1);}
+.notif-popup-hero{background:linear-gradient(135deg,#1B6CA8 0%,#1554A0 100%);padding:32px 24px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;overflow:hidden;}
+.notif-popup-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.08);}
+.notif-popup-hero::after{content:'';position:absolute;bottom:-40px;left:-20px;width:100px;height:100px;border-radius:50%;background:rgba(243,213,101,0.10);}
+.notif-popup-bell{width:64px;height:64px;background:rgba(255,255,255,0.18);border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;position:relative;z-index:1;border:2px solid rgba(255,255,255,0.25);}
+.notif-popup-bell svg{width:30px;height:30px;color:#fff;}
+.notif-popup-bell-ring{animation:bellRing 1.2s ease-in-out .5s both;}
+.notif-popup-hero h2{font-family:'Baloo 2',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:8px;position:relative;z-index:1;}
+.notif-popup-hero p{font-size:13px;color:rgba(255,255,255,0.8);line-height:1.6;position:relative;z-index:1;}
+.notif-popup-body{padding:20px 24px 24px;}
+.notif-popup-features{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.notif-popup-feat{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);}
+.notif-popup-feat-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.notif-popup-feat-icon svg{width:14px;height:14px;}
+.notif-popup-actions{display:flex;flex-direction:column;gap:8px;}
+.notif-popup-allow{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;box-shadow:0 4px 14px rgba(27,108,168,0.35);}
+.notif-popup-allow:hover{opacity:.92;transform:translateY(-1px);box-shadow:0 6px 18px rgba(27,108,168,0.4);}
+.notif-popup-allow svg{width:16px;height:16px;}
+.notif-popup-skip{width:100%;padding:10px;background:transparent;color:var(--text3);border:none;font-family:inherit;font-size:13px;cursor:pointer;border-radius:12px;transition:color .15s;}
+.notif-popup-skip:hover{color:var(--text2);background:var(--surface2);}
+@keyframes popupIn{from{opacity:0;transform:scale(.85) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+@keyframes fadeInBg{from{opacity:0;}to{opacity:1;}}
+@keyframes bellRing{0%,100%{transform:rotate(0);}15%{transform:rotate(12deg);}30%{transform:rotate(-10deg);}45%{transform:rotate(8deg);}60%{transform:rotate(-6deg);}75%{transform:rotate(4deg);}90%{transform:rotate(-2deg);}}
+[data-theme="dark"] .notif-popup{background:var(--surface);}
+
 [data-theme="dark"] .modal{background:var(--surface);}
 [data-theme="dark"] .btn-ghost{border-color:var(--border);color:var(--text2);}
 [data-theme="dark"] .btn-ghost:hover{background:var(--surface2);}
@@ -370,8 +398,8 @@ textarea{resize:vertical;min-height:80px;}
 <!-- ══ TAB: BUAT INVOICE ══ -->
 <div id="tab-create" class="tab-content active">
 
-  <!-- Notif permission card — hanya tampil jika belum izin -->
-  <div class="notif-perm-card" id="notifPermCard" style="display:none;">
+  <!-- Notif permission card — digantikan oleh popup dialog -->
+  <div class="notif-perm-card" id="notifPermCard" style="display:none !important;">
     <div class="notif-perm-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
     </div>
@@ -812,13 +840,28 @@ async function initServiceWorker() {
 function checkNotifPermission() {
   if (!('Notification' in window)) return;
   const dismissed = localStorage.getItem('notif_dismissed');
-  if (dismissed) return;
-  
+  if (dismissed) {
+    if (Notification.permission === 'granted') updateNotifBellIcon(true);
+    return;
+  }
   if (Notification.permission === 'default') {
-    document.getElementById('notifPermCard').style.display = 'flex';
+    // Tampilkan popup dialog setelah 800ms (beri waktu halaman render)
+    setTimeout(() => {
+      document.getElementById('notifPopupOverlay').classList.add('open');
+    }, 800);
   } else if (Notification.permission === 'granted') {
     updateNotifBellIcon(true);
   }
+}
+
+function dismissNotifPopup() {
+  document.getElementById('notifPopupOverlay').classList.remove('open');
+  localStorage.setItem('notif_dismissed', '1');
+}
+
+async function allowNotifFromPopup() {
+  document.getElementById('notifPopupOverlay').classList.remove('open');
+  await requestNotifPermission();
 }
 
 async function requestNotifPermission() {
@@ -2084,5 +2127,47 @@ document.addEventListener('click',function(e){
 /* RUN */
 init();
 </script>
+
+<!-- ══ NOTIF PERMISSION POPUP DIALOG ══ -->
+<div class="notif-popup-overlay" id="notifPopupOverlay">
+  <div class="notif-popup">
+    <div class="notif-popup-hero">
+      <div class="notif-popup-bell">
+        <svg class="notif-popup-bell-ring" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/></svg>
+      </div>
+      <h2>Aktifkan Notifikasi 🔔</h2>
+      <p>Dapatkan notifikasi otomatis saat guru lain membuat invoice baru. Tidak perlu refresh manual!</p>
+    </div>
+    <div class="notif-popup-body">
+      <div class="notif-popup-features">
+        <div class="notif-popup-feat">
+          <div class="notif-popup-feat-icon" style="background:var(--success-dim);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span>Notif muncul langsung, meski app di background</span>
+        </div>
+        <div class="notif-popup-feat">
+          <div class="notif-popup-feat-icon" style="background:var(--accent-dim);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <span>Update real-time tanpa perlu reload halaman</span>
+        </div>
+        <div class="notif-popup-feat">
+          <div class="notif-popup-feat-icon" style="background:var(--warning-dim);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <span>Aman — hanya notifikasi dari Markaz Belajar</span>
+        </div>
+      </div>
+      <div class="notif-popup-actions">
+        <button class="notif-popup-allow" onclick="allowNotifFromPopup()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Izinkan Notifikasi
+        </button>
+        <button class="notif-popup-skip" onclick="dismissNotifPopup()">Nanti Saja</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
