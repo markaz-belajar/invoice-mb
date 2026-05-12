@@ -1739,7 +1739,7 @@ async function confirmSend(){
     await syncFromSheets(false);
   }catch(e){console.warn('Update sent failed:',e);}
   if(currentSendMethod==='whatsapp'){
-    const phone=inv.student_phone||'';
+    const phone=inv.student_phone ? String(inv.student_phone).trim() : '';
     if(phone){const num=phone.startsWith('0')?'62'+phone.substring(1):phone.replace(/^\+/,'');let msg=`Invoice Markaz Belajar\n\nNo: ${inv.invoice_number}\nSiswa: ${inv.student_name}\nTotal: ${rp(inv.amount)}\nJatuh Tempo: ${fmtShort(inv.due_date)}`;if(note)msg+=`\n\nCatatan: ${note}`;msg+='\n\nTerima kasih! 🙏';window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`,'_blank');}
     else showToast('Nomor HP tidak ditemukan.',false);
   }
