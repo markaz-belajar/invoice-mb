@@ -974,64 +974,40 @@ function hasGasUrl() {
 /* BACA invoice dari Sheets */
 async function fetchInvoicesFromSheets() {
   if (!hasGasUrl()) {
-    // Fallback ke localStorage jika GAS_URL belum diisi
-    const local = JSON.parse(localStorage.getItem('mrkz_invoices') || '[]');
-    return local;
+    return JSON.parse(localStorage.getItem('mrkz_invoices') || '[]');
   }
-  
-  try {
-    const resp = await fetch(`${GAS_URL}?action=getInvoices&t=${Date.now()}`);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const data = await resp.json();
-    if (data.error) throw new Error(data.error);
-    return data.invoices || [];
-  } catch(e) {
-    console.error('Fetch invoices error:', e);
-    throw e;
-  }
+  const resp = await fetch(`${GAS_URL}?action=getInvoices&t=${Date.now()}`);
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data.invoices || [];
 }
-
-/* SIMPAN invoice baru ke Sheets */
 async function saveInvoiceToSheets(invData) {
   if (!hasGasUrl()) {
-    // Fallback: simpan ke localStorage saja
     const local = JSON.parse(localStorage.getItem('mrkz_invoices') || '[]');
     local.push(invData);
     localStorage.setItem('mrkz_invoices', JSON.stringify(local));
     return { ok: true, backendId: invData.__backendId, offline: true };
   }
-
-  const resp = await fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'saveInvoice', invoice: invData })
-  });
+  const encoded = encodeURIComponent(JSON.stringify({ invoice: invData }));
+  const resp = await fetch(`${GAS_URL}?action=saveInvoice&data=${encoded}`);
   const data = await resp.json();
   if (data.error) throw new Error(data.error);
   return data;
 }
-
-/* UPDATE invoice di Sheets (payment, sent, dll) */
 async function updateInvoiceInSheets(backendId, updates, updatedBy) {
   if (!hasGasUrl()) {
-    // Fallback: update localStorage
     const local = JSON.parse(localStorage.getItem('mrkz_invoices') || '[]');
     const idx = local.findIndex(i => i.__backendId === backendId);
     if (idx >= 0) { local[idx] = {...local[idx], ...updates}; localStorage.setItem('mrkz_invoices', JSON.stringify(local)); }
     return { ok: true };
   }
-
-  const resp = await fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'updateInvoice', backendId, updates, updatedBy })
-  });
+  const encoded = encodeURIComponent(JSON.stringify({ backendId, updates, updatedBy }));
+  const resp = await fetch(`${GAS_URL}?action=updateInvoice&data=${encoded}`);
   const data = await resp.json();
   if (data.error) throw new Error(data.error);
   return data;
 }
-
-/* HAPUS invoice dari Sheets */
 async function deleteInvoiceFromSheets(backendId, deletedBy) {
   if (!hasGasUrl()) {
     let local = JSON.parse(localStorage.getItem('mrkz_invoices') || '[]');
@@ -1039,26 +1015,16 @@ async function deleteInvoiceFromSheets(backendId, deletedBy) {
     localStorage.setItem('mrkz_invoices', JSON.stringify(local));
     return { ok: true };
   }
-
-  const resp = await fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'deleteInvoice', backendId, deletedBy })
-  });
+  const encoded = encodeURIComponent(JSON.stringify({ backendId, deletedBy }));
+  const resp = await fetch(`${GAS_URL}?action=deleteInvoice&data=${encoded}`);
   const data = await resp.json();
   if (data.error) throw new Error(data.error);
   return data;
 }
-
-/* UPLOAD bukti ke Drive */
 async function uploadProofToDrive(base64, mimeType, invoiceNumber) {
   if (!hasGasUrl()) return null;
-  
-  const resp = await fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'uploadProof', base64, mimeType, invoiceNumber })
-  });
+  const encoded = encodeURIComponent(JSON.stringify({ base64, mimeType, invoiceNumber }));
+  const resp = await fetch(`${GAS_URL}?action=uploadProof&data=${encoded}`);
   const data = await resp.json();
   if (data.error) throw new Error(data.error);
   return data.viewUrl;
