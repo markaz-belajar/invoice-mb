@@ -121,6 +121,25 @@ textarea{resize:vertical;min-height:80px;}
 .modal-field{margin-bottom:14px;}
 .modal-actions{display:flex;gap:10px;margin-top:16px;}
 
+
+/* SEND METHOD CARDS */
+.send-opt-card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px 10px;border:2px solid var(--border);border-radius:14px;background:var(--surface2);cursor:pointer;transition:all .2s;font-family:inherit;}
+.send-opt-card:hover{border-color:var(--border2);background:var(--surface);}
+.send-opt-card.selected-wa{border-color:#25D366;background:#f0fdf4;box-shadow:0 0 0 3px rgba(37,211,102,0.15);}
+[data-theme="dark"] .send-opt-card.selected-wa{background:rgba(37,211,102,0.08);}
+.send-opt-card.selected-email{border-color:#4285F4;background:#f0f4ff;box-shadow:0 0 0 3px rgba(66,133,244,0.15);}
+[data-theme="dark"] .send-opt-card.selected-email{background:rgba(66,133,244,0.08);}
+.send-opt-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;transition:transform .2s;}
+.wa-icon{background:#e7faea;color:#25D366;}
+.email-icon{background:#e8f0fe;color:#4285F4;}
+.send-opt-card.selected-wa .wa-icon,.send-opt-card.selected-email .email-icon{transform:scale(1.1);}
+.send-opt-label{font-size:13px;font-weight:700;color:var(--text2);transition:color .2s;}
+.send-opt-card.selected-wa .send-opt-label{color:#16a34a;}
+.send-opt-card.selected-email .send-opt-label{color:#2563eb;}
+.send-opt-check{position:absolute;top:8px;right:8px;width:20px;height:20px;background:#25D366;color:#fff;border-radius:50%;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;line-height:1;}
+.send-opt-card.selected-email .send-opt-check{background:#4285F4;}
+.send-opt-card.selected-wa .send-opt-check,.send-opt-card.selected-email .send-opt-check{display:flex;}
+
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;border:none;outline:none;transition:all .15s;white-space:nowrap;}
 .btn svg{width:14px;height:14px;flex-shrink:0;}
@@ -665,8 +684,20 @@ textarea{resize:vertical;min-height:80px;}
     <div class="modal-body">
       <div class="modal-field"><label>Pilih Metode Pengiriman</label>
         <div style="display:flex;gap:10px;margin-top:8px;">
-          <button class="btn btn-accent" onclick="sendVia('whatsapp')" style="flex:1;">WhatsApp</button>
-          <button class="btn btn-accent" onclick="sendVia('email')" style="flex:1;">Email</button>
+          <button id="sendOptWa" onclick="sendVia('whatsapp')" class="send-opt-card" style="flex:1;">
+            <span class="send-opt-check">&#10003;</span>
+            <span class="send-opt-icon wa-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.852L.057 23.57a.75.75 0 0 0 .918.919l5.739-1.479A11.953 11.953 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.953 9.953 0 0 1-5.127-1.417l-.368-.218-3.807.981.999-3.683-.24-.381A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+            </span>
+            <span class="send-opt-label">WhatsApp</span>
+          </button>
+          <button id="sendOptEmail" onclick="sendVia('email')" class="send-opt-card" style="flex:1;">
+            <span class="send-opt-check">&#10003;</span>
+            <span class="send-opt-icon email-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+            <span class="send-opt-label">Email</span>
+          </button>
         </div>
       </div>
       <div class="modal-field" id="sendNoteField" style="display:none;">
@@ -1726,7 +1757,18 @@ function openSendModal(invId){
   if(lbl&&inv){const isLunas=inv.payment_status==='paid';lbl.textContent=isLunas?'Cetak Invoice LUNAS':'Cetak PDF';}
   document.getElementById('sendModal').classList.add('open');
 }
-function sendVia(method){currentSendMethod=method;document.getElementById('sendNoteField').style.display='block';}
+function sendVia(method){
+  currentSendMethod=method;
+  document.getElementById('sendNoteField').style.display='block';
+  const wa=document.getElementById('sendOptWa');
+  const em=document.getElementById('sendOptEmail');
+  if(wa&&em){
+    wa.classList.remove('selected-wa','selected-email');
+    em.classList.remove('selected-wa','selected-email');
+    if(method==='whatsapp') wa.classList.add('selected-wa');
+    else em.classList.add('selected-email');
+  }
+}
 
 async function confirmSend(){
   if(!currentSendMethod){showToast('Pilih metode pengiriman.',false);return;}
@@ -1744,7 +1786,7 @@ async function confirmSend(){
     else showToast('Nomor HP tidak ditemukan.',false);
   }
   closeModal('sendModal');
-  document.getElementById('sendNote').value='';document.getElementById('sendNoteField').style.display='none';currentSendMethod=null;
+  document.getElementById('sendNote').value='';document.getElementById('sendNoteField').style.display='none';currentSendMethod=null;const _wa=document.getElementById('sendOptWa');const _em=document.getElementById('sendOptEmail');if(_wa)_wa.classList.remove('selected-wa','selected-email');if(_em)_em.classList.remove('selected-wa','selected-email');
 }
 
 function printCurrentInvoice(){
