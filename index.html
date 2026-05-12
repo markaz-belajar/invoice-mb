@@ -1800,7 +1800,7 @@ async function confirmSend(){
       else if(num.startsWith('0'))   { num = '62' + num.substring(1); }
       else if(num.startsWith('8'))   { num = '62' + num; }
       // else biarkan apa adanya (misal sudah format lain)
-      ;let msg=`Invoice Markaz Belajar\n\nNo: ${inv.invoice_number}\nSiswa: ${inv.student_name}\nTotal: ${rp(inv.amount)}\nJatuh Tempo: ${fmtShort(inv.due_date)}`;if(note)msg+=`\n\nCatatan: ${note}`;msg+='\n\nTerima kasih! 🙏';window.open(`whatsapp://send?phone=${num}&text=${encodeURIComponent(msg)}`);}
+      ;let msg=`Invoice Markaz Belajar\n\nNo: ${inv.invoice_number}\nSiswa: ${inv.student_name}\nTotal: ${rp(inv.amount)}\nJatuh Tempo: ${fmtShort(inv.due_date)}`;if(note)msg+=`\n\nCatatan: ${note}`;msg+='\n\nTerima kasih! 🙏';window.location.href=`https://wa.me/${num}?text=${encodeURIComponent(msg)}`;}
     else showToast('Nomor HP tidak ditemukan.',false);
   }
   // Reset loading state
