@@ -513,13 +513,21 @@ textarea{resize:vertical;min-height:70px;}
 
 <script>
 // ══════════════════════════════════════
-// CONFIG — ganti dengan GAS_URL kamu
-// ══════════════════════════════════════
-let GAS_URL = '';  // Isi dengan URL GAS yang sama dengan invoice
-// Contoh: 'https://script.google.com/macros/s/XXXX/exec'
+// CONFIG — GAS_URL sama dengan invoice
+let GAS_URL = 'https://script.google.com/macros/s/AKfycbxbyZtQyblDlDZgRyRLy_grf-W66O7nWwsL9vn1iI46GENgWtjAkcg5u7-LeBERXbiX7A/exec';
 
 function hasGasUrl() {
   return GAS_URL && GAS_URL.startsWith('https://script.google.com');
+}
+
+// Helper: semua write via GET ?method=post&data=... (CORS workaround untuk GAS)
+async function gasPost(action, payload) {
+  const encoded = encodeURIComponent(JSON.stringify({ action, ...payload }));
+  const resp = await fetch(`${GAS_URL}?method=post&data=${encoded}`, { cache: 'no-store' });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
 }
 
 // ══════════════════════════════════════
@@ -695,13 +703,13 @@ function updatePreviewAmount() {
 }
 
 // ══════════════════════════════════════
-// GAS FUNCTIONS (GET + querystring)
+// GAS FUNCTIONS
 // ══════════════════════════════════════
 async function fetchExpensesFromSheets() {
   if (!hasGasUrl()) {
     return JSON.parse(localStorage.getItem('mb_expenses') || '[]');
   }
-  const resp = await fetch(`${GAS_URL}?action=getExpenses&t=${Date.now()}`);
+  const resp = await fetch(`${GAS_URL}?action=getExpenses&t=${Date.now()}`, { cache: 'no-store' });
   if (!resp.ok) throw new Error('HTTP ' + resp.status);
   const data = await resp.json();
   if (data.error) throw new Error(data.error);
@@ -714,11 +722,7 @@ async function saveExpenseToSheets(exp) {
     localStorage.setItem('mb_expenses', JSON.stringify(local));
     return { ok: true };
   }
-  const encoded = encodeURIComponent(JSON.stringify({ expense: exp }));
-  const resp = await fetch(`${GAS_URL}?action=saveExpense&data=${encoded}`);
-  const data = await resp.json();
-  if (data.error) throw new Error(data.error);
-  return data;
+  return await gasPost('saveExpense', { expense: exp });
 }
 async function updateExpenseInSheets(id, updates) {
   if (!hasGasUrl()) {
@@ -727,11 +731,7 @@ async function updateExpenseInSheets(id, updates) {
     if (idx >= 0) { local[idx] = {...local[idx], ...updates}; localStorage.setItem('mb_expenses', JSON.stringify(local)); }
     return { ok: true };
   }
-  const encoded = encodeURIComponent(JSON.stringify({ id, updates }));
-  const resp = await fetch(`${GAS_URL}?action=updateExpense&data=${encoded}`);
-  const data = await resp.json();
-  if (data.error) throw new Error(data.error);
-  return data;
+  return await gasPost('updateExpense', { id, updates });
 }
 async function deleteExpenseFromSheets(id) {
   if (!hasGasUrl()) {
@@ -740,11 +740,7 @@ async function deleteExpenseFromSheets(id) {
     localStorage.setItem('mb_expenses', JSON.stringify(local));
     return { ok: true };
   }
-  const encoded = encodeURIComponent(JSON.stringify({ id }));
-  const resp = await fetch(`${GAS_URL}?action=deleteExpense&data=${encoded}`);
-  const data = await resp.json();
-  if (data.error) throw new Error(data.error);
-  return data;
+  return await gasPost('deleteExpense', { id });
 }
 
 // ══════════════════════════════════════
