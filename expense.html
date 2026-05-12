@@ -1,0 +1,1136 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markaz Belajar — Pengeluaran</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Baloo+2:wght@600;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#FDFAF4;--surface:#FFFFFF;--surface2:#F0EBE3;--border:#EDE9DF;--border2:#D8D1C7;
+  --text:#1C2B3A;--text2:#4A6070;--text3:#8FA4B4;
+  --accent:#1B6CA8;--accent-dim:rgba(27,108,168,0.10);
+  --success:#2E9E5B;--success-dim:rgba(46,158,91,0.10);
+  --danger:#DC3545;--danger-dim:rgba(220,53,69,0.10);
+  --warning:#F59F00;--warning-dim:rgba(245,159,0,0.12);
+  --r:10px;--rl:16px;--hdr-bg:#1B6CA8;--outer-bg:#1B6CA8;
+}
+[data-theme="dark"]{
+  --bg:#0F1923;--surface:#1A2535;--surface2:#222F40;--border:#2A3A4E;--border2:#344A60;
+  --text:#E8EEF4;--text2:#8FA4B4;--text3:#506070;
+  --accent:#4DA3D4;--accent-dim:rgba(77,163,212,0.12);
+  --success:#3BBF6E;--success-dim:rgba(59,191,110,0.12);
+  --danger:#F06070;--danger-dim:rgba(240,96,112,0.12);
+  --warning:#F59F00;--warning-dim:rgba(245,159,0,0.12);
+  --hdr-bg:#0D1520;--outer-bg:#0D1520;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;width:100%;}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--outer-bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;transition:background .3s,color .3s;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+
+/* HEADER */
+.hdr{background:var(--hdr-bg);overflow:hidden;transition:background .3s;}
+.hdr-b1{position:absolute;top:-30px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.07);}
+.hdr-b2{position:absolute;bottom:-50px;left:-30px;width:130px;height:130px;border-radius:50%;background:rgba(243,213,101,0.12);}
+.hdr-b3{position:absolute;top:40px;left:30%;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,0.05);}
+.hdr-inner{position:relative;z-index:2;padding:28px 20px 46px;display:flex;flex-direction:column;align-items:center;}
+.hdr-logo-img{width:90px;margin-bottom:0;}
+.hdr-greeting{margin:0 14px;margin-top:-24px;position:relative;z-index:10;}
+.hdr-greeting-card{background:#fff;border-radius:20px;box-shadow:0 4px 24px rgba(28,43,58,0.12);padding:15px 18px;display:flex;align-items:center;justify-content:space-between;}
+.hdr-greeting-card h2{font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:800;color:#1C2B3A;line-height:1.2;}
+.hdr-greeting-card p{font-size:12px;color:#8FA4B4;margin-top:2px;}
+.hdr-greeting-badge{background:#FFF3E0;color:#E65100;font-size:11px;font-weight:600;padding:5px 12px;border-radius:50px;white-space:nowrap;}
+.hdr-topbar{position:absolute;top:0;left:0;right:0;z-index:6000;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+
+/* NAV TABS */
+.nav-tabs{padding:12px 14px 10px;background:var(--hdr-bg);transition:background .3s;}
+.tab-bar-pill{background:rgba(255,255,255,0.18);border-radius:50px;padding:4px;display:flex;gap:2px;border:1.5px solid rgba(255,255,255,0.2);backdrop-filter:blur(8px);}
+.nav-tab{flex:1;padding:9px 0;border:none;background:transparent;border-radius:50px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.65);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
+.nav-tab:hover{color:#fff;background:rgba(255,255,255,0.1);}
+.nav-tab.active{background:#fff;color:#1B6CA8;box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+
+/* LAYOUT */
+.wrap{max-width:1200px;margin:0 auto;padding:16px 14px 40px;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* SECTION */
+.sec{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,0.08);transition:background .3s,border-color .3s;}
+.sec-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:7px;margin-bottom:14px;}
+.sec-title svg{width:13px;height:13px;flex-shrink:0;}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+@media(max-width:640px){.g2{grid-template-columns:1fr;gap:10px;}.g3{grid-template-columns:1fr;gap:10px;}}
+
+label{display:block;font-size:12px;color:var(--text2);margin-bottom:5px;font-weight:500;}
+input,select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:8px 11px;color:var(--text);font-family:inherit;font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+textarea{resize:vertical;min-height:70px;}
+
+/* TABLE */
+.track-table{width:100%;border-collapse:collapse;margin-top:4px;}
+.track-table th{background:var(--accent-dim);padding:8px;text-align:left;font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);}
+.track-table td{padding:9px 8px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);vertical-align:middle;}
+.track-table tr:hover{background:rgba(27,108,168,0.04);}
+.track-table tr:last-child td{border-bottom:none;}
+
+/* BADGES */
+.cat-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;border:none;outline:none;transition:all .15s;white-space:nowrap;}
+.btn svg{width:14px;height:14px;flex-shrink:0;}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+.btn-accent{background:var(--accent);color:#fff;}
+.btn-accent:hover{opacity:.9;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-danger:hover{opacity:.9;}
+.btn-small{padding:5px 9px;font-size:11px;border-radius:8px;}
+.btn-icon{background:var(--surface2);border:1px solid var(--border);padding:6px;border-radius:8px;color:var(--text3);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;}
+.btn-icon:hover{background:var(--danger-dim);color:var(--danger);}
+.btn-full{width:100%;justify-content:center;}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.actions .btn{flex:1;justify-content:center;min-width:80px;font-size:12px;}
+
+/* SUMMARY CARDS */
+.sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+@media(max-width:600px){.sum-grid{grid-template-columns:1fr 1fr;}}
+.sum-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.sum-label{font-size:11px;color:var(--text3);font-weight:500;margin-bottom:4px;}
+.sum-value{font-size:18px;font-weight:700;color:var(--text);font-family:'Geist Mono',monospace;line-height:1.2;}
+.sum-sub{font-size:10px;color:var(--text3);margin-top:3px;}
+.sum-card.danger .sum-value{color:var(--danger);}
+.sum-card.warning .sum-value{color:var(--warning);}
+.sum-card.success .sum-value{color:var(--success);}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(28,43,58,0.6);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);padding:20px;max-width:480px;width:90%;max-height:85vh;overflow-y:auto;}
+.modal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.modal-title svg{width:16px;height:16px;color:var(--danger);}
+.modal-actions{display:flex;gap:10px;margin-top:16px;}
+.modal-field{margin-bottom:14px;}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
+.filter-bar select,.filter-bar input{width:auto;flex:1;min-width:100px;}
+.filter-count{font-size:12px;color:var(--text3);white-space:nowrap;padding:6px 0;}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:32px 20px;color:var(--text3);font-size:13px;border:1px dashed var(--border);border-radius:var(--r);}
+.empty-state svg{width:28px;height:28px;margin:0 auto 10px;display:block;opacity:.25;}
+
+/* SYNC BAR */
+.sync-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:var(--r);font-size:11px;font-weight:500;margin-bottom:12px;}
+.sync-bar.ok{background:var(--success-dim);color:var(--success);}
+.sync-bar.syncing{background:var(--accent-dim);color:var(--accent);}
+.sync-bar.error{background:var(--danger-dim);color:var(--danger);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#1C2B3A;color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s;opacity:0;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.toast.success{background:var(--success);}
+.toast.error{background:var(--danger);}
+
+/* DATE PICKER */
+.date-wrap{position:relative;}
+.date-btn{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:8px 11px;color:var(--text);font-family:inherit;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border-color .15s;user-select:none;text-align:left;}
+.date-btn:hover{border-color:var(--border2);}
+.date-btn.open{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+.date-btn-text.placeholder{color:var(--text3);}
+.date-btn svg{width:14px;height:14px;color:var(--text3);flex-shrink:0;}
+.cal-popup{position:absolute;top:calc(100% + 6px);left:0;z-index:400;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);box-shadow:0 12px 32px rgba(28,43,58,.18);padding:16px;width:272px;display:none;}
+.cal-popup.open{display:block;}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cal-nav-btn{background:none;border:none;cursor:pointer;color:var(--text2);padding:5px 8px;border-radius:6px;display:flex;align-items:center;transition:background .1s;}
+.cal-nav-btn:hover{background:var(--surface2);}
+.cal-nav-btn svg{width:13px;height:13px;}
+.cal-month-lbl{font-size:13px;font-weight:600;color:var(--text);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-dn{text-align:center;font-size:10px;color:var(--text3);padding:4px 0;font-weight:600;}
+.cal-d{text-align:center;font-size:12px;color:var(--text2);padding:6px 2px;border-radius:6px;cursor:pointer;transition:all .1s;}
+.cal-d:hover{background:var(--surface2);}
+.cal-d.today{color:var(--accent);font-weight:600;}
+.cal-d.selected{background:var(--accent);color:#fff;font-weight:600;}
+.cal-d.empty,.cal-d.other{color:var(--text3);opacity:.4;cursor:default;pointer-events:none;}
+
+/* DARK MODE */
+[data-theme="dark"] .nav-tab.active{background:rgba(255,255,255,0.15);color:#fff;}
+[data-theme="dark"] .hdr-greeting-card{background:var(--surface);box-shadow:0 4px 24px rgba(0,0,0,0.4);}
+[data-theme="dark"] .hdr-greeting-card h2{color:var(--text);}
+[data-theme="dark"] .hdr-greeting-card p{color:var(--text3);}
+[data-theme="dark"] .hdr-greeting-badge{background:rgba(230,81,0,0.2);color:#FF8A50;}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);border-color:var(--border);color:var(--text);}
+[data-theme="dark"] .date-btn{background:var(--surface2);border-color:var(--border);color:var(--text);}
+[data-theme="dark"] .cal-popup{background:var(--surface);border-color:var(--border);}
+[data-theme="dark"] .sum-card{background:var(--surface);}
+[data-theme="dark"] .modal{background:var(--surface);}
+
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.spin{animation:spin 1s linear infinite;}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.fade-in{animation:slideIn .25s ease both;}
+</style>
+</head>
+<body>
+<div style="max-width:1200px;margin:0 auto;min-height:100vh;background:linear-gradient(to bottom,var(--hdr-bg) 0%,var(--hdr-bg) 60%,var(--bg) 100%);box-shadow:0 0 40px rgba(28,43,58,0.15);">
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      Hapus Pengeluaran
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:6px;">Yakin ingin menghapus pengeluaran ini?</p>
+    <p id="deleteModalDesc" style="font-size:13px;font-weight:600;color:var(--text);"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-full" onclick="closeDeleteModal()">Batal</button>
+      <button class="btn btn-danger btn-full" onclick="confirmDelete()">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-title" style="color:var(--text);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Edit Pengeluaran
+    </div>
+    <div class="modal-field">
+      <label>Tanggal</label>
+      <div class="date-wrap">
+        <button type="button" class="date-btn" id="editDateBtn" onclick="toggleCal('editCal','editDateBtn')">
+          <span class="date-btn-text" id="editDateText">Pilih tanggal</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </button>
+        <div class="cal-popup" id="editCal"></div>
+      </div>
+      <input type="hidden" id="editDate">
+    </div>
+    <div class="modal-field">
+      <label>Kategori</label>
+      <select id="editKategori"></select>
+    </div>
+    <div class="modal-field">
+      <label>Deskripsi</label>
+      <input type="text" id="editDeskripsi" placeholder="Keterangan pengeluaran">
+    </div>
+    <div class="modal-field">
+      <label>Jumlah (Rp)</label>
+      <input type="number" id="editJumlah" placeholder="0" min="0">
+    </div>
+    <div class="modal-field">
+      <label>Dibayar oleh</label>
+      <input type="text" id="editDibayarOleh" placeholder="Nama">
+    </div>
+    <div class="modal-field">
+      <label>Catatan (opsional)</label>
+      <textarea id="editCatatan" placeholder="Catatan tambahan..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-full" onclick="closeEditModal()">Batal</button>
+      <button class="btn btn-accent btn-full" onclick="submitEdit()">Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
+<div>
+<header class="hdr">
+  <div class="hdr-topbar">
+    <div style="display:flex;align-items:center;gap:5px;">
+      <div id="syncStatus" style="display:flex;align-items:center;gap:5px;font-size:11px;color:#fff;max-width:200px;overflow:hidden;font-weight:500;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+        <span>Memuat...</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:7px;align-items:center;">
+      <button onclick="toggleDark()" title="Mode gelap" style="width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;">
+        <svg id="darkIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button onclick="manualSync()" title="Sync" style="width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="hdr-inner">
+    <img class="hdr-logo-img" src="Open_MB_Icon.png" alt="Markaz Belajar" onerror="this.style.display='none';">
+  </div>
+</header>
+
+<div class="hdr-greeting">
+  <div class="hdr-greeting-card">
+    <div>
+      <h2>Pengeluaran Operasional</h2>
+      <p>Catat & pantau biaya operasional</p>
+    </div>
+    <div class="hdr-greeting-badge" id="bulanBadge">● Bulan Ini</div>
+  </div>
+</div>
+
+<div style="position:sticky;top:0;z-index:200;">
+<div class="nav-tabs">
+  <div class="tab-bar-pill">
+    <button class="nav-tab active" onclick="switchTab('input',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Catat
+    </button>
+    <button class="nav-tab" onclick="switchTab('list',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      Riwayat
+    </button>
+    <button class="nav-tab" onclick="switchTab('rekap',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Rekap
+    </button>
+  </div>
+</div>
+</div>
+
+<div class="wrap">
+
+<!-- ══ TAB: CATAT ══ -->
+<div id="tab-input" class="tab-content active">
+
+  <!-- Summary bulan ini -->
+  <div class="sum-grid" id="summaryCards">
+    <div class="sum-card danger">
+      <div class="sum-label">Total Bulan Ini</div>
+      <div class="sum-value" id="sumTotal">Rp 0</div>
+      <div class="sum-sub" id="sumBulan">—</div>
+    </div>
+    <div class="sum-card warning">
+      <div class="sum-label">Transaksi</div>
+      <div class="sum-value" id="sumCount">0</div>
+      <div class="sum-sub">entri bulan ini</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Terbesar</div>
+      <div class="sum-value" style="font-size:14px;" id="sumMax">—</div>
+      <div class="sum-sub" id="sumMaxCat">—</div>
+    </div>
+  </div>
+
+  <!-- Form input -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Form Pengeluaran Baru
+    </div>
+
+    <div class="g2">
+      <div>
+        <label>Tanggal <span style="color:var(--danger)">*</span></label>
+        <div class="date-wrap">
+          <button type="button" class="date-btn" id="inputDateBtn" onclick="toggleCal('inputCal','inputDateBtn')">
+            <span class="date-btn-text placeholder" id="inputDateText">Pilih tanggal</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </button>
+          <div class="cal-popup" id="inputCal"></div>
+        </div>
+        <input type="hidden" id="inputDate">
+      </div>
+      <div>
+        <label>Kategori <span style="color:var(--danger)">*</span></label>
+        <select id="inputKategori">
+          <option value="">Pilih kategori...</option>
+          <option value="ATK">📎 ATK (Alat Tulis Kantor)</option>
+          <option value="Listrik">💡 Listrik</option>
+          <option value="Internet">🌐 Internet</option>
+          <option value="Transportasi">🚗 Transportasi</option>
+          <option value="Konsumsi">🍱 Konsumsi</option>
+          <option value="Kebersihan">🧹 Kebersihan</option>
+          <option value="Perlengkapan">📦 Perlengkapan</option>
+          <option value="Gaji">👤 Gaji/Honor</option>
+          <option value="Sewa">🏠 Sewa</option>
+          <option value="Lainnya">📋 Lainnya</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <label>Deskripsi <span style="color:var(--danger)">*</span></label>
+      <input type="text" id="inputDeskripsi" placeholder="Contoh: Beli spidol whiteboard 2 lusin">
+    </div>
+
+    <div class="g2" style="margin-top:12px;">
+      <div>
+        <label>Jumlah (Rp) <span style="color:var(--danger)">*</span></label>
+        <input type="number" id="inputJumlah" placeholder="0" min="0" oninput="updatePreviewAmount()">
+      </div>
+      <div>
+        <label>Dibayar oleh <span style="color:var(--danger)">*</span></label>
+        <input type="text" id="inputDibayarOleh" placeholder="Nama guru/admin">
+      </div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <label>Catatan (opsional)</label>
+      <textarea id="inputCatatan" placeholder="Catatan tambahan atau nomor struk..."></textarea>
+    </div>
+
+    <!-- Preview jumlah -->
+    <div id="amountPreview" style="display:none;background:var(--danger-dim);border:1px solid rgba(220,53,69,0.2);border-radius:var(--r);padding:10px 14px;margin-top:12px;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:12px;color:var(--text2);">Total yang akan dicatat:</span>
+      <span id="previewAmount" style="font-size:16px;font-weight:700;color:var(--danger);font-family:'Geist Mono',monospace;">Rp 0</span>
+    </div>
+
+    <div class="actions" style="margin-top:16px;">
+      <button class="btn btn-ghost" onclick="resetForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+        Reset
+      </button>
+      <button class="btn btn-accent" onclick="submitExpense()" style="flex:2;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13"/><polyline points="7 3 7 8 15 8"/></svg>
+        Simpan Pengeluaran
+      </button>
+    </div>
+  </div>
+
+</div><!-- /tab-input -->
+
+<!-- ══ TAB: RIWAYAT ══ -->
+<div id="tab-list" class="tab-content">
+
+  <div id="syncBar" class="sync-bar syncing">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+    <span id="syncBarText">Memuat data...</span>
+  </div>
+
+  <div class="filter-bar">
+    <select id="filterBulan" onchange="renderList()">
+      <option value="">Semua Bulan</option>
+    </select>
+    <select id="filterKat" onchange="renderList()">
+      <option value="">Semua Kategori</option>
+      <option value="ATK">ATK</option>
+      <option value="Listrik">Listrik</option>
+      <option value="Internet">Internet</option>
+      <option value="Transportasi">Transportasi</option>
+      <option value="Konsumsi">Konsumsi</option>
+      <option value="Kebersihan">Kebersihan</option>
+      <option value="Perlengkapan">Perlengkapan</option>
+      <option value="Gaji">Gaji/Honor</option>
+      <option value="Sewa">Sewa</option>
+      <option value="Lainnya">Lainnya</option>
+    </select>
+    <span class="filter-count" id="filterCount">0 entri</span>
+  </div>
+
+  <div class="sec" style="padding:0;overflow:hidden;">
+    <div id="expenseList" style="overflow-x:auto;">
+      <div class="empty-state" style="margin:16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Belum ada pengeluaran
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-list -->
+
+<!-- ══ TAB: REKAP ══ -->
+<div id="tab-rekap" class="tab-content">
+
+  <div class="sec">
+    <div class="sec-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Filter Rekap
+    </div>
+    <div class="g2">
+      <div>
+        <label>Bulan</label>
+        <select id="rekapBulan" onchange="renderRekap()"></select>
+      </div>
+      <div>
+        <label>Tahun</label>
+        <select id="rekapTahun" onchange="renderRekap()"></select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total rekap -->
+  <div class="sum-grid">
+    <div class="sum-card danger">
+      <div class="sum-label">Total Pengeluaran</div>
+      <div class="sum-value" id="rekapTotal">Rp 0</div>
+      <div class="sum-sub" id="rekapPeriode">—</div>
+    </div>
+    <div class="sum-card warning">
+      <div class="sum-label">Jumlah Transaksi</div>
+      <div class="sum-value" id="rekapJml">0</div>
+      <div class="sum-sub">transaksi</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Rata-rata/Transaksi</div>
+      <div class="sum-value" style="font-size:14px;" id="rekapAvg">Rp 0</div>
+      <div class="sum-sub">per entri</div>
+    </div>
+  </div>
+
+  <!-- Rekap per kategori -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Per Kategori
+    </div>
+    <div id="rekapKatList">
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Pilih bulan dan tahun
+      </div>
+    </div>
+  </div>
+
+  <!-- Rekap per orang -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Per Pembayar
+    </div>
+    <div id="rekapOrangList">
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Pilih bulan dan tahun
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-rekap -->
+
+</div><!-- /wrap -->
+</div><!-- /container -->
+</div><!-- /outer -->
+
+<script>
+// ══════════════════════════════════════
+// CONFIG — ganti dengan GAS_URL kamu
+// ══════════════════════════════════════
+let GAS_URL = '';  // Isi dengan URL GAS yang sama dengan invoice
+// Contoh: 'https://script.google.com/macros/s/XXXX/exec'
+
+function hasGasUrl() {
+  return GAS_URL && GAS_URL.startsWith('https://script.google.com');
+}
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let expenses = [];
+let editingId = null;
+let deletingId = null;
+let syncTimer = null;
+const POLL_MS = 30000;
+
+// ══════════════════════════════════════
+// KATEGORI CONFIG
+// ══════════════════════════════════════
+const KAT_CONFIG = {
+  'ATK':          { color:'#1B6CA8', bg:'rgba(27,108,168,0.12)',  emoji:'📎' },
+  'Listrik':      { color:'#F59F00', bg:'rgba(245,159,0,0.12)',   emoji:'💡' },
+  'Internet':     { color:'#7950F2', bg:'rgba(121,80,242,0.12)',  emoji:'🌐' },
+  'Transportasi': { color:'#2E9E5B', bg:'rgba(46,158,91,0.12)',   emoji:'🚗' },
+  'Konsumsi':     { color:'#E67700', bg:'rgba(230,119,0,0.12)',   emoji:'🍱' },
+  'Kebersihan':   { color:'#0CA678', bg:'rgba(12,166,120,0.12)',  emoji:'🧹' },
+  'Perlengkapan': { color:'#3B82F6', bg:'rgba(59,130,246,0.12)', emoji:'📦' },
+  'Gaji':         { color:'#DC3545', bg:'rgba(220,53,69,0.12)',   emoji:'👤' },
+  'Sewa':         { color:'#6F42C1', bg:'rgba(111,66,193,0.12)', emoji:'🏠' },
+  'Lainnya':      { color:'#8FA4B4', bg:'rgba(143,164,180,0.12)',emoji:'📋' },
+};
+
+function katBadge(kat) {
+  const c = KAT_CONFIG[kat] || KAT_CONFIG['Lainnya'];
+  return `<span class="cat-badge" style="background:${c.bg};color:${c.color};">${c.emoji} ${kat}</span>`;
+}
+
+// ══════════════════════════════════════
+// UTILITY
+// ══════════════════════════════════════
+function rp(n) { return 'Rp ' + Number(n||0).toLocaleString('id-ID'); }
+function fmtDate(d) {
+  if (!d) return '—';
+  const dt = typeof d === 'string' ? new Date(d) : d;
+  return dt.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+}
+function genId() { return 'exp_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+function nowYMD() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function bulanLabel(ym) {
+  if (!ym) return '—';
+  const [y,m] = ym.split('-');
+  const names = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+  return `${names[parseInt(m)-1]} ${y}`;
+}
+function ymFromDate(dateStr) {
+  if (!dateStr) return '';
+  return dateStr.slice(0,7); // "YYYY-MM"
+}
+function currentYM() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+let toastTimer;
+function showToast(msg, ok=true) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (ok ? 'success' : 'error');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ══════════════════════════════════════
+// DARK MODE
+// ══════════════════════════════════════
+function toggleDark() {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', dark ? '' : 'dark');
+  localStorage.setItem('mb_theme', dark ? '' : 'dark');
+}
+if (localStorage.getItem('mb_theme') === 'dark') {
+  document.documentElement.setAttribute('data-theme','dark');
+}
+
+// ══════════════════════════════════════
+// TAB NAVIGATION
+// ══════════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'list') renderList();
+  if (name === 'rekap') renderRekap();
+}
+
+// ══════════════════════════════════════
+// CALENDAR (reusable)
+// ══════════════════════════════════════
+const calState = {};
+function toggleCal(calId, btnId) {
+  const cal = document.getElementById(calId);
+  const isOpen = cal.classList.contains('open');
+  document.querySelectorAll('.cal-popup').forEach(c => c.classList.remove('open'));
+  document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('open'));
+  if (!isOpen) {
+    const today = new Date();
+    if (!calState[calId]) calState[calId] = { year: today.getFullYear(), month: today.getMonth() };
+    renderCal(calId, btnId);
+    cal.classList.add('open');
+    document.getElementById(btnId).classList.add('open');
+  }
+}
+function renderCal(calId, btnId) {
+  const { year, month } = calState[calId];
+  const names = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const first = new Date(year, month, 1).getDay();
+  const days = new Date(year, month+1, 0).getDate();
+  const today = new Date();
+  let html = `<div class="cal-nav">
+    <button class="cal-nav-btn" onclick="calMove('${calId}','${btnId}',-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <span class="cal-month-lbl">${names[month]} ${year}</span>
+    <button class="cal-nav-btn" onclick="calMove('${calId}','${btnId}',1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+  </div><div class="cal-grid">`;
+  ['Min','Sen','Sel','Rab','Kam','Jum','Sab'].forEach(d => html += `<div class="cal-dn">${d}</div>`);
+  for (let i=0;i<first;i++) html += `<div class="cal-d empty"></div>`;
+  for (let d=1;d<=days;d++) {
+    const isToday = d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear();
+    const ymd = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const inputId = calId === 'inputCal' ? 'inputDate' : (calId === 'editCal' ? 'editDate' : '');
+    const sel = inputId && document.getElementById(inputId)?.value === ymd ? ' selected' : '';
+    html += `<div class="cal-d${isToday?' today':''}${sel}" onclick="pickDate('${calId}','${btnId}','${ymd}')">${d}</div>`;
+  }
+  html += '</div>';
+  document.getElementById(calId).innerHTML = html;
+}
+function calMove(calId, btnId, dir) {
+  calState[calId].month += dir;
+  if (calState[calId].month > 11) { calState[calId].month=0; calState[calId].year++; }
+  if (calState[calId].month < 0)  { calState[calId].month=11; calState[calId].year--; }
+  renderCal(calId, btnId);
+}
+function pickDate(calId, btnId, ymd) {
+  const inputId = calId === 'inputCal' ? 'inputDate' : (calId === 'editCal' ? 'editDate' : '');
+  const textId  = calId === 'inputCal' ? 'inputDateText' : (calId === 'editCal' ? 'editDateText' : '');
+  if (inputId) {
+    document.getElementById(inputId).value = ymd;
+    const el = document.getElementById(textId);
+    el.textContent = fmtDate(ymd);
+    el.classList.remove('placeholder');
+  }
+  document.getElementById(calId).classList.remove('open');
+  document.getElementById(btnId).classList.remove('open');
+  renderCal(calId, btnId);
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.date-wrap')) {
+    document.querySelectorAll('.cal-popup').forEach(c => c.classList.remove('open'));
+    document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('open'));
+  }
+});
+
+// ══════════════════════════════════════
+// AMOUNT PREVIEW
+// ══════════════════════════════════════
+function updatePreviewAmount() {
+  const v = parseFloat(document.getElementById('inputJumlah').value) || 0;
+  const box = document.getElementById('amountPreview');
+  if (v > 0) {
+    box.style.display = 'flex';
+    document.getElementById('previewAmount').textContent = rp(v);
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+// ══════════════════════════════════════
+// GAS FUNCTIONS (GET + querystring)
+// ══════════════════════════════════════
+async function fetchExpensesFromSheets() {
+  if (!hasGasUrl()) {
+    return JSON.parse(localStorage.getItem('mb_expenses') || '[]');
+  }
+  const resp = await fetch(`${GAS_URL}?action=getExpenses&t=${Date.now()}`);
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data.expenses || [];
+}
+async function saveExpenseToSheets(exp) {
+  if (!hasGasUrl()) {
+    const local = JSON.parse(localStorage.getItem('mb_expenses') || '[]');
+    local.push(exp);
+    localStorage.setItem('mb_expenses', JSON.stringify(local));
+    return { ok: true };
+  }
+  const encoded = encodeURIComponent(JSON.stringify({ expense: exp }));
+  const resp = await fetch(`${GAS_URL}?action=saveExpense&data=${encoded}`);
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+async function updateExpenseInSheets(id, updates) {
+  if (!hasGasUrl()) {
+    const local = JSON.parse(localStorage.getItem('mb_expenses') || '[]');
+    const idx = local.findIndex(e => e.__id === id);
+    if (idx >= 0) { local[idx] = {...local[idx], ...updates}; localStorage.setItem('mb_expenses', JSON.stringify(local)); }
+    return { ok: true };
+  }
+  const encoded = encodeURIComponent(JSON.stringify({ id, updates }));
+  const resp = await fetch(`${GAS_URL}?action=updateExpense&data=${encoded}`);
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+async function deleteExpenseFromSheets(id) {
+  if (!hasGasUrl()) {
+    let local = JSON.parse(localStorage.getItem('mb_expenses') || '[]');
+    local = local.filter(e => e.__id !== id);
+    localStorage.setItem('mb_expenses', JSON.stringify(local));
+    return { ok: true };
+  }
+  const encoded = encodeURIComponent(JSON.stringify({ id }));
+  const resp = await fetch(`${GAS_URL}?action=deleteExpense&data=${encoded}`);
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+// ══════════════════════════════════════
+// SYNC
+// ══════════════════════════════════════
+function setSyncStatus(state, msg) {
+  const bar = document.getElementById('syncBar');
+  const txt = document.getElementById('syncBarText');
+  const icons = {
+    ok: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+    syncing: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>`,
+    error: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+  };
+  bar.className = `sync-bar ${state}`;
+  bar.innerHTML = `${icons[state]||''}<span>${msg}</span>`;
+
+  // Topbar sync status
+  const topbar = document.getElementById('syncStatus');
+  topbar.innerHTML = `${icons[state]||''}<span>${msg}</span>`;
+}
+
+async function syncData(isManual=false) {
+  setSyncStatus('syncing','Sinkronisasi...');
+  try {
+    expenses = await fetchExpensesFromSheets();
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+    setSyncStatus('ok', `${expenses.length} entri · sync ${timeStr}`);
+    updateSummary();
+    populateFilterBulan();
+    populateRekapSelects();
+    if (document.getElementById('tab-list').classList.contains('active')) renderList();
+    if (document.getElementById('tab-rekap').classList.contains('active')) renderRekap();
+    if (isManual) showToast('Data berhasil disinkronkan! ✓', true);
+  } catch(e) {
+    setSyncStatus('error','Gagal sync: ' + e.message);
+    if (isManual) showToast('Gagal sync: ' + e.message, false);
+  }
+}
+
+function manualSync() { syncData(true); }
+
+function startPolling() {
+  if (syncTimer) clearInterval(syncTimer);
+  syncTimer = setInterval(() => syncData(false), POLL_MS);
+  syncData(false);
+}
+
+// ══════════════════════════════════════
+// SUMMARY (bulan ini)
+// ══════════════════════════════════════
+function updateSummary() {
+  const ym = currentYM();
+  const thisMonth = expenses.filter(e => ymFromDate(e.date) === ym);
+  const total = thisMonth.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
+  const maxE = thisMonth.reduce((a,b) => (parseFloat(b.amount)||0) > (parseFloat(a.amount)||0) ? b : a, {amount:0});
+
+  document.getElementById('sumTotal').textContent = rp(total);
+  document.getElementById('sumCount').textContent = thisMonth.length;
+  document.getElementById('sumBulan').textContent = bulanLabel(ym);
+  document.getElementById('sumMax').textContent = maxE.amount ? rp(maxE.amount) : '—';
+  document.getElementById('sumMaxCat').textContent = maxE.category || '—';
+  document.getElementById('bulanBadge').textContent = `● ${bulanLabel(ym)}`;
+}
+
+// ══════════════════════════════════════
+// FORM SUBMIT
+// ══════════════════════════════════════
+async function submitExpense() {
+  const date = document.getElementById('inputDate').value;
+  const kat  = document.getElementById('inputKategori').value;
+  const desk = document.getElementById('inputDeskripsi').value.trim();
+  const jml  = parseFloat(document.getElementById('inputJumlah').value);
+  const by   = document.getElementById('inputDibayarOleh').value.trim();
+  const note = document.getElementById('inputCatatan').value.trim();
+
+  if (!date) return showToast('Tanggal harus diisi', false);
+  if (!kat)  return showToast('Pilih kategori', false);
+  if (!desk) return showToast('Deskripsi harus diisi', false);
+  if (!jml || jml <= 0) return showToast('Jumlah harus lebih dari 0', false);
+  if (!by)   return showToast('Nama pembayar harus diisi', false);
+
+  const exp = {
+    __id: genId(),
+    date, category: kat,
+    description: desk,
+    amount: jml,
+    paid_by: by,
+    notes: note,
+    created_at: new Date().toISOString(),
+  };
+
+  const btn = document.querySelector('[onclick="submitExpense()"]');
+  btn.disabled = true; btn.textContent = 'Menyimpan...';
+
+  try {
+    await saveExpenseToSheets(exp);
+    expenses.push(exp);
+    updateSummary();
+    populateFilterBulan();
+    populateRekapSelects();
+    resetForm();
+    showToast('Pengeluaran berhasil disimpan! ✓', true);
+  } catch(e) {
+    showToast('Gagal simpan: ' + e.message, false);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13"/><polyline points="7 3 7 8 15 8"/></svg> Simpan Pengeluaran`;
+  }
+}
+
+function resetForm() {
+  document.getElementById('inputDate').value = '';
+  document.getElementById('inputDateText').textContent = 'Pilih tanggal';
+  document.getElementById('inputDateText').classList.add('placeholder');
+  document.getElementById('inputKategori').value = '';
+  document.getElementById('inputDeskripsi').value = '';
+  document.getElementById('inputJumlah').value = '';
+  document.getElementById('inputDibayarOleh').value = '';
+  document.getElementById('inputCatatan').value = '';
+  document.getElementById('amountPreview').style.display = 'none';
+}
+
+// ══════════════════════════════════════
+// RENDER LIST
+// ══════════════════════════════════════
+function populateFilterBulan() {
+  const sel = document.getElementById('filterBulan');
+  const cur = sel.value;
+  const yms = [...new Set(expenses.map(e => ymFromDate(e.date)).filter(Boolean))].sort().reverse();
+  sel.innerHTML = '<option value="">Semua Bulan</option>' + yms.map(ym => `<option value="${ym}"${ym===cur?' selected':''}>${bulanLabel(ym)}</option>`).join('');
+}
+
+function renderList() {
+  const filterBulan = document.getElementById('filterBulan').value;
+  const filterKat   = document.getElementById('filterKat').value;
+
+  let filtered = expenses.filter(e => {
+    if (filterBulan && ymFromDate(e.date) !== filterBulan) return false;
+    if (filterKat && e.category !== filterKat) return false;
+    return true;
+  }).sort((a,b) => b.date.localeCompare(a.date));
+
+  document.getElementById('filterCount').textContent = `${filtered.length} entri`;
+
+  const container = document.getElementById('expenseList');
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty-state" style="margin:16px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Tidak ada data
+    </div>`;
+    return;
+  }
+
+  let html = `<table class="track-table">
+    <thead><tr>
+      <th>Tanggal</th>
+      <th>Kategori</th>
+      <th>Deskripsi</th>
+      <th>Dibayar oleh</th>
+      <th style="text-align:right;">Jumlah</th>
+      <th style="text-align:center;">Aksi</th>
+    </tr></thead><tbody>`;
+
+  filtered.forEach(e => {
+    html += `<tr class="fade-in">
+      <td style="white-space:nowrap;font-size:11px;color:var(--text3);">${fmtDate(e.date)}</td>
+      <td>${katBadge(e.category)}</td>
+      <td>
+        <div style="font-weight:500;font-size:12px;">${e.description}</div>
+        ${e.notes ? `<div style="font-size:10px;color:var(--text3);margin-top:2px;">${e.notes}</div>` : ''}
+      </td>
+      <td style="font-size:12px;color:var(--text2);">${e.paid_by || '—'}</td>
+      <td style="text-align:right;font-family:'Geist Mono',monospace;font-weight:600;color:var(--danger);font-size:12px;">${rp(e.amount)}</td>
+      <td style="text-align:center;white-space:nowrap;">
+        <button class="btn-icon" onclick="openEdit('${e.__id}')" title="Edit" style="margin-right:4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="btn-icon" onclick="openDelete('${e.__id}')" title="Hapus">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// ══════════════════════════════════════
+// REKAP
+// ══════════════════════════════════════
+function populateRekapSelects() {
+  const years = [...new Set(expenses.map(e => e.date?.slice(0,4)).filter(Boolean))].sort().reverse();
+  const curYear = new Date().getFullYear().toString();
+  const selTahun = document.getElementById('rekapTahun');
+  selTahun.innerHTML = years.map(y => `<option value="${y}"${y===curYear?' selected':''}>${y}</option>`).join('');
+  if (!years.includes(curYear)) selTahun.innerHTML = `<option value="${curYear}" selected>${curYear}</option>` + selTahun.innerHTML;
+
+  const selBulan = document.getElementById('rekapBulan');
+  const bulanNames = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const curMonth = new Date().getMonth()+1;
+  selBulan.innerHTML = bulanNames.map((n,i) => `<option value="${String(i+1).padStart(2,'0')}"${(i+1)===curMonth?' selected':''}>${n}</option>`).join('');
+}
+
+function renderRekap() {
+  const bulan = document.getElementById('rekapBulan')?.value;
+  const tahun = document.getElementById('rekapTahun')?.value;
+  if (!bulan || !tahun) return;
+  const ym = `${tahun}-${bulan}`;
+  const filtered = expenses.filter(e => ymFromDate(e.date) === ym);
+  const total = filtered.reduce((s,e) => s+(parseFloat(e.amount)||0), 0);
+  const avg   = filtered.length ? Math.round(total/filtered.length) : 0;
+
+  document.getElementById('rekapTotal').textContent   = rp(total);
+  document.getElementById('rekapJml').textContent     = filtered.length;
+  document.getElementById('rekapAvg').textContent     = rp(avg);
+  document.getElementById('rekapPeriode').textContent = bulanLabel(ym);
+
+  // Per kategori
+  const byKat = {};
+  filtered.forEach(e => {
+    if (!byKat[e.category]) byKat[e.category] = {total:0, count:0};
+    byKat[e.category].total += parseFloat(e.amount)||0;
+    byKat[e.category].count++;
+  });
+  const katSorted = Object.entries(byKat).sort((a,b)=>b[1].total-a[1].total);
+
+  if (katSorted.length === 0) {
+    document.getElementById('rekapKatList').innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Tidak ada data</div>`;
+  } else {
+    document.getElementById('rekapKatList').innerHTML = katSorted.map(([kat, v]) => {
+      const pct = total > 0 ? Math.round(v.total/total*100) : 0;
+      const c = KAT_CONFIG[kat] || KAT_CONFIG['Lainnya'];
+      return `<div style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          ${katBadge(kat)}
+          <div style="text-align:right;">
+            <span style="font-family:'Geist Mono',monospace;font-weight:600;font-size:13px;color:var(--text);">${rp(v.total)}</span>
+            <span style="font-size:10px;color:var(--text3);margin-left:6px;">${v.count} transaksi · ${pct}%</span>
+          </div>
+        </div>
+        <div style="height:6px;background:var(--surface2);border-radius:99px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${c.color};border-radius:99px;transition:width .4s ease;"></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Per orang
+  const byOrang = {};
+  filtered.forEach(e => {
+    const key = e.paid_by || 'Unknown';
+    if (!byOrang[key]) byOrang[key] = {total:0, count:0};
+    byOrang[key].total += parseFloat(e.amount)||0;
+    byOrang[key].count++;
+  });
+  const orangSorted = Object.entries(byOrang).sort((a,b)=>b[1].total-a[1].total);
+
+  if (orangSorted.length === 0) {
+    document.getElementById('rekapOrangList').innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Tidak ada data</div>`;
+  } else {
+    document.getElementById('rekapOrangList').innerHTML = `<table class="track-table">
+      <thead><tr><th>Nama</th><th style="text-align:right;">Jumlah</th><th style="text-align:right;">Transaksi</th></tr></thead>
+      <tbody>${orangSorted.map(([nama, v]) => `<tr>
+        <td style="font-weight:500;">${nama}</td>
+        <td style="text-align:right;font-family:'Geist Mono',monospace;font-weight:600;color:var(--danger);">${rp(v.total)}</td>
+        <td style="text-align:right;color:var(--text3);">${v.count}x</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+}
+
+// ══════════════════════════════════════
+// EDIT
+// ══════════════════════════════════════
+function openEdit(id) {
+  const e = expenses.find(x => x.__id === id);
+  if (!e) return;
+  editingId = id;
+
+  // Populate select kategori
+  const katSel = document.getElementById('editKategori');
+  katSel.innerHTML = `<option value="">Pilih kategori...</option>
+    <option value="ATK">📎 ATK</option>
+    <option value="Listrik">💡 Listrik</option>
+    <option value="Internet">🌐 Internet</option>
+    <option value="Transportasi">🚗 Transportasi</option>
+    <option value="Konsumsi">🍱 Konsumsi</option>
+    <option value="Kebersihan">🧹 Kebersihan</option>
+    <option value="Perlengkapan">📦 Perlengkapan</option>
+    <option value="Gaji">👤 Gaji/Honor</option>
+    <option value="Sewa">🏠 Sewa</option>
+    <option value="Lainnya">📋 Lainnya</option>`;
+
+  document.getElementById('editDate').value      = e.date || '';
+  document.getElementById('editDateText').textContent = e.date ? fmtDate(e.date) : 'Pilih tanggal';
+  document.getElementById('editKategori').value  = e.category || '';
+  document.getElementById('editDeskripsi').value = e.description || '';
+  document.getElementById('editJumlah').value    = e.amount || '';
+  document.getElementById('editDibayarOleh').value = e.paid_by || '';
+  document.getElementById('editCatatan').value   = e.notes || '';
+
+  if (e.date) {
+    const [y,m] = e.date.split('-');
+    calState['editCal'] = { year: parseInt(y), month: parseInt(m)-1 };
+  }
+
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeEditModal() {
+  editingId = null;
+  document.getElementById('editModal').classList.remove('open');
+}
+
+async function submitEdit() {
+  const date = document.getElementById('editDate').value;
+  const kat  = document.getElementById('editKategori').value;
+  const desk = document.getElementById('editDeskripsi').value.trim();
+  const jml  = parseFloat(document.getElementById('editJumlah').value);
+  const by   = document.getElementById('editDibayarOleh').value.trim();
+  const note = document.getElementById('editCatatan').value.trim();
+
+  if (!date||!kat||!desk||!jml||!by) return showToast('Semua field wajib diisi', false);
+
+  const updates = { date, category:kat, description:desk, amount:jml, paid_by:by, notes:note };
+
+  try {
+    await updateExpenseInSheets(editingId, updates);
+    const idx = expenses.findIndex(e => e.__id === editingId);
+    if (idx >= 0) expenses[idx] = {...expenses[idx], ...updates};
+    updateSummary();
+    renderList();
+    closeEditModal();
+    showToast('Pengeluaran diperbarui! ✓', true);
+  } catch(e) {
+    showToast('Gagal update: ' + e.message, false);
+  }
+}
+
+// ══════════════════════════════════════
+// DELETE
+// ══════════════════════════════════════
+function openDelete(id) {
+  deletingId = id;
+  const e = expenses.find(x => x.__id === id);
+  document.getElementById('deleteModalDesc').textContent = e ? `${e.description} — ${rp(e.amount)}` : '';
+  document.getElementById('deleteModal').classList.add('open');
+}
+function closeDeleteModal() {
+  deletingId = null;
+  document.getElementById('deleteModal').classList.remove('open');
+}
+async function confirmDelete() {
+  try {
+    await deleteExpenseFromSheets(deletingId);
+    expenses = expenses.filter(e => e.__id !== deletingId);
+    updateSummary();
+    populateFilterBulan();
+    renderList();
+    closeDeleteModal();
+    showToast('Pengeluaran dihapus', true);
+  } catch(e) {
+    showToast('Gagal hapus: ' + e.message, false);
+  }
+}
+
+// Close modal on overlay click
+document.getElementById('deleteModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeDeleteModal(); });
+document.getElementById('editModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeEditModal(); });
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Set today as default date
+  const today = nowYMD();
+  document.getElementById('inputDate').value = today;
+  document.getElementById('inputDateText').textContent = fmtDate(today);
+  document.getElementById('inputDateText').classList.remove('placeholder');
+
+  populateRekapSelects();
+  startPolling();
+});
+</script>
+</body>
+</html>
