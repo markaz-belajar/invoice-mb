@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Markaz Belajar — Pengeluaran</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Baloo+2:wght@600;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -232,7 +232,12 @@ textarea{resize:vertical;min-height:70px;}
     </div>
     <div class="modal-field">
       <label>Dibayar oleh</label>
-      <input type="text" id="editDibayarOleh" placeholder="Nama">
+      <select id="editDibayarOleh">
+        <option value="">Pilih nama...</option>
+        <option value="Elis Rosmiati">Elis Rosmiati</option>
+        <option value="Yessi Marlina">Yessi Marlina</option>
+        <option value="Annisa Zahrotun J">Annisa Zahrotun J</option>
+      </select>
     </div>
     <div class="modal-field">
       <label>Catatan (opsional)</label>
@@ -344,16 +349,16 @@ textarea{resize:vertical;min-height:70px;}
         <label>Kategori <span style="color:var(--danger)">*</span></label>
         <select id="inputKategori">
           <option value="">Pilih kategori...</option>
-          <option value="ATK">📎 ATK (Alat Tulis Kantor)</option>
-          <option value="Listrik">💡 Listrik</option>
-          <option value="Internet">🌐 Internet</option>
-          <option value="Transportasi">🚗 Transportasi</option>
-          <option value="Konsumsi">🍱 Konsumsi</option>
-          <option value="Kebersihan">🧹 Kebersihan</option>
-          <option value="Perlengkapan">📦 Perlengkapan</option>
-          <option value="Gaji">👤 Gaji/Honor</option>
-          <option value="Sewa">🏠 Sewa</option>
-          <option value="Lainnya">📋 Lainnya</option>
+          <option value="ATK">ATK (Alat Tulis Kantor)</option>
+          <option value="Listrik">Listrik</option>
+          <option value="Internet">Internet</option>
+          <option value="Transportasi">Transportasi</option>
+          <option value="Konsumsi">Konsumsi</option>
+          <option value="Kebersihan">Kebersihan</option>
+          <option value="Perlengkapan">Perlengkapan</option>
+          <option value="Gaji">Gaji/Honor</option>
+          <option value="Sewa">Sewa</option>
+          <option value="Lainnya">Lainnya</option>
         </select>
       </div>
     </div>
@@ -370,7 +375,12 @@ textarea{resize:vertical;min-height:70px;}
       </div>
       <div>
         <label>Dibayar oleh <span style="color:var(--danger)">*</span></label>
-        <input type="text" id="inputDibayarOleh" placeholder="Nama guru/admin">
+        <select id="inputDibayarOleh">
+          <option value="">Pilih nama...</option>
+          <option value="Elis Rosmiati">Elis Rosmiati</option>
+          <option value="Yessi Marlina">Yessi Marlina</option>
+          <option value="Annisa Zahrotun J">Annisa Zahrotun J</option>
+        </select>
       </div>
     </div>
 
@@ -401,11 +411,6 @@ textarea{resize:vertical;min-height:70px;}
 
 <!-- ══ TAB: RIWAYAT ══ -->
 <div id="tab-list" class="tab-content">
-
-  <div id="syncBar" class="sync-bar syncing">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
-    <span id="syncBarText">Memuat data...</span>
-  </div>
 
   <div class="filter-bar">
     <select id="filterBulan" onchange="renderList()">
@@ -543,21 +548,21 @@ const POLL_MS = 30000;
 // KATEGORI CONFIG
 // ══════════════════════════════════════
 const KAT_CONFIG = {
-  'ATK':          { color:'#1B6CA8', bg:'rgba(27,108,168,0.12)',  emoji:'📎' },
-  'Listrik':      { color:'#F59F00', bg:'rgba(245,159,0,0.12)',   emoji:'💡' },
-  'Internet':     { color:'#7950F2', bg:'rgba(121,80,242,0.12)',  emoji:'🌐' },
-  'Transportasi': { color:'#2E9E5B', bg:'rgba(46,158,91,0.12)',   emoji:'🚗' },
-  'Konsumsi':     { color:'#E67700', bg:'rgba(230,119,0,0.12)',   emoji:'🍱' },
-  'Kebersihan':   { color:'#0CA678', bg:'rgba(12,166,120,0.12)',  emoji:'🧹' },
-  'Perlengkapan': { color:'#3B82F6', bg:'rgba(59,130,246,0.12)', emoji:'📦' },
-  'Gaji':         { color:'#DC3545', bg:'rgba(220,53,69,0.12)',   emoji:'👤' },
-  'Sewa':         { color:'#6F42C1', bg:'rgba(111,66,193,0.12)', emoji:'🏠' },
-  'Lainnya':      { color:'#8FA4B4', bg:'rgba(143,164,180,0.12)',emoji:'📋' },
+  'ATK':          { color:'#1B6CA8', bg:'rgba(27,108,168,0.12)'  },
+  'Listrik':      { color:'#F59F00', bg:'rgba(245,159,0,0.12)'   },
+  'Internet':     { color:'#7950F2', bg:'rgba(121,80,242,0.12)'  },
+  'Transportasi': { color:'#2E9E5B', bg:'rgba(46,158,91,0.12)'   },
+  'Konsumsi':     { color:'#E67700', bg:'rgba(230,119,0,0.12)'   },
+  'Kebersihan':   { color:'#0CA678', bg:'rgba(12,166,120,0.12)'  },
+  'Perlengkapan': { color:'#3B82F6', bg:'rgba(59,130,246,0.12)'  },
+  'Gaji':         { color:'#DC3545', bg:'rgba(220,53,69,0.12)'   },
+  'Sewa':         { color:'#6F42C1', bg:'rgba(111,66,193,0.12)'  },
+  'Lainnya':      { color:'#8FA4B4', bg:'rgba(143,164,180,0.12)' },
 };
 
 function katBadge(kat) {
   const c = KAT_CONFIG[kat] || KAT_CONFIG['Lainnya'];
-  return `<span class="cat-badge" style="background:${c.bg};color:${c.color};">${c.emoji} ${kat}</span>`;
+  return `<span class="cat-badge" style="background:${c.bg};color:${c.color};">${kat}</span>`;
 }
 
 // ══════════════════════════════════════
@@ -747,19 +752,17 @@ async function deleteExpenseFromSheets(id) {
 // SYNC
 // ══════════════════════════════════════
 function setSyncStatus(state, msg) {
-  const bar = document.getElementById('syncBar');
-  const txt = document.getElementById('syncBarText');
   const icons = {
     ok: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
     syncing: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>`,
     error: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
   };
-  bar.className = `sync-bar ${state}`;
-  bar.innerHTML = `${icons[state]||''}<span>${msg}</span>`;
-
-  // Topbar sync status
+  const colors = { ok:'var(--success)', syncing:'rgba(255,255,255,0.8)', error:'var(--danger)' };
   const topbar = document.getElementById('syncStatus');
-  topbar.innerHTML = `${icons[state]||''}<span>${msg}</span>`;
+  if (topbar) {
+    topbar.style.color = colors[state] || 'rgba(255,255,255,0.7)';
+    topbar.innerHTML = `${icons[state]||''}<span>${msg}</span>`;
+  }
 }
 
 async function syncData(isManual=false) {
