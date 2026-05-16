@@ -1078,14 +1078,21 @@ async function uploadProofToDrive(base64, mimeType, invoiceNumber) {
     uploadBase64 = await compressImageBase64(base64, 400, 0.5);
     if (uploadBase64.length > 150000) uploadBase64 = await compressImageBase64(base64, 250, 0.4);
   } catch(e) {}
-  const clean = uploadBase64.replace(/^data:[^;]+;base64,/, '');
-  const body = JSON.stringify({ action: 'uploadProof', base64: clean, mimeType: 'image/jpeg', invoiceNumber });
-  const encoded = encodeURIComponent(body);
-  const resp = await fetch(`${GAS_URL}?method=post&data=${encoded}`, { cache: 'no-store' });
+  // Kirim via POST body (bukan query string) — sama seperti Tracer yang sudah terbukti jalan
+  const payload = JSON.stringify({
+    base64:   uploadBase64,  // kirim dengan prefix data:image/... (GAS akan split(',')[1])
+    mimeType: 'image/jpeg',
+    filename: 'bukti_' + (invoiceNumber || Date.now()) + '.jpg'
+  });
+  const resp = await fetch(GAS_URL, {
+    method:  'POST',
+    headers: { 'Content-Type': 'text/plain' }, // text/plain = no CORS preflight
+    body:    payload
+  });
   if (!resp.ok) throw new Error('HTTP ' + resp.status);
   const data = await resp.json();
-  if (data.error) throw new Error(data.error);
-  return data.viewUrl;
+  if (!data.success && !data.viewUrl && !data.url) throw new Error(data.error || 'Upload gagal');
+  return data.viewUrl || data.url;
 }
 
 /* SYNC: ambil data terbaru, bandingkan, tampilkan notif jika ada yang baru */
