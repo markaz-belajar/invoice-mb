@@ -26,6 +26,8 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;width:100%;}
+body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;-webkit-touch-callout:none;}
+input,select,textarea{-webkit-user-select:text;-moz-user-select:text;user-select:text;}
 body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--outer-bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;transition:background .3s,color .3s;}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
@@ -1544,7 +1546,10 @@ function addProg(){
   const jenjang = activeStudent.jenjang || 'Elementary';
   const jenProgs=PROGS[jenjang]||['Program'];
   const defaultProg=(!isManualStudent&&student&&student.program&&jenProgs.includes(student.program))?student.program:jenProgs[0];
-  progs.push({id:pc,prog:defaultProg,type:'Reguler',dur:1,manualPrice:null,useManualPrice:false});
+  // Pakai tipe & durasi dari database siswa kalau ada
+  const defaultType = (!isManualStudent && student && student.defaultType) ? student.defaultType : 'Reguler';
+  const defaultDur  = (!isManualStudent && student && student.defaultDur)  ? student.defaultDur  : 1;
+  progs.push({id:pc,prog:defaultProg,type:defaultType,dur:defaultDur,manualPrice:null,useManualPrice:false});
   renderProgList();if(prevOpen)renderPrev();
 }
 function removeProg(id){progs=progs.filter(p=>p.id!==id);renderProgList();if(prevOpen)renderPrev();}
@@ -2244,6 +2249,19 @@ document.addEventListener('click',function(e){
 
 /* RUN */
 init();
+
+/* CEGAH LONG PRESS / BLOK TEKS */
+document.addEventListener('contextmenu', function(e){
+  // Izinkan context menu hanya di input/select/textarea
+  if(!['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)){
+    e.preventDefault();
+  }
+});
+document.addEventListener('selectstart', function(e){
+  if(!['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)){
+    e.preventDefault();
+  }
+});
 </script>
 
 <!-- ══ NOTIF PERMISSION POPUP DIALOG ══ -->
