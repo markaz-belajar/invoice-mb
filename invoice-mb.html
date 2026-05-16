@@ -162,13 +162,13 @@ textarea{resize:vertical;min-height:80px;}
 
 /* INVOICE DOC */
 .inv-doc{background:#fff;border-radius:10px;overflow:hidden;font-family:'Geist',sans-serif;color:#1c1c1c;font-size:11.5px;width:100%;max-width:520px;margin:0 auto;}
-.inv-top{background:#f3d465;padding:12px 20px;}
+.inv-top{background:#1c1c1c;color:#fff;padding:12px 20px;}
 .inv-top-row{display:flex;justify-content:space-between;align-items:center;}
 .inv-brand{font-size:16px;font-weight:700;letter-spacing:-.03em;}
 .inv-brand span{color:#8ab4f8;}
 .inv-tagline{font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;letter-spacing:.06em;text-transform:uppercase;}
 .inv-title-block{text-align:right;}
-.inv-title-word{font-size:18px;font-weight:300;letter-spacing:-.04em;color:#543c34;line-height:1;}
+.inv-title-word{font-size:20px;font-weight:300;letter-spacing:-.04em;opacity:.75;}
 .inv-num{font-size:10px;font-weight:600;color:#8ab4f8;font-family:'Geist Mono',monospace;margin-top:2px;}
 .inv-body{padding:18px 24px;}
 .inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}
@@ -1035,8 +1035,7 @@ async function gasPost(action, payload) {
     const resp = await fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: body,
-      cache: 'no-store',
+      body: body, cache: 'no-store',
     });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
@@ -1598,7 +1597,7 @@ function togglePreview(){
 function buildInvHTML(d){
   const rows=d.items.length?d.items.map(it=>`<tr><td style="font-size:11px;">${it.label}</td><td style="font-size:11px;">${it.type||'—'}</td><td style="font-size:11px;">${it.dur?it.dur+' Bulan':'—'}</td><td style="text-align:right;font-family:'Geist Mono',monospace;font-size:11px;">${rp(it.price)}</td></tr>`).join(''):`<tr><td colspan="4" style="text-align:center;color:#bbb;padding:16px;font-size:11px;">Belum ada item</td></tr>`;
   const ibuPrefix = n => (n && n !== '—') ? 'Ibu ' + n : n;
-  return `<div class="inv-doc"><div class="inv-top"><div class="inv-top-row"><img src="https://raw.githubusercontent.com/markaz-belajar/invoice-mb/main/Open_MB_Icon.png" style="height:44px;width:auto;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'"><div class="inv-title-block"><div class="inv-title-word" style="color:#543c34;">Invoice</div><div class="inv-num" style="color:#543c34;">${d.invNum}</div>${d.nomorInduk?`<div style="font-size:9px;color:rgba(28,44,58,.45);font-family:'Geist Mono',monospace;margin-top:2px;">${d.nomorInduk}</div>`:''}</div></div></div><div class="inv-body"><div class="inv-parties"><div><div class="inv-plbl">Dari</div><div class="inv-pname">Markaz Belajar</div><div class="inv-psub">Jl.Raya Sirih Rt 01 Rw 05<br>Des. Kamasan, Kec. Cinangka<br>Kab. Serang – Banten<br>08366583082</div></div><div><div class="inv-plbl">Tagihan Kepada</div><div class="inv-pname">${ibuPrefix(d.pName)}</div><div class="inv-psub">${d.sName}${d.jenjang?' · '+d.jenjang:''}${d.guru?' · Guru: '+d.guru:''}</div>${d.alamat?`<div class="inv-psub" style="margin-top:4px;">${d.alamat}</div>`:''}</div></div><div class="inv-meta"><div class="inv-mb"><div class="inv-ml">Tanggal</div><div class="inv-mv">${fmtShort(d.invDate)}</div></div><div class="inv-mb"><div class="inv-ml">Jatuh Tempo</div><div class="inv-mv" style="color:#dc2626;">${fmtShort(d.dueDate)}</div></div><div class="inv-mb"><div class="inv-ml">Dibuat Oleh</div><div class="inv-mv">${d.creator}</div></div></div><table class="inv-tbl"><thead><tr><th>Program</th><th>Tipe</th><th>Durasi</th><th>Harga</th></tr></thead><tbody>${rows}</tbody></table><div class="inv-totals"><div class="inv-trow"><span>Subtotal</span><span>${rp(d.subtotal)}</span></div><div class="inv-tfinal"><span class="inv-tflbl">Total</span><span class="inv-tfval">${rp(d.subtotal)}</span></div></div><div class="inv-bank"><div class="inv-bank-ttl">Informasi Pembayaran</div><div class="inv-bank-row"><span class="inv-bname">Dana</span><span class="inv-bnum">0838-665-830-82</span></div><div class="inv-bank-row"><span class="inv-bname">BCA</span><span class="inv-bnum">651-065-92-26</span></div><div class="inv-ban">a.n Elis Rosmiati</div></div>${d.notes?`<div class="inv-notes">Catatan: ${d.notes}</div>`:''}<div class="inv-created">Dibuat oleh: ${d.creator} · ${fmtShort(d.invDate)}</div></div><div class="inv-footer">Terima kasih atas kepercayaan Anda — markaz.belajar@gmail.com</div></div>`;
+  return `<div class="inv-doc"><div class="inv-top"><div class="inv-top-row"><div><img src="https://raw.githubusercontent.com/markaz-belajar/invoice-mb/main/Open_MB_Icon.png" style="height:48px;width:auto;object-fit:contain;" onerror="this.style.display='none'"></div><div class="inv-title-block"><div class="inv-title-word">Invoice</div><div class="inv-num">${d.invNum}</div>${d.nomorInduk?`<div style="font-size:9px;color:rgba(255,255,255,.45);font-family:'Geist Mono',monospace;margin-top:3px;">${d.nomorInduk}</div>`:''}</div></div></div><div class="inv-body"><div class="inv-parties"><div><div class="inv-plbl">Dari</div><div class="inv-pname">Markaz Belajar</div><div class="inv-psub">Jl.Raya Sirih Rt 01 Rw 05<br>Des. Kamasan, Kec. Cinangka<br>Kab. Serang – Banten<br>08366583082</div></div><div><div class="inv-plbl">Tagihan Kepada</div><div class="inv-pname">${ibuPrefix(d.pName)}</div><div class="inv-psub">${d.sName}${d.jenjang?' · '+d.jenjang:''}${d.guru?' · Guru: '+d.guru:''}</div>${d.alamat?`<div class="inv-psub" style="margin-top:4px;">${d.alamat}</div>`:''}</div></div><div class="inv-meta"><div class="inv-mb"><div class="inv-ml">Tanggal</div><div class="inv-mv">${fmtShort(d.invDate)}</div></div><div class="inv-mb"><div class="inv-ml">Jatuh Tempo</div><div class="inv-mv" style="color:#dc2626;">${fmtShort(d.dueDate)}</div></div><div class="inv-mb"><div class="inv-ml">Dibuat Oleh</div><div class="inv-mv">${d.creator}</div></div></div><table class="inv-tbl"><thead><tr><th>Program</th><th>Tipe</th><th>Durasi</th><th>Harga</th></tr></thead><tbody>${rows}</tbody></table><div class="inv-totals"><div class="inv-trow"><span>Subtotal</span><span>${rp(d.subtotal)}</span></div><div class="inv-tfinal"><span class="inv-tflbl">Total</span><span class="inv-tfval">${rp(d.subtotal)}</span></div></div><div class="inv-bank"><div class="inv-bank-ttl">Informasi Pembayaran</div><div class="inv-bank-row"><span class="inv-bname">Dana</span><span class="inv-bnum">0838-665-830-82</span></div><div class="inv-bank-row"><span class="inv-bname">BCA</span><span class="inv-bnum">651-065-92-26</span></div><div class="inv-ban">a.n Elis Rosmiati</div></div>${d.notes?`<div class="inv-notes">Catatan: ${d.notes}</div>`:''}<div class="inv-created">Dibuat oleh: ${d.creator} · ${fmtShort(d.invDate)}</div></div><div class="inv-footer">Terima kasih atas kepercayaan Anda — markaz.belajar@gmail.com</div></div>`;
 }
 
 function buildInv(){
@@ -1630,7 +1629,7 @@ function _renderPDF(invHTML,filename,paidStamp=false){
   if(paidStamp){const stampHTML=`<div style="position:absolute;top:45%;left:50%;transform:translate(-50%,-50%) rotate(-28deg);font-size:64px;font-weight:900;color:rgba(220,38,38,0.20);border:7px solid rgba(220,38,38,0.20);border-radius:10px;padding:4px 18px;letter-spacing:.12em;white-space:nowrap;pointer-events:none;z-index:10;font-family:Arial,sans-serif;text-transform:uppercase;">LUNAS</div>`;finalHTML=invHTML.replace(/(<div class="inv-footer")/, stampHTML+'$1');}
   const pw=window.open('','_blank','width=620,height=800');
   if(!pw){showToast('Popup diblokir browser. Izinkan popup untuk mencetak.',false);return;}
-  pw.document.write(`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>${filename.replace('.pdf','')}</title><link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}html,body{background:#fff;}body{display:flex;justify-content:center;padding:24px 0 40px;}.inv-doc{background:#fff;border-radius:10px;overflow:hidden;font-family:'Geist',sans-serif;color:#1c1c1c;font-size:11.5px;width:520px;position:relative;}.inv-top{background:#f3d465 !important;padding:12px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.inv-top-row{display:flex;justify-content:space-between;align-items:center;}.inv-brand{font-size:16px;font-weight:700;letter-spacing:-.03em;color:#fff;}.inv-brand span{color:#8ab4f8 !important;}.inv-tagline{font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;letter-spacing:.06em;text-transform:uppercase;}.inv-title-block{text-align:right;}.inv-title-word{font-size:18px;font-weight:300;letter-spacing:-.04em;color:#543c34;line-height:1;}.inv-num{font-size:10px;font-weight:600;color:#543c34 !important;font-family:'Geist Mono',monospace;margin-top:2px;}.inv-body{padding:18px 24px;}.inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}.inv-plbl{font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}.inv-pname{font-size:12px;font-weight:700;color:#1c1c1c;}.inv-psub{font-size:10px;color:#666;margin-top:2px;line-height:1.55;}.inv-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}.inv-mb{background:#f4f5f8 !important;border-radius:6px;padding:8px 10px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.inv-ml{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.06em;}.inv-mv{font-size:11px;font-weight:600;color:#1c1c1c;margin-top:2px;}.inv-tbl{width:100%;border-collapse:collapse;margin-bottom:12px;}.inv-tbl th{background:#f4f5f8 !important;padding:7px 10px;text-align:left;font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.07em;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.inv-tbl th:last-child,.inv-tbl td:last-child{text-align:right;}.inv-tbl td{padding:8px 10px;border-bottom:1px solid #eef0f4;font-size:11px;color:#1c1c1c;}.inv-tbl tr:last-child td{border-bottom:none;}.inv-totals{background:#f4f5f8 !important;border-radius:8px;padding:12px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.inv-trow{display:flex;justify-content:space-between;font-size:11px;color:#666;padding:2px 0;}.inv-tfinal{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #dde0e8;}.inv-tflbl{font-size:12px;font-weight:700;color:#1c1c1c;}.inv-tfval{font-size:14px;font-weight:700;color:#1c1c1c;font-family:'Geist Mono',monospace;}.inv-bank{margin-top:14px;padding:12px 14px;border:1px solid #eef0f4;border-radius:8px;}.inv-bank-ttl{font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}.inv-bank-row{display:flex;justify-content:space-between;font-size:10px;margin:3px 0;}.inv-bname{color:#1c1c1c;font-weight:600;}.inv-bnum{color:#4a7fe0;font-family:'Geist Mono',monospace;}.inv-ban{font-size:9px;color:#aaa;margin-top:4px;}.inv-notes{margin-top:10px;font-size:10px;color:#888;font-style:italic;}.inv-created{margin-top:6px;font-size:9px;color:#aaa;}.inv-footer{padding:10px 24px;background:#f4f5f8 !important;text-align:center;font-size:9px;color:#aaa;-webkit-print-color-adjust:exact;print-color-adjust:exact;}@page{size:auto;margin:8mm 10mm;}@media print{*{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}html,body{background:#fff !important;padding:0;margin:0;}body{display:block;}.inv-doc{width:100%;border-radius:0;box-shadow:none;}.no-print{display:none !important;}}</style></head><body>${finalHTML}<div class="no-print" style="text-align:center;margin-top:24px;font-family:system-ui;font-size:13px;color:#888;"><p style="margin-bottom:10px;">Klik <strong>Cetak / Save as PDF</strong></p><button onclick="window.print()" style="padding:10px 24px;background:#1c1c1c;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">🖨️ Cetak / Save PDF</button></div><script>window.addEventListener('load',function(){setTimeout(function(){window.print();},800);});<\/script></body></html>`);
+  pw.document.write(`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>${filename.replace('.pdf','')}</title><link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}html,body{background:#fff;}body{display:flex;justify-content:center;padding:24px 0 40px;}.inv-doc{background:#fff;border-radius:10px;overflow:hidden;font-family:'Geist',sans-serif;color:#1c1c1c;font-size:11.5px;width:520px;position:relative;}.inv-top{background:#1c1c1c !important;color:#fff !important;padding:12px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.inv-top-row{display:flex;justify-content:space-between;align-items:center;}.inv-brand{font-size:16px;font-weight:700;letter-spacing:-.03em;color:#fff;}.inv-brand span{color:#8ab4f8 !important;}.inv-tagline{font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;letter-spacing:.06em;text-transform:uppercase;}.inv-title-block{text-align:right;}.inv-title-word{font-size:20px;font-weight:300;letter-spacing:-.04em;opacity:.75;color:#fff;}.inv-num{font-size:10px;font-weight:600;color:#8ab4f8 !important;font-family:'Geist Mono',monospace;margin-top:2px;}.inv-body{padding:18px 24px;}.inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}.inv-plbl{font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}.inv-pname{font-size:12px;font-weight:700;color:#1c1c1c;}.inv-psub{font-size:10px;color:#666;margin-top:2px;line-height:1.55;}.inv-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}.inv-mb{background:#f4f5f8 !important;border-radius:6px;padding:8px 10px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.inv-ml{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.06em;}.inv-mv{font-size:11px;font-weight:600;color:#1c1c1c;margin-top:2px;}.inv-tbl{width:100%;border-collapse:collapse;margin-bottom:12px;}.inv-tbl th{background:#f4f5f8 !important;padding:7px 10px;text-align:left;font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.07em;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.inv-tbl th:last-child,.inv-tbl td:last-child{text-align:right;}.inv-tbl td{padding:8px 10px;border-bottom:1px solid #eef0f4;font-size:11px;color:#1c1c1c;}.inv-tbl tr:last-child td{border-bottom:none;}.inv-totals{background:#f4f5f8 !important;border-radius:8px;padding:12px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.inv-trow{display:flex;justify-content:space-between;font-size:11px;color:#666;padding:2px 0;}.inv-tfinal{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #dde0e8;}.inv-tflbl{font-size:12px;font-weight:700;color:#1c1c1c;}.inv-tfval{font-size:14px;font-weight:700;color:#1c1c1c;font-family:'Geist Mono',monospace;}.inv-bank{margin-top:14px;padding:12px 14px;border:1px solid #eef0f4;border-radius:8px;}.inv-bank-ttl{font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}.inv-bank-row{display:flex;justify-content:space-between;font-size:10px;margin:3px 0;}.inv-bname{color:#1c1c1c;font-weight:600;}.inv-bnum{color:#4a7fe0;font-family:'Geist Mono',monospace;}.inv-ban{font-size:9px;color:#aaa;margin-top:4px;}.inv-notes{margin-top:10px;font-size:10px;color:#888;font-style:italic;}.inv-created{margin-top:6px;font-size:9px;color:#aaa;}.inv-footer{padding:10px 24px;background:#f4f5f8 !important;text-align:center;font-size:9px;color:#aaa;-webkit-print-color-adjust:exact;print-color-adjust:exact;}@page{size:auto;margin:8mm 10mm;}@media print{*{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}html,body{background:#fff !important;padding:0;margin:0;}body{display:block;}.inv-doc{width:100%;border-radius:0;box-shadow:none;}.no-print{display:none !important;}}</style></head><body>${finalHTML}<div class="no-print" style="text-align:center;margin-top:24px;font-family:system-ui;font-size:13px;color:#888;"><p style="margin-bottom:10px;">Klik <strong>Cetak / Save as PDF</strong></p><button onclick="window.print()" style="padding:10px 24px;background:#1c1c1c;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">🖨️ Cetak / Save PDF</button></div><script>window.addEventListener('load',function(){setTimeout(function(){window.print();},800);});<\/script></body></html>`);
   pw.document.close();
 }
 
@@ -1873,33 +1872,24 @@ function handlePaymentProofUpload(e){
   reader.readAsDataURL(file);
 }
 
-/* ── COMPRESS IMAGE ── */
-function compressImageBase64(base64, maxPx=800, quality=0.75){
+function compressImageBase64(base64,maxPx=800,quality=0.75){
   return new Promise((resolve,reject)=>{
     const img=new Image();
     img.onload=()=>{
       let w=img.width,h=img.height;
-      if(w>maxPx||h>maxPx){
-        if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}
-        else{w=Math.round(w*maxPx/h);h=maxPx;}
-      }
-      const canvas=document.createElement('canvas');
-      canvas.width=w;canvas.height=h;
-      const ctx=canvas.getContext('2d');
-      ctx.drawImage(img,0,0,w,h);
+      if(w>maxPx||h>maxPx){if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;}}
+      const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
       resolve(canvas.toDataURL('image/jpeg',quality));
-    };
-    img.onerror=reject;
-    img.src=base64;
+    };img.onerror=reject;img.src=base64;
   });
 }
-
 async function confirmPayment(){
   if(!currentInvoiceId)return;
   const updatedBy=document.getElementById('createdBy').value;
   let proofUrl=null;
   
-  // Upload bukti jika ada — kompres dulu
+  // Upload bukti jika ada
   if(currentProofData){
     try{
       const inv=invoices.find(i=>i.__backendId===currentInvoiceId);
@@ -1953,15 +1943,13 @@ function openProofUpload(invId){
     if(file.size>5*1024*1024){showToast('File terlalu besar',false);return;}
     const reader=new FileReader();
     reader.onload=async(evt)=>{
-      try{
-        const inv=invoices.find(i=>i.__backendId===invId);
-        const compressed=await compressImageBase64(evt.target.result,800,0.7);
-        let proofUrl=compressed;
-        try{const url=await uploadProofToDrive(compressed,'image/jpeg',inv?.invoice_number||'inv');if(url)proofUrl=url;}
-        catch(err){console.warn('Upload Drive gagal, simpan lokal terkompresi',err);}
-        await updateInvoiceInSheets(invId,{payment_proof:proofUrl},document.getElementById('createdBy').value);
-        await syncFromSheets(false);showToast('Bukti pembayaran berhasil disimpan! ✓',true);
-      }catch(err){showToast('Gagal simpan bukti: '+err.message,false);}
+      currentProofData=evt.target.result;
+      const inv=invoices.find(i=>i.__backendId===invId);
+      const mimeType=currentProofData.split(';')[0].replace('data:','');
+      let proofUrl=currentProofData;
+      try{const url=await uploadProofToDrive(currentProofData,mimeType,inv?.invoice_number||'inv');if(url)proofUrl=url;}catch(err){console.warn('Upload Drive gagal, simpan lokal',err);}
+      try{await updateInvoiceInSheets(invId,{payment_proof:proofUrl},document.getElementById('createdBy').value);await syncFromSheets(false);showToast('Bukti pembayaran berhasil disimpan! ✓',true);}
+      catch(err){showToast('Gagal simpan bukti: '+err.message,false);}
       currentProofData=null;
     };
     reader.readAsDataURL(file);
