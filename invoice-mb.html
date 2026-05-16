@@ -1023,25 +1023,18 @@ async function fetchInvoicesFromSheets() {
   return data.invoices || [];
 }
 async function gasPost(action, payload) {
+  // Selalu POST body — hindari 413 Content Too Large dari GET query string
   const body = JSON.stringify({ action, ...payload });
-  if (body.length < 50000) {
-    const encoded = encodeURIComponent(body);
-    const resp = await fetch(`${GAS_URL}?method=post&data=${encoded}`, { cache: 'no-store' });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const data = await resp.json();
-    if (data.error) throw new Error(data.error);
-    return data;
-  } else {
-    const resp = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: body, cache: 'no-store',
-    });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const data = await resp.json();
-    if (data.error) throw new Error(data.error);
-    return data;
-  }
+  const resp = await fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: body,
+    cache: 'no-store',
+  });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
 }
 
 async function saveInvoiceToSheets(invData) {
