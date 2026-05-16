@@ -1912,23 +1912,34 @@ async function confirmPayment(){
   const updatedBy=document.getElementById('createdBy').value;
   let proofUrl=null;
   
-  // Upload bukti jika ada — fallback ke base64 lokal kalau Drive gagal
+  // Upload bukti ke Drive — WAJIB berhasil jika ada gambar
   if(currentProofData){
+    showToast('Mengupload bukti ke Drive...', true);
+    let compressed=currentProofData;
     try{
-      const compressed=await compressImageBase64(currentProofData,800,0.7);
-      proofUrl=compressed; // simpan lokal dulu sebagai fallback
-      const inv=invoices.find(i=>i.__backendId===currentInvoiceId);
+      compressed=await compressImageBase64(currentProofData,700,0.65);
+      if(compressed.length>500000) compressed=await compressImageBase64(currentProofData,500,0.55);
+    }catch(e){}
+    
+    let driveUrl=null; let uploadErr2=null;
+    const inv2=invoices.find(i=>i.__backendId===currentInvoiceId);
+    for(let attempt=1;attempt<=3;attempt++){
       try{
-        const url=await uploadProofToDrive(compressed,'image/jpeg',inv?.invoice_number||'inv');
-        if(url)proofUrl=url; // pakai URL Drive kalau berhasil
-      }catch(driveErr){
-        console.warn('Drive upload gagal, pakai lokal:',driveErr);
-        // proofUrl sudah = compressed, tetap lanjut
+        const url=await uploadProofToDrive(compressed,'image/jpeg',inv2?.invoice_number||'inv');
+        if(url){driveUrl=url;break;}
+      }catch(err){
+        uploadErr2=err;
+        if(attempt<3) await new Promise(r=>setTimeout(r,1500*attempt));
       }
-    }catch(e){
-      console.warn('Compress gagal:',e);
-      proofUrl=currentProofData; // pakai raw kalau compress gagal
     }
+    if(!driveUrl){
+      const errDetail2=uploadErr2?.message?.includes('fetch')||uploadErr2?.message?.includes('Failed')
+        ?'Koneksi ke server gagal.':'Upload gagal.';
+      if(confirmPayBtn){confirmPayBtn.disabled=false;confirmPayBtn.textContent='Simpan';}
+      showToast('❌ Bukti gagal terupload ke Drive: '+errDetail2+' Coba lagi nanti.', false);
+      return; // Batalkan — jangan simpan pembayaran tanpa bukti
+    }
+    proofUrl=driveUrl;
   }
 
   const updates={
@@ -1982,11 +1993,59 @@ function openProofUpload(invId){
     reader.onload=async(evt)=>{
       currentProofData=evt.target.result;
       const inv=invoices.find(i=>i.__backendId===invId);
-      const mimeType=currentProofData.split(';')[0].replace('data:','');
-      let proofUrl=currentProofData;
-      try{const url=await uploadProofToDrive(currentProofData,mimeType,inv?.invoice_number||'inv');if(url)proofUrl=url;}catch(err){console.warn('Upload Drive gagal, simpan lokal',err);}
-      try{await updateInvoiceInSheets(invId,{payment_proof:proofUrl},document.getElementById('createdBy').value);await syncFromSheets(false);showToast('Bukti pembayaran berhasil disimpan! ✓',true);}
-      catch(err){showToast('Gagal simpan bukti: '+err.message,false);}
+      
+      // Tampilkan loading toast
+      showToast('Mengupload bukti ke Drive...', true);
+      
+      // Step 1: Compress agresif — kurangi ukuran agar tidak timeout
+      let compressed=currentProofData;
+      try{
+        compressed=await compressImageBase64(currentProofData,700,0.65);
+        // Kalau masih besar (>500KB base64 ~375KB), compress lebih kecil lagi
+        if(compressed.length>500000){
+          compressed=await compressImageBase64(currentProofData,500,0.55);
+        }
+      }catch(e){ console.warn('Compress error:',e); }
+      
+      // Step 2: Upload ke Drive — WAJIB berhasil (retry 3x)
+      let driveUrl=null;
+      let uploadErr=null;
+      for(let attempt=1; attempt<=3; attempt++){
+        try{
+          const url=await uploadProofToDrive(compressed,'image/jpeg',inv?.invoice_number||'inv');
+          if(url){ driveUrl=url; break; }
+        }catch(err){
+          uploadErr=err;
+          console.warn('Upload attempt '+attempt+' gagal:',err.message);
+          if(attempt<3) await new Promise(r=>setTimeout(r,1500*attempt)); // tunggu sebelum retry
+        }
+      }
+      
+      // Step 3: Kalau Drive gagal — simpan payment data tanpa bukti, tandai pending
+      if(!driveUrl){
+        const errDetail = uploadErr?.message?.includes('fetch')||uploadErr?.message?.includes('Failed')
+          ? 'Koneksi ke server gagal.'
+          : (uploadErr?.message||'Upload gagal.');
+        showToast('❌ Bukti gagal terupload ke Drive: '+errDetail+' Coba lagi nanti.', false);
+        // Tandai invoice punya pending proof (base64 sementara, perlu upload ulang)
+        const localInv=invoices.find(i=>i.__backendId===invId);
+        if(localInv){ localInv._pendingProof=compressed; }
+        currentProofData=null;
+        return; // Berhenti — jangan simpan tanpa bukti yang valid
+      }
+      
+      // Step 4: Upload berhasil — simpan URL Drive ke Sheets
+      try{
+        await updateInvoiceInSheets(invId, {payment_proof:driveUrl}, document.getElementById('createdBy').value);
+        await syncFromSheets(false);
+        showToast('✓ Bukti berhasil diarsip ke Drive!', true);
+      }catch(sheetsErr){
+        // Sheets gagal tapi Drive sudah berhasil — simpan URL ke lokal dulu
+        const localInv=invoices.find(i=>i.__backendId===invId);
+        if(localInv){ localInv.payment_proof=driveUrl; localInv._pendingSync=true; }
+        renderTracking();
+        showToast('Bukti di Drive ✓ — gagal sync ke Sheets, akan coba lagi saat refresh.', false);
+      }
       currentProofData=null;
     };
     reader.readAsDataURL(file);
@@ -2149,7 +2208,7 @@ async function confirmEdit(){
     showToast('Invoice berhasil diperbarui! ✓',true);
     closeModal('editModal');
   }catch(e){
-    showToast('Gagal update: '+e.message,false);
+    const editErrMsg=e.message.includes('fetch')||e.message.includes('Failed')||e.message.includes('abort')?'Koneksi bermasalah. Coba lagi atau pastikan internet aktif.':'Gagal update: '+e.message; showToast(editErrMsg,false);
     // Rollback UI
     await syncFromSheets(false);
   }finally{
