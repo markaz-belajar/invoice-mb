@@ -1934,11 +1934,15 @@ async function confirmPayment(){
       }
     }
     if(!driveUrl){
-      const errDetail2=uploadErr2?.message?.includes('fetch')||uploadErr2?.message?.includes('Failed')
-        ?'Koneksi ke server gagal.':'Upload gagal.';
+      const errMsg2 = uploadErr2?.message || 'Unknown error';
       if(confirmPayBtn){confirmPayBtn.disabled=false;confirmPayBtn.textContent='Simpan';}
-      showToast('❌ Bukti gagal terupload ke Drive: '+errDetail2+' Coba lagi nanti.', false);
-      return; // Batalkan — jangan simpan pembayaran tanpa bukti
+      alert('❌ Upload gagal:
+
+' + errMsg2 + '
+
+Silakan screenshot pesan ini.');
+      showToast('❌ Upload gagal: ' + errMsg2, false);
+      return;
     }
     proofUrl=driveUrl;
   }
