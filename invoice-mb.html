@@ -1023,14 +1023,30 @@ async function fetchInvoicesFromSheets() {
   return data.invoices || [];
 }
 async function gasPost(action, payload) {
-  // GAS Web App dari browser harus pakai GET — POST di-redirect dan kehilangan body
-  // Semua operasi write dikirim via ?method=post&data=...
-  const encoded = encodeURIComponent(JSON.stringify({ action, ...payload }));
-  const resp = await fetch(`${GAS_URL}?method=post&data=${encoded}`, { cache: 'no-store' });
-  if (!resp.ok) throw new Error('HTTP ' + resp.status);
-  const data = await resp.json();
-  if (data.error) throw new Error(data.error);
-  return data;
+  const body = JSON.stringify({ action, ...payload });
+  // Kalau payload kecil (<50KB), pakai GET (lebih andal di GAS tanpa CORS issue)
+  // Kalau besar (misal ada base64 image), pakai POST dengan no-cors mode + fallback
+  if (body.length < 50000) {
+    const encoded = encodeURIComponent(body);
+    const resp = await fetch(`${GAS_URL}?method=post&data=${encoded}`, { cache: 'no-store' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    return data;
+  } else {
+    // Payload besar: kirim via POST dengan body JSON
+    // GAS perlu doPost() handler — data ada di e.postData.contents
+    const resp = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: body,
+      cache: 'no-store',
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    return data;
+  }
 }
 
 async function saveInvoiceToSheets(invData) {
@@ -1861,20 +1877,51 @@ function handlePaymentProofUpload(e){
   reader.readAsDataURL(file);
 }
 
+/* ── COMPRESS IMAGE ── */
+function compressImageBase64(base64, maxPx=800, quality=0.75){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>{
+      let w=img.width,h=img.height;
+      if(w>maxPx||h>maxPx){
+        if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}
+        else{w=Math.round(w*maxPx/h);h=maxPx;}
+      }
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      resolve(canvas.toDataURL('image/jpeg',quality));
+    };
+    img.onerror=reject;
+    img.src=base64;
+  });
+}
+
 async function confirmPayment(){
   if(!currentInvoiceId)return;
   const updatedBy=document.getElementById('createdBy').value;
   let proofUrl=null;
   
-  // Upload bukti jika ada
+  // Upload bukti jika ada — kompres dulu kalau terlalu besar
   if(currentProofData){
     try{
       const inv=invoices.find(i=>i.__backendId===currentInvoiceId);
-      const mimeType=currentProofData.split(';')[0].replace('data:','');
-      const url=await uploadProofToDrive(currentProofData,mimeType,inv?.invoice_number||'inv');
-      proofUrl=url||currentProofData; // fallback base64 jika upload gagal
+      // Kompres gambar ke max 800px dan kualitas 0.7 sebelum upload
+      const compressed=await compressImageBase64(currentProofData,800,0.7);
+      const mimeType='image/jpeg';
+      const url=await uploadProofToDrive(compressed,mimeType,inv?.invoice_number||'inv');
+      if(url){
+        proofUrl=url; // URL Drive (ideal)
+      } else {
+        // Fallback: simpan compressed base64 lokal (bukan raw)
+        proofUrl=compressed;
+      }
     }catch(e){
-      proofUrl=currentProofData; // simpan base64 lokal jika error
+      console.warn('Upload proof error:',e);
+      // Kompres saja untuk lokal — jangan simpan raw base64 yang besar
+      try{proofUrl=await compressImageBase64(currentProofData,600,0.6);}
+      catch(e2){proofUrl=null;}
     }
   }
 
@@ -1917,16 +1964,21 @@ function openProofUpload(invId){
   input.type='file';input.accept='image/*';
   input.onchange=async(e)=>{
     const file=e.target.files[0];if(!file)return;
-    if(file.size>5*1024*1024){showToast('File terlalu besar',false);return;}
+    if(file.size>10*1024*1024){showToast('File terlalu besar (Maks 10MB)',false);return;}
+    showToast('Mengompres & mengunggah bukti...', true);
     const reader=new FileReader();
     reader.onload=async(evt)=>{
-      currentProofData=evt.target.result;
-      const inv=invoices.find(i=>i.__backendId===invId);
-      const mimeType=currentProofData.split(';')[0].replace('data:','');
-      let proofUrl=currentProofData;
-      try{const url=await uploadProofToDrive(currentProofData,mimeType,inv?.invoice_number||'inv');if(url)proofUrl=url;}catch(err){console.warn('Upload Drive gagal, simpan lokal',err);}
-      try{await updateInvoiceInSheets(invId,{payment_proof:proofUrl},document.getElementById('createdBy').value);await syncFromSheets(false);showToast('Bukti pembayaran berhasil disimpan! ✓',true);}
-      catch(err){showToast('Gagal simpan bukti: '+err.message,false);}
+      try{
+        const inv=invoices.find(i=>i.__backendId===invId);
+        // Kompres dulu sebelum upload
+        const compressed=await compressImageBase64(evt.target.result,800,0.7);
+        let proofUrl=compressed;
+        try{const url=await uploadProofToDrive(compressed,'image/jpeg',inv?.invoice_number||'inv');if(url)proofUrl=url;}
+        catch(err){console.warn('Upload Drive gagal, simpan lokal terkompresi',err);}
+        await updateInvoiceInSheets(invId,{payment_proof:proofUrl},document.getElementById('createdBy').value);
+        await syncFromSheets(false);
+        showToast('Bukti pembayaran berhasil disimpan! ✓',true);
+      }catch(err){showToast('Gagal simpan bukti: '+err.message,false);}
       currentProofData=null;
     };
     reader.readAsDataURL(file);
