@@ -1073,8 +1073,15 @@ async function deleteInvoiceFromSheets(backendId, deletedBy) {
 }
 async function uploadProofToDrive(base64, mimeType, invoiceNumber) {
   if (!hasGasUrl()) return null;
-  const body = JSON.stringify({ action: 'uploadProof', base64, mimeType, invoiceNumber });
-  // Pakai GET (POST-via-GET) untuk hindari CORS preflight dari GitHub Pages
+  // Compress sangat kecil agar bisa lewat GET (hindari CORS preflight dari GitHub Pages)
+  let uploadBase64 = base64;
+  try {
+    uploadBase64 = await compressImageBase64(base64, 400, 0.5);
+    if (uploadBase64.length > 150000) uploadBase64 = await compressImageBase64(base64, 250, 0.4);
+  } catch(e) {}
+  // Strip prefix data URL
+  const clean = uploadBase64.replace(/^data:[^;]+;base64,/, '');
+  const body = JSON.stringify({ action: 'uploadProof', base64: clean, mimeType: 'image/jpeg', invoiceNumber });
   const encoded = encodeURIComponent(body);
   const resp = await fetch(`${GAS_URL}?method=post&data=${encoded}`, { cache: 'no-store' });
   if (!resp.ok) throw new Error('HTTP ' + resp.status);
