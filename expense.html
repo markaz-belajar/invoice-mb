@@ -226,16 +226,18 @@ textarea{resize:vertical;min-height:70px;}
 .dash-sub{display:none;}
 .dash-sub.active{display:block;}
 
-/* PERIOD FILTER */
-.period-filter{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
-.period-chips{display:flex;gap:4px;background:var(--surface2);border-radius:10px;padding:2px;}
-.period-chip{border:none;background:transparent;padding:5px 10px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;}
+/* PERIOD FILTER — 2 baris: chip granularitas (full width) + nav (center) */
+.period-filter{margin-bottom:12px;}
+.period-chips{display:flex;gap:3px;background:var(--surface2);border-radius:10px;padding:2px;margin-bottom:8px;}
+.period-chip{flex:1;border:none;background:transparent;padding:7px 4px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;}
 .period-chip.active{background:var(--accent);color:#fff;}
-.period-nav{display:flex;align-items:center;gap:4px;}
-.period-nav-btn{width:24px;height:24px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.period-nav{display:flex;align-items:center;justify-content:center;gap:6px;}
+.period-nav-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0;}
 .period-nav-btn svg{width:12px;height:12px;}
-.period-nav-label{font-size:11.5px;font-weight:700;color:var(--text);white-space:nowrap;min-width:70px;text-align:center;}
-.period-date-input{border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text2);font-size:10.5px;padding:3px 4px;width:30px;overflow:hidden;}
+.period-nav-label{display:flex;align-items:center;gap:6px;border:none;background:var(--surface2);border-radius:10px;padding:6px 12px;font-family:inherit;font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;cursor:pointer;max-width:190px;}
+.period-nav-label svg{width:13px;height:13px;color:var(--text3);flex-shrink:0;}
+.period-nav-label span{overflow:hidden;text-overflow:ellipsis;}
+#periodDateInput{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none;}
 
 /* MINI STATS (tertinggi/terendah/rata-rata) */
 .stat-mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
@@ -527,11 +529,14 @@ textarea{resize:vertical;min-height:70px;}
         <button class="period-nav-btn" onclick="shiftDashPeriod(-1)" aria-label="Sebelumnya">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-        <span class="period-nav-label" id="periodNavLabel">Bulan Ini</span>
+        <button class="period-nav-label" onclick="openPeriodDatePicker()">
+          <span id="periodNavLabel">Bulan Ini</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </button>
         <button class="period-nav-btn" onclick="shiftDashPeriod(1)" aria-label="Berikutnya">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-        <input type="date" class="period-date-input" onchange="jumpToDate(this.value)" title="Lompat ke tanggal tertentu">
+        <input type="date" id="periodDateInput" onchange="jumpToDate(this.value)">
       </div>
     </div>
 
@@ -809,7 +814,7 @@ textarea{resize:vertical;min-height:70px;}
 <script>
 // ══════════════════════════════════════
 // CONFIG — GAS_URL sama dengan invoice
-let GAS_URL = 'https://script.google.com/macros/s/AKfycbxbyZtQyblDlDZgRyRLy_grf-W66O7nWwsL9vn1iI46GENgWtjAkcg5u7-LeBERXbiX7A/exec';
+let GAS_URL = 'https://script.google.com/macros/s/AKfycbwvhs-vpBsrYnQbqEJJQ4VUgEt4iDRUtp-IhEKFB0MepxqRsfwURWrPkKOeLApOwg97/exec';
 
 function hasGasUrl() {
   return GAS_URL && GAS_URL.startsWith('https://script.google.com');
@@ -1348,6 +1353,10 @@ function shiftDashPeriod(dir) {
   if (dashPeriodType === 'bulan')  dashPeriodRef = addMonths(dashPeriodRef, dir);
   if (dashPeriodType === 'tahun')  dashPeriodRef = addYears(dashPeriodRef, dir);
   renderDashPeriod();
+}
+function openPeriodDatePicker() {
+  const el = document.getElementById('periodDateInput');
+  try { el.showPicker(); } catch(_) { el.focus(); el.click(); }
 }
 function jumpToDate(val) {
   if (!val) return;
