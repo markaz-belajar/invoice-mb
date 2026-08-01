@@ -1282,6 +1282,24 @@ function shortPeriodLabel(type, ref) {
   return `${BULAN_NAMES[ref.getMonth()].slice(0,3)}${String(ref.getFullYear()).slice(2)}`;
 }
 
+// Bangun deret waktu (mis. 6 bulan/minggu/tahun/hari terakhir) untuk chart tren
+function buildTrendSeries(count = 6) {
+  const series = [];
+  for (let i = count - 1; i >= 0; i--) {
+    let ref;
+    if (dashPeriodType === 'hari')        ref = addDays(dashPeriodRef, -i);
+    else if (dashPeriodType === 'minggu') ref = addDays(dashPeriodRef, -i*7);
+    else if (dashPeriodType === 'tahun')  ref = addYears(dashPeriodRef, -i);
+    else                                   ref = addMonths(dashPeriodRef, -i);
+
+    const { start, end, label } = getDashRange(dashPeriodType, ref);
+    const items = expenses.filter(e => e.date >= start && e.date <= end);
+    const total = items.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
+    series.push({ ref, label, shortLabel: shortPeriodLabel(dashPeriodType, ref), total, count: items.length });
+  }
+  return series;
+}
+
 // Render chart garis tren + tabel per periode (mis. 6 bulan terakhir)
 function renderTrendChart() {
   const trendLabel = { hari:'7 Hari', minggu:'6 Minggu', bulan:'6 Bulan', tahun:'6 Tahun' }[dashPeriodType];
