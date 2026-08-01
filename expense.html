@@ -247,7 +247,7 @@ textarea{resize:vertical;min-height:70px;}
 .stat-mini-sub{font-size:9.5px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 /* TREN BEBERAPA PERIODE (chart garis + tabel tertinggi/terendah) */
-.trend-chart-wrap{width:100%;margin-bottom:10px;}
+.trend-chart-wrap{width:100%;max-width:380px;margin:0 auto 10px;}
 .trend-chart-wrap svg{width:100%;height:auto;display:block;}
 .trend-row{display:flex;align-items:center;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--border);font-size:12px;}
 .trend-row:last-child{border-bottom:none;}
@@ -572,7 +572,7 @@ textarea{resize:vertical;min-height:70px;}
       <!-- Tren beberapa periode terakhir (mis. 6 bulan) — lihat periode tertinggi/terendah -->
       <div class="daterows-title" id="trendTitle">Tren 6 Bulan Terakhir</div>
       <div class="trend-chart-wrap">
-        <svg id="trendSvg" viewBox="0 0 300 110" preserveAspectRatio="none"></svg>
+        <svg id="trendSvg" viewBox="0 0 300 98"></svg>
       </div>
       <div id="trendTable" style="margin-bottom:16px;"></div>
 
@@ -1301,6 +1301,20 @@ function buildTrendSeries(count = 6) {
 }
 
 // Render chart garis tren + tabel per periode (mis. 6 bulan terakhir)
+// Bikin garis melengkung halus lewat titik-titik (quadratic bezier via titik tengah)
+function smoothPath(points) {
+  if (points.length < 2) return `M ${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
+  let d = `M ${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i], p1 = points[i+1];
+    const midX = (p0.x + p1.x) / 2, midY = (p0.y + p1.y) / 2;
+    d += ` Q ${p0.x.toFixed(1)},${p0.y.toFixed(1)} ${midX.toFixed(1)},${midY.toFixed(1)}`;
+  }
+  const last = points[points.length-1];
+  d += ` T ${last.x.toFixed(1)},${last.y.toFixed(1)}`;
+  return d;
+}
+
 function renderTrendChart() {
   const trendLabel = { hari:'7 Hari', minggu:'6 Minggu', bulan:'6 Bulan', tahun:'6 Tahun' }[dashPeriodType];
   document.getElementById('trendTitle').textContent = `Tren ${trendLabel} Terakhir`;
@@ -1311,50 +1325,57 @@ function renderTrendChart() {
   const maxTotal = Math.max(...values);
   const minTotal = Math.min(...values);
 
-  const W = 300, H = 110, padX = 14, padY = 14;
+  const activeSeries = series.filter(s => s.count > 0);
+  const activeValues = activeSeries.map(s => s.total);
+  const activeMax = activeValues.length ? Math.max(...activeValues) : 0;
+  const activeMin = activeValues.length ? Math.min(...activeValues) : 0;
+
+  const W = 300, H = 80, padX = 16, padTop = 12, padBottom = 10;
   const stepX = series.length > 1 ? (W - padX*2) / (series.length-1) : 0;
   const range = (maxTotal - minTotal) || 1;
+  const plotH = H - padTop - padBottom;
 
   const points = series.map((s,i) => {
     const x = padX + i*stepX;
     const y = maxTotal === minTotal
-      ? H/2
-      : H - padY - ((s.total - minTotal)/range) * (H - padY*2);
+      ? padTop + plotH/2
+      : padTop + plotH - ((s.total - minTotal)/range) * plotH;
     return { ...s, x, y };
   });
 
-  const pathD = points.map((p,i) => (i===0?'M':'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
-  const areaD = pathD + ` L${points[points.length-1].x.toFixed(1)},${H-2} L${points[0].x.toFixed(1)},${H-2} Z`;
+  const lineD = smoothPath(points);
+  const areaD = lineD + ` L${points[points.length-1].x.toFixed(1)},${H} L${points[0].x.toFixed(1)},${H} Z`;
 
   const dotsSvg = points.map(p => {
-    const isMax = p.total === maxTotal && maxTotal > 0;
-    const isMin = p.total === minTotal && p.total !== maxTotal;
+    const isMax = p.count > 0 && activeSeries.length > 1 && p.total === activeMax;
+    const isMin = p.count > 0 && activeSeries.length > 1 && p.total === activeMin && p.total !== activeMax;
     const fill = isMax ? 'var(--danger)' : (isMin ? 'var(--success)' : 'var(--accent)');
-    const r = (isMax || isMin) ? 4.5 : 3;
-    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${fill}" stroke="var(--surface)" stroke-width="1.5"/>`;
+    const r = (isMax || isMin) ? 3.2 : 2.2;
+    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${fill}" stroke="var(--surface)" stroke-width="1"/>`;
   }).join('');
 
   const labelsSvg = points.map(p =>
-    `<text x="${p.x.toFixed(1)}" y="${H-1}" font-size="7.5" fill="var(--text3)" text-anchor="middle">${p.shortLabel}</text>`
+    `<text x="${p.x.toFixed(1)}" y="${H + 14}" font-size="6.5" fill="var(--text3)" text-anchor="middle">${p.shortLabel}</text>`
   ).join('');
 
+  document.getElementById('trendSvg').setAttribute('viewBox', `0 0 ${W} ${H + 18}`);
   document.getElementById('trendSvg').innerHTML = `
     <path d="${areaD}" fill="var(--accent-dim)"/>
-    <path d="${pathD}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${lineD}" fill="none" stroke="var(--accent)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
     ${dotsSvg}
     ${labelsSvg}
   `;
 
-  const tableRows = [...series].reverse().map(s => {
+  const tableRows = [...activeSeries].reverse().map(s => {
     let tag = '';
-    if (maxTotal > 0 && s.total === maxTotal) tag = '<span class="trend-tag high">Tertinggi</span>';
-    else if (s.total > 0 && s.total === minTotal) tag = '<span class="trend-tag low">Terendah</span>';
+    if (activeSeries.length > 1 && s.total === activeMax) tag = '<span class="trend-tag high">Tertinggi</span>';
+    else if (activeSeries.length > 1 && s.total === activeMin) tag = '<span class="trend-tag low">Terendah</span>';
     return `<div class="trend-row">
       <span class="trend-row-label">${s.label}</span>
       <span class="trend-row-right"><span class="trend-row-amt">${rp(s.total)}</span>${tag}</span>
     </div>`;
   }).join('');
-  document.getElementById('trendTable').innerHTML = tableRows || `<div class="empty-state" style="border:none;padding:10px 0;">Belum ada data</div>`;
+  document.getElementById('trendTable').innerHTML = tableRows || `<div class="empty-state" style="border:none;padding:10px 0;">Belum ada transaksi di periode ini</div>`;
 }
 
 
@@ -1479,7 +1500,7 @@ function openQuickAdd() {
   document.getElementById('qaAmount').textContent = 'Rp 0';
   document.getElementById('qaDeskripsi').value = '';
   document.getElementById('qaCatatan').value = '';
-  document.getElementById('qaDibayarOleh').value = '';
+  document.getElementById('qaDibayarOleh').value = 'Elis Rosmiati';
   const today = nowYMD();
   document.getElementById('qaDate').value = today;
   document.getElementById('qaDateText').textContent = 'Hari ini · ' + fmtDate(today);
