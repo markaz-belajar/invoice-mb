@@ -48,6 +48,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--outer
 .nav-tabs{padding:12px 14px 10px;background:var(--hdr-bg);transition:background .3s;}
 .tab-bar-pill{background:rgba(255,255,255,0.18);border-radius:50px;padding:4px;display:flex;gap:2px;border:1.5px solid rgba(255,255,255,0.2);backdrop-filter:blur(8px);}
 .nav-tab{flex:1;padding:9px 0;border:none;background:transparent;border-radius:50px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.65);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
+.nav-tab svg{flex-shrink:0;}
 .nav-tab:hover{color:#fff;background:rgba(255,255,255,0.1);}
 .nav-tab.active{background:#fff;color:#1B6CA8;box-shadow:0 2px 8px rgba(0,0,0,0.15);}
 
@@ -160,6 +161,115 @@ textarea{resize:vertical;min-height:70px;}
 .cal-d.selected{background:var(--accent);color:#fff;font-weight:600;}
 .cal-d.empty,.cal-d.other{color:var(--text3);opacity:.4;cursor:default;pointer-events:none;}
 
+/* FAB */
+.fab{position:fixed;bottom:22px;right:20px;width:58px;height:58px;border-radius:50%;background:var(--success);color:#fff;border:none;box-shadow:0 8px 22px rgba(46,158,91,0.45);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:900;transition:transform .15s,box-shadow .15s;}
+.fab:hover{transform:scale(1.06);box-shadow:0 10px 26px rgba(46,158,91,0.55);}
+.fab:active{transform:scale(0.96);}
+.fab svg{width:26px;height:26px;}
+
+/* QUICK ADD BOTTOM SHEET */
+.qa-overlay{display:none;position:fixed;inset:0;background:rgba(28,43,58,.55);z-index:1000;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px);}
+.qa-overlay.open{display:flex;}
+.qa-sheet{background:var(--surface);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:14px 16px 20px;max-height:92vh;overflow-y:auto;animation:qaUp .25s ease;}
+@keyframes qaUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.qa-handle{width:38px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 14px;}
+.qa-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.qa-head h3{font-size:15px;font-weight:700;color:var(--text);}
+.qa-close{background:var(--surface2);border:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;}
+.qa-cats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px;}
+.qa-cat{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px;border-radius:14px;cursor:pointer;border:1.5px solid transparent;transition:all .15s;}
+.qa-cat.active{border-color:var(--accent);background:var(--accent-dim);}
+.qa-cat-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.qa-cat-label{font-size:8.5px;color:var(--text2);text-align:center;line-height:1.2;}
+.qa-amount-row{display:flex;align-items:baseline;justify-content:center;background:var(--surface2);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;}
+.qa-amount-display{font-family:'Geist Mono',monospace;font-size:26px;font-weight:700;color:var(--text);}
+.qa-row2{display:flex;gap:8px;margin-bottom:10px;}
+.qa-row2>div{flex:1;}
+.qa-numpad{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.qa-key{background:var(--surface2);border:none;border-radius:12px;padding:13px 0;font-size:16px;font-weight:600;color:var(--text);cursor:pointer;transition:background .1s;}
+.qa-key:active{background:var(--border2);}
+.qa-key.qa-save{background:var(--success);color:#fff;grid-row:span 2;display:flex;align-items:center;justify-content:center;}
+.qa-key.qa-clear{color:var(--danger);}
+.qa-extra{margin-top:10px;}
+.qa-icon-picker{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.qa-icon-choice{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:10px 0;display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;transition:all .15s;}
+.qa-icon-choice:hover{border-color:var(--border2);}
+.qa-icon-choice.active{border-color:var(--accent);background:var(--accent-dim);color:var(--accent);}
+
+/* DONUT CHART */
+.donut-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center;}
+.donut{width:140px;height:140px;border-radius:50%;position:relative;flex-shrink:0;}
+.donut-center{position:absolute;inset:20px;background:var(--surface);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.donut-center .v{font-size:12px;font-weight:700;color:var(--text);font-family:'Geist Mono',monospace;}
+.donut-center .l{font-size:9px;color:var(--text3);margin-top:2px;}
+.donut-legend{flex:1;min-width:150px;}
+.donut-legend-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;}
+.donut-legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.donut-legend-name{flex:1;color:var(--text2);}
+.donut-legend-pct{font-weight:700;color:var(--text);font-family:'Geist Mono',monospace;font-size:11px;}
+
+/* TAMBAH PENGELUARAN — accordion toggle */
+.add-expense-toggle{width:100%;display:flex;align-items:center;gap:10px;padding:16px;background:transparent;border:none;cursor:pointer;text-align:left;font-family:inherit;}
+.add-expense-toggle-icon{width:32px;height:32px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.add-expense-toggle-icon svg{width:16px;height:16px;}
+.add-expense-toggle-label{flex:1;font-size:14px;font-weight:700;color:var(--text);}
+.add-expense-chevron{width:18px;height:18px;color:var(--text3);transition:transform .2s;flex-shrink:0;}
+.add-expense-toggle.open .add-expense-chevron{transform:rotate(180deg);}
+.add-expense-panel{display:none;border-top:1px solid var(--border);}
+.add-expense-panel.open{display:block;animation:panelDown .2s ease;}
+@keyframes panelDown{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+
+/* DASHBOARD SUBTABS (Ringkasan / Rincian Kategori) — compact */
+.subtab-pill{display:flex;gap:3px;background:var(--surface2);border-radius:10px;padding:2px;margin-bottom:12px;max-width:280px;}
+.subtab-btn{flex:1;border:none;background:transparent;padding:5px 8px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.subtab-btn.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.dash-sub{display:none;}
+.dash-sub.active{display:block;}
+
+/* PERIOD FILTER */
+.period-filter{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.period-chips{display:flex;gap:4px;background:var(--surface2);border-radius:10px;padding:2px;}
+.period-chip{border:none;background:transparent;padding:5px 10px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;}
+.period-chip.active{background:var(--accent);color:#fff;}
+.period-nav{display:flex;align-items:center;gap:4px;}
+.period-nav-btn{width:24px;height:24px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.period-nav-btn svg{width:12px;height:12px;}
+.period-nav-label{font-size:11.5px;font-weight:700;color:var(--text);white-space:nowrap;min-width:70px;text-align:center;}
+.period-date-input{border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text2);font-size:10.5px;padding:3px 4px;width:30px;overflow:hidden;}
+
+/* MINI STATS (tertinggi/terendah/rata-rata) */
+.stat-mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.stat-mini{background:var(--surface2);border-radius:12px;padding:10px;text-align:center;}
+.stat-mini-label{font-size:10px;color:var(--text3);margin-bottom:4px;}
+.stat-mini-value{font-size:13px;font-weight:700;color:var(--text);font-family:'Geist Mono',monospace;}
+.stat-mini-sub{font-size:9.5px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* TREN BEBERAPA PERIODE (chart garis + tabel tertinggi/terendah) */
+.trend-chart-wrap{width:100%;margin-bottom:10px;}
+.trend-chart-wrap svg{width:100%;height:auto;display:block;}
+.trend-row{display:flex;align-items:center;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--border);font-size:12px;}
+.trend-row:last-child{border-bottom:none;}
+.trend-row-label{color:var(--text2);font-weight:600;}
+.trend-row-right{display:flex;align-items:center;gap:6px;}
+.trend-row-amt{font-weight:700;color:var(--text);font-family:'Geist Mono',monospace;}
+.trend-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap;}
+.trend-tag.high{background:var(--danger-dim);color:var(--danger);}
+.trend-tag.low{background:var(--success-dim);color:var(--success);}
+
+/* RINCIAN PER TANGGAL */
+.daterows-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
+.date-row{display:flex;align-items:center;justify-content:space-between;padding:7px 2px;border-bottom:1px solid var(--border);font-size:12px;}
+.date-row:last-child{border-bottom:none;}
+.date-row-date{color:var(--text2);}
+.date-row-amt{font-weight:700;color:var(--text);font-family:'Geist Mono',monospace;}
+
+/* INSIGHTS */
+.insight-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;}
+.insight-badge.up{background:var(--danger-dim);color:var(--danger);}
+.insight-badge.down{background:var(--success-dim);color:var(--success);}
+.insight-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.insight-days{font-size:11px;color:var(--text3);}
+
 /* DARK MODE */
 [data-theme="dark"] .nav-tab.active{background:rgba(255,255,255,0.15);color:#fff;}
 [data-theme="dark"] .hdr-greeting-card{background:var(--surface);box-shadow:0 4px 24px rgba(0,0,0,0.4);}
@@ -171,6 +281,9 @@ textarea{resize:vertical;min-height:70px;}
 [data-theme="dark"] .cal-popup{background:var(--surface);border-color:var(--border);}
 [data-theme="dark"] .sum-card{background:var(--surface);}
 [data-theme="dark"] .modal{background:var(--surface);}
+[data-theme="dark"] .donut-center{background:var(--surface);}
+[data-theme="dark"] .qa-sheet{background:var(--surface);}
+[data-theme="dark"] .qa-amount-row,[data-theme="dark"] .qa-key{background:var(--surface2);}
 
 @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .spin{animation:spin 1s linear infinite;}
@@ -250,6 +363,94 @@ textarea{resize:vertical;min-height:70px;}
   </div>
 </div>
 
+<!-- QUICK ADD BOTTOM SHEET -->
+<div class="qa-overlay" id="quickAddOverlay">
+  <div class="qa-sheet">
+    <div class="qa-handle"></div>
+    <div class="qa-head">
+      <h3>Catat Pengeluaran</h3>
+      <button class="qa-close" onclick="closeQuickAdd()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="qa-cats" id="qaCats"></div>
+
+    <!-- Form buat kategori baru (muncul saat pilih "Lainnya") -->
+    <div id="qaNewCatForm" style="display:none;background:var(--surface2);border-radius:var(--r);padding:12px;margin-bottom:14px;">
+      <label>Nama Kategori Baru</label>
+      <input type="text" id="qaNewCatName" placeholder="Contoh: Pajak, Asuransi, Marketing...">
+      <label style="margin-top:10px;">Pilih Ikon</label>
+      <div class="qa-icon-picker" id="qaIconPicker"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="cancelNewCat()">Batal</button>
+        <button class="btn btn-accent" style="flex:2;justify-content:center;" onclick="createNewCategory()">Tambah & Pakai</button>
+      </div>
+    </div>
+
+    <div class="qa-amount-row">
+      <span id="qaAmount" class="qa-amount-display">Rp 0</span>
+    </div>
+
+    <div class="qa-row2">
+      <div>
+        <label style="margin-bottom:3px;">Tanggal</label>
+        <div class="date-wrap">
+          <button type="button" class="date-btn" id="qaDateBtn" onclick="toggleCal('qaCal','qaDateBtn')">
+            <span class="date-btn-text" id="qaDateText">Hari ini</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </button>
+          <div class="cal-popup" id="qaCal"></div>
+        </div>
+        <input type="hidden" id="qaDate">
+      </div>
+      <div>
+        <label style="margin-bottom:3px;">Dibayar oleh</label>
+        <select id="qaDibayarOleh">
+          <option value="">Pilih nama...</option>
+          <option value="Elis Rosmiati">Elis Rosmiati</option>
+          <option value="Yessi Marlina">Yessi Marlina</option>
+          <option value="Annisa Zahrotun J">Annisa Zahrotun J</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="qa-numpad">
+      <button class="qa-key" onclick="qaKey('7')">7</button>
+      <button class="qa-key" onclick="qaKey('8')">8</button>
+      <button class="qa-key" onclick="qaKey('9')">9</button>
+      <button class="qa-key qa-save" style="grid-row:span 3;" onclick="qaSave()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </button>
+      <button class="qa-key" onclick="qaKey('4')">4</button>
+      <button class="qa-key" onclick="qaKey('5')">5</button>
+      <button class="qa-key" onclick="qaKey('6')">6</button>
+      <button class="qa-key" onclick="qaKey('1')">1</button>
+      <button class="qa-key" onclick="qaKey('2')">2</button>
+      <button class="qa-key" onclick="qaKey('3')">3</button>
+      <button class="qa-key" onclick="qaKey('0')">0</button>
+      <button class="qa-key" onclick="qaKey('000')">000</button>
+      <button class="qa-key qa-clear" onclick="qaKey('back')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto;"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+      </button>
+    </div>
+
+    <div class="qa-extra">
+      <label>Deskripsi (opsional)</label>
+      <input type="text" id="qaDeskripsi" placeholder="Contoh: Beli spidol whiteboard">
+    </div>
+    <div class="qa-extra">
+      <label>Catatan (opsional)</label>
+      <input type="text" id="qaCatatan" placeholder="Catatan tambahan...">
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openQuickAdd()" title="Catat pengeluaran cepat">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
+
 <div>
 <header class="hdr">
   <div class="hdr-topbar">
@@ -287,7 +488,7 @@ textarea{resize:vertical;min-height:70px;}
 <div class="nav-tabs">
   <div class="tab-bar-pill">
     <button class="nav-tab active" onclick="switchTab('input',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
       Catat
     </button>
     <button class="nav-tab" onclick="switchTab('list',this)">
@@ -304,10 +505,90 @@ textarea{resize:vertical;min-height:70px;}
 
 <div class="wrap">
 
-<!-- ══ TAB: CATAT ══ -->
+<!-- ══ TAB: CATAT (DASHBOARD) ══ -->
 <div id="tab-input" class="tab-content active">
 
-  <!-- Summary bulan ini -->
+  <!-- Ringkasan & breakdown pengeluaran -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+      <span id="dashPeriodTitle">Pengeluaran Bulan Ini</span>
+    </div>
+
+    <!-- Filter periode -->
+    <div class="period-filter">
+      <div class="period-chips">
+        <button class="period-chip" id="periodChipHari" onclick="setDashPeriod('hari',this)">Hari</button>
+        <button class="period-chip" onclick="setDashPeriod('minggu',this)">Minggu</button>
+        <button class="period-chip active" onclick="setDashPeriod('bulan',this)">Bulan</button>
+        <button class="period-chip" onclick="setDashPeriod('tahun',this)">Tahun</button>
+      </div>
+      <div class="period-nav">
+        <button class="period-nav-btn" onclick="shiftDashPeriod(-1)" aria-label="Sebelumnya">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="period-nav-label" id="periodNavLabel">Bulan Ini</span>
+        <button class="period-nav-btn" onclick="shiftDashPeriod(1)" aria-label="Berikutnya">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <input type="date" class="period-date-input" onchange="jumpToDate(this.value)" title="Lompat ke tanggal tertentu">
+      </div>
+    </div>
+
+    <div class="insight-row">
+      <span class="insight-days" id="insightDays">—</span>
+      <span id="insightDelta"></span>
+    </div>
+
+    <div class="subtab-pill" id="dashSubtabs">
+      <button class="subtab-btn active" onclick="switchDashSub('ringkasan',this)">Ringkasan</button>
+      <button class="subtab-btn" onclick="switchDashSub('kategori',this)">Rincian Kategori</button>
+    </div>
+
+    <div id="dashSub-ringkasan" class="dash-sub active">
+      <div class="stat-mini-grid">
+        <div class="stat-mini">
+          <div class="stat-mini-label">Transaksi Terbesar</div>
+          <div class="stat-mini-value" id="statMaxVal">—</div>
+          <div class="stat-mini-sub" id="statMaxSub">—</div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-label">Transaksi Terkecil</div>
+          <div class="stat-mini-value" id="statMinVal">—</div>
+          <div class="stat-mini-sub" id="statMinSub">—</div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-label">Rata-rata</div>
+          <div class="stat-mini-value" id="statAvgVal">—</div>
+          <div class="stat-mini-sub">per transaksi</div>
+        </div>
+      </div>
+
+      <!-- Tren beberapa periode terakhir (mis. 6 bulan) — lihat periode tertinggi/terendah -->
+      <div class="daterows-title" id="trendTitle">Tren 6 Bulan Terakhir</div>
+      <div class="trend-chart-wrap">
+        <svg id="trendSvg" viewBox="0 0 300 110" preserveAspectRatio="none"></svg>
+      </div>
+      <div id="trendTable" style="margin-bottom:16px;"></div>
+
+      <div class="daterows-title">Rincian per Tanggal</div>
+      <div id="dateBreakdown"></div>
+    </div>
+
+    <div id="dashSub-kategori" class="dash-sub">
+      <div class="donut-wrap">
+        <div class="donut" id="donutChart">
+          <div class="donut-center">
+            <span class="v" id="donutCenterV">Rp 0</span>
+            <span class="l">Total</span>
+          </div>
+        </div>
+        <div class="donut-legend" id="donutLegend"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary bulan ini (selalu tampil) -->
   <div class="sum-grid" id="summaryCards">
     <div class="sum-card danger">
       <div class="sum-label">Total Bulan Ini</div>
@@ -326,84 +607,93 @@ textarea{resize:vertical;min-height:70px;}
     </div>
   </div>
 
-  <!-- Form input -->
-  <div class="sec">
-    <div class="sec-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      Form Pengeluaran Baru
-    </div>
+  <!-- Tambah Pengeluaran — accordion, collapsed by default -->
+  <div class="sec" style="padding:0;overflow:hidden;">
+    <button class="add-expense-toggle" id="addExpenseToggle" onclick="toggleAddExpense()">
+      <span class="add-expense-toggle-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </span>
+      <span class="add-expense-toggle-label">Tambah Pengeluaran</span>
+      <svg class="add-expense-chevron" id="addExpenseChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
 
-    <div class="g2">
-      <div>
-        <label>Tanggal <span style="color:var(--danger)">*</span></label>
-        <div class="date-wrap">
-          <button type="button" class="date-btn" id="inputDateBtn" onclick="toggleCal('inputCal','inputDateBtn')">
-            <span class="date-btn-text placeholder" id="inputDateText">Pilih tanggal</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          </button>
-          <div class="cal-popup" id="inputCal"></div>
+    <div class="add-expense-panel" id="addExpensePanel">
+      <div style="padding:16px;">
+
+        <div class="g2">
+          <div>
+            <label>Tanggal <span style="color:var(--danger)">*</span></label>
+            <div class="date-wrap">
+              <button type="button" class="date-btn" id="inputDateBtn" onclick="toggleCal('inputCal','inputDateBtn')">
+                <span class="date-btn-text placeholder" id="inputDateText">Pilih tanggal</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </button>
+              <div class="cal-popup" id="inputCal"></div>
+            </div>
+            <input type="hidden" id="inputDate">
+          </div>
+          <div>
+            <label>Kategori <span style="color:var(--danger)">*</span></label>
+            <select id="inputKategori">
+              <option value="">Pilih kategori...</option>
+              <option value="ATK">ATK (Alat Tulis Kantor)</option>
+              <option value="Listrik">Listrik</option>
+              <option value="Internet">Internet</option>
+              <option value="Transportasi">Transportasi</option>
+              <option value="Konsumsi">Konsumsi</option>
+              <option value="Kebersihan">Kebersihan</option>
+              <option value="Perlengkapan">Perlengkapan</option>
+              <option value="Gaji">Gaji/Honor</option>
+              <option value="Sewa">Sewa</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </div>
         </div>
-        <input type="hidden" id="inputDate">
+
+        <div style="margin-top:12px;">
+          <label>Deskripsi <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="inputDeskripsi" placeholder="Contoh: Beli spidol whiteboard 2 lusin">
+        </div>
+
+        <div class="g2" style="margin-top:12px;">
+          <div>
+            <label>Jumlah (Rp) <span style="color:var(--danger)">*</span></label>
+            <input type="number" id="inputJumlah" placeholder="0" min="0" oninput="updatePreviewAmount()">
+          </div>
+          <div>
+            <label>Dibayar oleh <span style="color:var(--danger)">*</span></label>
+            <select id="inputDibayarOleh">
+              <option value="">Pilih nama...</option>
+              <option value="Elis Rosmiati">Elis Rosmiati</option>
+              <option value="Yessi Marlina">Yessi Marlina</option>
+              <option value="Annisa Zahrotun J">Annisa Zahrotun J</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <label>Catatan (opsional)</label>
+          <textarea id="inputCatatan" placeholder="Catatan tambahan atau nomor struk..."></textarea>
+        </div>
+
+        <!-- Preview jumlah -->
+        <div id="amountPreview" style="display:none;background:var(--danger-dim);border:1px solid rgba(220,53,69,0.2);border-radius:var(--r);padding:10px 14px;margin-top:12px;align-items:center;justify-content:space-between;">
+          <span style="font-size:12px;color:var(--text2);">Total yang akan dicatat:</span>
+          <span id="previewAmount" style="font-size:16px;font-weight:700;color:var(--danger);font-family:'Geist Mono',monospace;">Rp 0</span>
+        </div>
+
+        <div class="actions" style="margin-top:16px;">
+          <button class="btn btn-ghost" onclick="resetForm()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+            Reset
+          </button>
+          <button class="btn btn-accent" onclick="submitExpense()" style="flex:2;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13"/><polyline points="7 3 7 8 15 8"/></svg>
+            Simpan Pengeluaran
+          </button>
+        </div>
+
       </div>
-      <div>
-        <label>Kategori <span style="color:var(--danger)">*</span></label>
-        <select id="inputKategori">
-          <option value="">Pilih kategori...</option>
-          <option value="ATK">ATK (Alat Tulis Kantor)</option>
-          <option value="Listrik">Listrik</option>
-          <option value="Internet">Internet</option>
-          <option value="Transportasi">Transportasi</option>
-          <option value="Konsumsi">Konsumsi</option>
-          <option value="Kebersihan">Kebersihan</option>
-          <option value="Perlengkapan">Perlengkapan</option>
-          <option value="Gaji">Gaji/Honor</option>
-          <option value="Sewa">Sewa</option>
-          <option value="Lainnya">Lainnya</option>
-        </select>
-      </div>
-    </div>
-
-    <div style="margin-top:12px;">
-      <label>Deskripsi <span style="color:var(--danger)">*</span></label>
-      <input type="text" id="inputDeskripsi" placeholder="Contoh: Beli spidol whiteboard 2 lusin">
-    </div>
-
-    <div class="g2" style="margin-top:12px;">
-      <div>
-        <label>Jumlah (Rp) <span style="color:var(--danger)">*</span></label>
-        <input type="number" id="inputJumlah" placeholder="0" min="0" oninput="updatePreviewAmount()">
-      </div>
-      <div>
-        <label>Dibayar oleh <span style="color:var(--danger)">*</span></label>
-        <select id="inputDibayarOleh">
-          <option value="">Pilih nama...</option>
-          <option value="Elis Rosmiati">Elis Rosmiati</option>
-          <option value="Yessi Marlina">Yessi Marlina</option>
-          <option value="Annisa Zahrotun J">Annisa Zahrotun J</option>
-        </select>
-      </div>
-    </div>
-
-    <div style="margin-top:12px;">
-      <label>Catatan (opsional)</label>
-      <textarea id="inputCatatan" placeholder="Catatan tambahan atau nomor struk..."></textarea>
-    </div>
-
-    <!-- Preview jumlah -->
-    <div id="amountPreview" style="display:none;background:var(--danger-dim);border:1px solid rgba(220,53,69,0.2);border-radius:var(--r);padding:10px 14px;margin-top:12px;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:12px;color:var(--text2);">Total yang akan dicatat:</span>
-      <span id="previewAmount" style="font-size:16px;font-weight:700;color:var(--danger);font-family:'Geist Mono',monospace;">Rp 0</span>
-    </div>
-
-    <div class="actions" style="margin-top:16px;">
-      <button class="btn btn-ghost" onclick="resetForm()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
-        Reset
-      </button>
-      <button class="btn btn-accent" onclick="submitExpense()" style="flex:2;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13"/><polyline points="7 3 7 8 15 8"/></svg>
-        Simpan Pengeluaran
-      </button>
     </div>
   </div>
 
@@ -545,24 +835,81 @@ let syncTimer = null;
 const POLL_MS = 30000;
 
 // ══════════════════════════════════════
-// KATEGORI CONFIG
+// KATEGORI — sistem terpadu (builtin + custom tersinkron tim)
 // ══════════════════════════════════════
-const KAT_CONFIG = {
-  'ATK':          { color:'#1B6CA8', bg:'rgba(27,108,168,0.12)'  },
-  'Listrik':      { color:'#F59F00', bg:'rgba(245,159,0,0.12)'   },
-  'Internet':     { color:'#7950F2', bg:'rgba(121,80,242,0.12)'  },
-  'Transportasi': { color:'#2E9E5B', bg:'rgba(46,158,91,0.12)'   },
-  'Konsumsi':     { color:'#E67700', bg:'rgba(230,119,0,0.12)'   },
-  'Kebersihan':   { color:'#0CA678', bg:'rgba(12,166,120,0.12)'  },
-  'Perlengkapan': { color:'#3B82F6', bg:'rgba(59,130,246,0.12)'  },
-  'Gaji':         { color:'#DC3545', bg:'rgba(220,53,69,0.12)'   },
-  'Sewa':         { color:'#6F42C1', bg:'rgba(111,66,193,0.12)'  },
-  'Lainnya':      { color:'#8FA4B4', bg:'rgba(143,164,180,0.12)' },
+const BUILTIN_CATS = [
+  { key:'ATK',          color:'#1B6CA8', bg:'rgba(27,108,168,0.12)',  icon:'paperclip' },
+  { key:'Listrik',      color:'#F59F00', bg:'rgba(245,159,0,0.12)',   icon:'zap' },
+  { key:'Internet',     color:'#7950F2', bg:'rgba(121,80,242,0.12)',  icon:'wifi' },
+  { key:'Transportasi', color:'#2E9E5B', bg:'rgba(46,158,91,0.12)',   icon:'truck' },
+  { key:'Konsumsi',     color:'#E67700', bg:'rgba(230,119,0,0.12)',   icon:'coffee' },
+  { key:'Kebersihan',   color:'#0CA678', bg:'rgba(12,166,120,0.12)',  icon:'droplet' },
+  { key:'Perlengkapan', color:'#3B82F6', bg:'rgba(59,130,246,0.12)',  icon:'package' },
+  { key:'Gaji',         color:'#DC3545', bg:'rgba(220,53,69,0.12)',   icon:'briefcase' },
+  { key:'Sewa',         color:'#6F42C1', bg:'rgba(111,66,193,0.12)',  icon:'home' },
+  { key:'Lainnya',      color:'#8FA4B4', bg:'rgba(143,164,180,0.12)', icon:'dots' },
+];
+
+// Kategori kustom hasil buatan tim, disinkronkan lewat Google Sheets
+let CUSTOM_CATS = [];
+
+// Palet warna otomatis untuk kategori baru (biar user tak perlu pilih warna manual)
+const CUSTOM_PALETTE = ['#E8590C','#0CA678','#5F3DC4','#C2255C','#1971C2','#087F5B','#9C36B5','#F08C00','#0C8599','#37B24D'];
+function hexToRgba(hex, a) {
+  const h = hex.replace('#','');
+  const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+// Ikon line-style minimalis (senada dengan ikon tab Catat/Riwayat/Rekap)
+const ICON_PATHS = {
+  paperclip: `<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>`,
+  zap:       `<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>`,
+  wifi:      `<path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>`,
+  truck:     `<path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>`,
+  coffee:    `<path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>`,
+  droplet:   `<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>`,
+  package:   `<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>`,
+  briefcase: `<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>`,
+  home:      `<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>`,
+  dots:      `<circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/>`,
+  // pilihan ikon untuk kategori baru
+  tag:       `<path d="M20.59 13.41L11 3.83A2 2 0 0 0 9.83 3H4a1 1 0 0 0-1 1v5.83a2 2 0 0 0 .59 1.41l9.58 9.58a2 2 0 0 0 2.83 0l6.59-6.59a2 2 0 0 0 0-2.83z"/><line x1="6.5" y1="6.5" x2="6.51" y2="6.5"/>`,
+  star:      `<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>`,
+  heart:     `<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>`,
+  gift:      `<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>`,
+  book:      `<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>`,
+  music:     `<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>`,
+  tool:      `<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.77z"/>`,
+  bookmark:  `<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>`,
 };
+const NEW_CAT_ICON_CHOICES = ['tag','star','heart','gift','book','music','tool','bookmark'];
+
+function iconSvg(name, size=18) {
+  const path = ICON_PATHS[name] || ICON_PATHS['dots'];
+  const fillMode = (name === 'dots') ? 'currentColor' : 'none';
+  return `<svg viewBox="0 0 24 24" fill="${fillMode}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="${size}" height="${size}">${path}</svg>`;
+}
+
+function allCats() { return [...BUILTIN_CATS, ...CUSTOM_CATS]; }
+function catInfo(key) {
+  return allCats().find(c => c.key === key) || BUILTIN_CATS.find(c => c.key === 'Lainnya');
+}
 
 function katBadge(kat) {
-  const c = KAT_CONFIG[kat] || KAT_CONFIG['Lainnya'];
+  const c = catInfo(kat);
   return `<span class="cat-badge" style="background:${c.bg};color:${c.color};">${kat}</span>`;
+}
+
+function populateCategoryDropdowns() {
+  const cats = allCats();
+  const opts = cats.map(c => `<option value="${c.key}">${c.key}</option>`).join('');
+
+  const inputSel = document.getElementById('inputKategori');
+  if (inputSel) { const cur = inputSel.value; inputSel.innerHTML = `<option value="">Pilih kategori...</option>${opts}`; inputSel.value = cur; }
+
+  const filterSel = document.getElementById('filterKat');
+  if (filterSel) { const cur = filterSel.value; filterSel.innerHTML = `<option value="">Semua Kategori</option>${opts}`; filterSel.value = cur; }
 }
 
 // ══════════════════════════════════════
@@ -627,6 +974,22 @@ function switchTab(name, btn) {
   if (name === 'rekap') renderRekap();
 }
 
+function switchDashSub(view, btn) {
+  document.querySelectorAll('.dash-sub').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('#dashSubtabs .subtab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('dashSub-'+view).classList.add('active');
+  btn.classList.add('active');
+}
+
+function toggleAddExpense(forceOpen) {
+  const panel  = document.getElementById('addExpensePanel');
+  const toggle = document.getElementById('addExpenseToggle');
+  const open = forceOpen !== undefined ? forceOpen : !panel.classList.contains('open');
+  panel.classList.toggle('open', open);
+  toggle.classList.toggle('open', open);
+  if (open) panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
 // ══════════════════════════════════════
 // CALENDAR (reusable)
 // ══════════════════════════════════════
@@ -660,7 +1023,7 @@ function renderCal(calId, btnId) {
   for (let d=1;d<=days;d++) {
     const isToday = d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear();
     const ymd = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const inputId = calId === 'inputCal' ? 'inputDate' : (calId === 'editCal' ? 'editDate' : '');
+    const inputId = calId === 'inputCal' ? 'inputDate' : (calId === 'editCal' ? 'editDate' : (calId === 'qaCal' ? 'qaDate' : ''));
     const sel = inputId && document.getElementById(inputId)?.value === ymd ? ' selected' : '';
     html += `<div class="cal-d${isToday?' today':''}${sel}" onclick="pickDate('${calId}','${btnId}','${ymd}')">${d}</div>`;
   }
@@ -674,8 +1037,8 @@ function calMove(calId, btnId, dir) {
   renderCal(calId, btnId);
 }
 function pickDate(calId, btnId, ymd) {
-  const inputId = calId === 'inputCal' ? 'inputDate' : (calId === 'editCal' ? 'editDate' : '');
-  const textId  = calId === 'inputCal' ? 'inputDateText' : (calId === 'editCal' ? 'editDateText' : '');
+  const inputId = calId === 'inputCal' ? 'inputDate' : (calId === 'editCal' ? 'editDate' : (calId === 'qaCal' ? 'qaDate' : ''));
+  const textId  = calId === 'inputCal' ? 'inputDateText' : (calId === 'editCal' ? 'editDateText' : (calId === 'qaCal' ? 'qaDateText' : ''));
   if (inputId) {
     document.getElementById(inputId).value = ymd;
     const el = document.getElementById(textId);
@@ -748,6 +1111,27 @@ async function deleteExpenseFromSheets(id) {
   return await gasPost('deleteExpense', { id });
 }
 
+// ── Kategori kustom (tersinkron tim lewat Sheets) ──
+async function fetchCategoriesFromSheets() {
+  if (!hasGasUrl()) {
+    return JSON.parse(localStorage.getItem('mb_categories') || '[]');
+  }
+  const resp = await fetch(`${GAS_URL}?action=getCategories&t=${Date.now()}`, { cache: 'no-store' });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data.categories || [];
+}
+async function saveCategoryToSheets(cat) {
+  if (!hasGasUrl()) {
+    const local = JSON.parse(localStorage.getItem('mb_categories') || '[]');
+    local.push(cat);
+    localStorage.setItem('mb_categories', JSON.stringify(local));
+    return { ok: true };
+  }
+  return await gasPost('saveCategory', { category: cat });
+}
+
 // ══════════════════════════════════════
 // SYNC
 // ══════════════════════════════════════
@@ -769,6 +1153,8 @@ async function syncData(isManual=false) {
   setSyncStatus('syncing','Sinkronisasi...');
   try {
     expenses = await fetchExpensesFromSheets();
+    try { CUSTOM_CATS = await fetchCategoriesFromSheets(); } catch(_) { /* kategori kustom opsional, jangan gagalkan sync utama */ }
+    populateCategoryDropdowns();
     const now = new Date();
     const timeStr = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
     setSyncStatus('ok', `${expenses.length} entri · sync ${timeStr}`);
@@ -807,7 +1193,380 @@ function updateSummary() {
   document.getElementById('sumMax').textContent = maxE.amount ? rp(maxE.amount) : '—';
   document.getElementById('sumMaxCat').textContent = maxE.category || '—';
   document.getElementById('bulanBadge').textContent = `● ${bulanLabel(ym)}`;
+
+  renderDashPeriod();
 }
+
+// ══════════════════════════════════════
+// DONUT CHART — breakdown kategori pada periode terpilih
+// ══════════════════════════════════════
+function renderDonut(total, byKat) {
+  const entries = Object.entries(byKat).sort((a,b) => b[1].total - a[1].total);
+  const chart  = document.getElementById('donutChart');
+  const legend = document.getElementById('donutLegend');
+  document.getElementById('donutCenterV').textContent = rp(total);
+
+  if (entries.length === 0) {
+    chart.style.background = 'var(--surface2)';
+    legend.innerHTML = `<div class="empty-state" style="border:none;padding:6px 0;">Belum ada pengeluaran di periode ini</div>`;
+    return;
+  }
+
+  let acc = 0;
+  const stops = entries.map(([kat, v]) => {
+    const c = catInfo(kat);
+    const pct = total > 0 ? (v.total/total*100) : 0;
+    const start = acc; acc += pct;
+    return `${c.color} ${start}% ${acc}%`;
+  }).join(', ');
+  chart.style.background = `conic-gradient(${stops})`;
+
+  legend.innerHTML = entries.map(([kat, v]) => {
+    const c = catInfo(kat);
+    const pct = total > 0 ? Math.round(v.total/total*100) : 0;
+    return `<div class="donut-legend-item">
+      <div class="donut-legend-dot" style="background:${c.color};"></div>
+      <div class="donut-legend-name">${kat}</div>
+      <div class="donut-legend-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+// FILTER PERIODE — Hari / Minggu / Bulan / Tahun / Tanggal spesifik
+// ══════════════════════════════════════
+const BULAN_NAMES = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+let dashPeriodType = 'bulan'; // 'hari' | 'minggu' | 'bulan' | 'tahun'
+let dashPeriodRef  = new Date();
+
+function toYMD2(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function addDays(d,n)   { const dt = new Date(d); dt.setDate(dt.getDate()+n); return dt; }
+function addMonths(d,n) { const dt = new Date(d); dt.setMonth(dt.getMonth()+n); return dt; }
+function addYears(d,n)  { const dt = new Date(d); dt.setFullYear(dt.getFullYear()+n); return dt; }
+function startOfWeek(d) { const dt = new Date(d); const day = (dt.getDay()+6)%7; dt.setDate(dt.getDate()-day); return dt; }
+
+function getDashRange(type = dashPeriodType, ref = dashPeriodRef) {
+  if (type === 'hari') {
+    const s = toYMD2(ref);
+    return { start:s, end:s, label: fmtDate(s) };
+  }
+  if (type === 'minggu') {
+    const s = startOfWeek(ref);
+    const e = addDays(s,6);
+    const sameMonth = s.getMonth() === e.getMonth();
+    const label = sameMonth
+      ? `${s.getDate()} – ${e.getDate()} ${BULAN_NAMES[e.getMonth()]} ${e.getFullYear()}`
+      : `${s.getDate()} ${BULAN_NAMES[s.getMonth()].slice(0,3)} – ${e.getDate()} ${BULAN_NAMES[e.getMonth()].slice(0,3)} ${e.getFullYear()}`;
+    return { start: toYMD2(s), end: toYMD2(e), label };
+  }
+  if (type === 'tahun') {
+    const y = ref.getFullYear();
+    return { start:`${y}-01-01`, end:`${y}-12-31`, label:`Tahun ${y}` };
+  }
+  // bulan (default)
+  const y = ref.getFullYear(), m = ref.getMonth();
+  const s = new Date(y,m,1), e = new Date(y,m+1,0);
+  return { start: toYMD2(s), end: toYMD2(e), label: `${BULAN_NAMES[m]} ${y}` };
+}
+
+// Label pendek untuk sumbu-x chart tren, mis. "Feb26", "12 Jan", "2025"
+function shortPeriodLabel(type, ref) {
+  if (type === 'hari')   return `${ref.getDate()} ${BULAN_NAMES[ref.getMonth()].slice(0,3)}`;
+  if (type === 'minggu') { const s = startOfWeek(ref); return `${s.getDate()} ${BULAN_NAMES[s.getMonth()].slice(0,3)}`; }
+  if (type === 'tahun')  return `${ref.getFullYear()}`;
+  return `${BULAN_NAMES[ref.getMonth()].slice(0,3)}${String(ref.getFullYear()).slice(2)}`;
+}
+
+// Render chart garis tren + tabel per periode (mis. 6 bulan terakhir)
+function renderTrendChart() {
+  const trendLabel = { hari:'7 Hari', minggu:'6 Minggu', bulan:'6 Bulan', tahun:'6 Tahun' }[dashPeriodType];
+  document.getElementById('trendTitle').textContent = `Tren ${trendLabel} Terakhir`;
+
+  const count = dashPeriodType === 'hari' ? 7 : 6;
+  const series = buildTrendSeries(count);
+  const values = series.map(s => s.total);
+  const maxTotal = Math.max(...values);
+  const minTotal = Math.min(...values);
+
+  const W = 300, H = 110, padX = 14, padY = 14;
+  const stepX = series.length > 1 ? (W - padX*2) / (series.length-1) : 0;
+  const range = (maxTotal - minTotal) || 1;
+
+  const points = series.map((s,i) => {
+    const x = padX + i*stepX;
+    const y = maxTotal === minTotal
+      ? H/2
+      : H - padY - ((s.total - minTotal)/range) * (H - padY*2);
+    return { ...s, x, y };
+  });
+
+  const pathD = points.map((p,i) => (i===0?'M':'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+  const areaD = pathD + ` L${points[points.length-1].x.toFixed(1)},${H-2} L${points[0].x.toFixed(1)},${H-2} Z`;
+
+  const dotsSvg = points.map(p => {
+    const isMax = p.total === maxTotal && maxTotal > 0;
+    const isMin = p.total === minTotal && p.total !== maxTotal;
+    const fill = isMax ? 'var(--danger)' : (isMin ? 'var(--success)' : 'var(--accent)');
+    const r = (isMax || isMin) ? 4.5 : 3;
+    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${fill}" stroke="var(--surface)" stroke-width="1.5"/>`;
+  }).join('');
+
+  const labelsSvg = points.map(p =>
+    `<text x="${p.x.toFixed(1)}" y="${H-1}" font-size="7.5" fill="var(--text3)" text-anchor="middle">${p.shortLabel}</text>`
+  ).join('');
+
+  document.getElementById('trendSvg').innerHTML = `
+    <path d="${areaD}" fill="var(--accent-dim)"/>
+    <path d="${pathD}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dotsSvg}
+    ${labelsSvg}
+  `;
+
+  const tableRows = [...series].reverse().map(s => {
+    let tag = '';
+    if (maxTotal > 0 && s.total === maxTotal) tag = '<span class="trend-tag high">Tertinggi</span>';
+    else if (s.total > 0 && s.total === minTotal) tag = '<span class="trend-tag low">Terendah</span>';
+    return `<div class="trend-row">
+      <span class="trend-row-label">${s.label}</span>
+      <span class="trend-row-right"><span class="trend-row-amt">${rp(s.total)}</span>${tag}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('trendTable').innerHTML = tableRows || `<div class="empty-state" style="border:none;padding:10px 0;">Belum ada data</div>`;
+}
+
+
+
+function setDashPeriod(type, btn) {
+  dashPeriodType = type;
+  document.querySelectorAll('.period-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDashPeriod();
+}
+function shiftDashPeriod(dir) {
+  if (dashPeriodType === 'hari')   dashPeriodRef = addDays(dashPeriodRef, dir);
+  if (dashPeriodType === 'minggu') dashPeriodRef = addDays(dashPeriodRef, dir*7);
+  if (dashPeriodType === 'bulan')  dashPeriodRef = addMonths(dashPeriodRef, dir);
+  if (dashPeriodType === 'tahun')  dashPeriodRef = addYears(dashPeriodRef, dir);
+  renderDashPeriod();
+}
+function jumpToDate(val) {
+  if (!val) return;
+  const [y,m,d] = val.split('-').map(Number);
+  dashPeriodRef = new Date(y, m-1, d);
+  dashPeriodType = 'hari';
+  document.querySelectorAll('.period-chip').forEach(b => b.classList.remove('active'));
+  document.getElementById('periodChipHari').classList.add('active');
+  renderDashPeriod();
+}
+
+function renderDashPeriod() {
+  const { start, end, label } = getDashRange();
+  document.getElementById('dashPeriodTitle').textContent = `Pengeluaran ${label}`;
+  document.getElementById('periodNavLabel').textContent = label;
+
+  const filtered = expenses.filter(e => e.date >= start && e.date <= end);
+  const total = filtered.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
+
+  // Tertinggi / terendah / rata-rata
+  let maxE = null, minE = null;
+  filtered.forEach(e => {
+    const amt = parseFloat(e.amount) || 0;
+    if (!maxE || amt > parseFloat(maxE.amount)) maxE = e;
+    if (!minE || amt < parseFloat(minE.amount)) minE = e;
+  });
+  document.getElementById('statMaxVal').textContent = maxE ? rp(maxE.amount) : '—';
+  document.getElementById('statMaxSub').textContent = maxE ? `${maxE.category} · ${fmtDate(maxE.date)}` : '—';
+  document.getElementById('statMinVal').textContent = minE ? rp(minE.amount) : '—';
+  document.getElementById('statMinSub').textContent = minE ? `${minE.category} · ${fmtDate(minE.date)}` : '—';
+  document.getElementById('statAvgVal').textContent = filtered.length ? rp(Math.round(total/filtered.length)) : 'Rp 0';
+
+  // Rincian per tanggal
+  const byDate = {};
+  filtered.forEach(e => { byDate[e.date] = (byDate[e.date]||0) + (parseFloat(e.amount)||0); });
+  const dateEntries = Object.entries(byDate).sort((a,b) => b[0].localeCompare(a[0]));
+  const dateCont = document.getElementById('dateBreakdown');
+  if (dateEntries.length === 0) {
+    dateCont.innerHTML = `<div class="empty-state" style="border:none;padding:10px 0;">Belum ada transaksi di periode ini</div>`;
+  } else {
+    dateCont.innerHTML = dateEntries.map(([d, amt]) => `
+      <div class="date-row">
+        <span class="date-row-date">${fmtDate(d)}</span>
+        <span class="date-row-amt">${rp(amt)}</span>
+      </div>`).join('');
+  }
+
+  // Donut kategori mengikuti periode yang sama
+  const byKat = {};
+  filtered.forEach(e => {
+    if (!byKat[e.category]) byKat[e.category] = {total:0, count:0};
+    byKat[e.category].total += parseFloat(e.amount)||0;
+    byKat[e.category].count++;
+  });
+  renderDonut(total, byKat);
+
+  // Tren beberapa periode terakhir — lihat periode mana yang tertinggi/terendah
+  renderTrendChart();
+
+  // Insight — hanya relevan untuk granularitas "bulan"
+  const deltaEl = document.getElementById('insightDelta');
+  const daysEl  = document.getElementById('insightDays');
+  if (dashPeriodType === 'bulan') {
+    const refPrev = addMonths(dashPeriodRef, -1);
+    const prevYm  = `${refPrev.getFullYear()}-${String(refPrev.getMonth()+1).padStart(2,'0')}`;
+    const prevTotal = expenses.filter(e => ymFromDate(e.date) === prevYm).reduce((s,e) => s+(parseFloat(e.amount)||0), 0);
+    if (prevTotal > 0) {
+      const diffPct = Math.round(((total - prevTotal) / prevTotal) * 100);
+      const up = diffPct >= 0;
+      deltaEl.innerHTML = `<span class="insight-badge ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(diffPct)}% dari bulan lalu</span>`;
+    } else {
+      deltaEl.innerHTML = '';
+    }
+    const now = new Date();
+    const isCurMonth = dashPeriodRef.getFullYear() === now.getFullYear() && dashPeriodRef.getMonth() === now.getMonth();
+    if (isCurMonth) {
+      const lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+      const daysLeft = lastDay - now.getDate();
+      daysEl.textContent = daysLeft > 0 ? `${daysLeft} hari lagi sampai akhir bulan` : 'Hari terakhir bulan ini';
+    } else {
+      daysEl.textContent = `${filtered.length} transaksi`;
+    }
+  } else {
+    deltaEl.innerHTML = '';
+    daysEl.textContent = `${filtered.length} transaksi`;
+  }
+}
+
+// ══════════════════════════════════════
+// QUICK ADD (tombol +) — kategori grid + numpad
+// ══════════════════════════════════════
+let qaCategory = '';
+let qaAmountStr = '0';
+let qaNewCatIcon = '';
+
+function openQuickAdd() {
+  qaCategory = '';
+  qaAmountStr = '0';
+  qaNewCatIcon = '';
+  cancelNewCat();
+  renderQaCats();
+  document.getElementById('qaAmount').textContent = 'Rp 0';
+  document.getElementById('qaDeskripsi').value = '';
+  document.getElementById('qaCatatan').value = '';
+  document.getElementById('qaDibayarOleh').value = '';
+  const today = nowYMD();
+  document.getElementById('qaDate').value = today;
+  document.getElementById('qaDateText').textContent = 'Hari ini · ' + fmtDate(today);
+  document.getElementById('quickAddOverlay').classList.add('open');
+}
+function closeQuickAdd() {
+  document.getElementById('quickAddOverlay').classList.remove('open');
+}
+function renderQaCats() {
+  const cont = document.getElementById('qaCats');
+  cont.innerHTML = allCats().map(c => {
+    const isTrigger = c.key === 'Lainnya';
+    const clickAction = isTrigger ? 'openNewCatForm()' : `qaPickCat('${c.key}')`;
+    return `<div class="qa-cat${qaCategory===c.key?' active':''}" onclick="${clickAction}">
+      <div class="qa-cat-icon" style="background:${c.bg};color:${c.color};">${iconSvg(c.icon)}</div>
+      <div class="qa-cat-label">${c.key}</div>
+    </div>`;
+  }).join('');
+}
+function qaPickCat(k) {
+  qaCategory = k;
+  cancelNewCat();
+  renderQaCats();
+}
+
+// ── Buat kategori baru (dipicu saat memilih "Lainnya") ──
+function openNewCatForm() {
+  qaCategory = '';
+  renderQaCats();
+  qaNewCatIcon = '';
+  document.getElementById('qaNewCatName').value = '';
+  renderNewCatIconPicker();
+  document.getElementById('qaNewCatForm').style.display = 'block';
+}
+function cancelNewCat() {
+  const form = document.getElementById('qaNewCatForm');
+  if (form) form.style.display = 'none';
+}
+function renderNewCatIconPicker() {
+  const cont = document.getElementById('qaIconPicker');
+  cont.innerHTML = NEW_CAT_ICON_CHOICES.map(name => `
+    <div class="qa-icon-choice${qaNewCatIcon===name?' active':''}" onclick="pickNewCatIcon('${name}')">${iconSvg(name)}</div>
+  `).join('');
+}
+function pickNewCatIcon(name) {
+  qaNewCatIcon = name;
+  renderNewCatIconPicker();
+}
+async function createNewCategory() {
+  const name = document.getElementById('qaNewCatName').value.trim();
+  if (!name) return showToast('Isi nama kategori dulu', false);
+  if (!qaNewCatIcon) return showToast('Pilih ikon dulu', false);
+  if (allCats().some(c => c.key.toLowerCase() === name.toLowerCase())) {
+    return showToast('Kategori ini sudah ada', false);
+  }
+
+  const idx = CUSTOM_CATS.length % CUSTOM_PALETTE.length;
+  const color = CUSTOM_PALETTE[idx];
+  const newCat = { key: name, color, bg: hexToRgba(color, 0.12), icon: qaNewCatIcon };
+
+  try {
+    await saveCategoryToSheets(newCat);
+    CUSTOM_CATS.push(newCat);
+    populateCategoryDropdowns();
+    qaCategory = name;
+    cancelNewCat();
+    renderQaCats();
+    showToast(`Kategori "${name}" ditambahkan! ✓`, true);
+  } catch(e) {
+    showToast('Gagal menambah kategori: ' + e.message, false);
+  }
+}
+function qaKey(k) {
+  if (k === 'back') {
+    qaAmountStr = qaAmountStr.length > 1 ? qaAmountStr.slice(0,-1) : '0';
+  } else if (k === '000') {
+    qaAmountStr = qaAmountStr === '0' ? '0' : qaAmountStr + '000';
+  } else {
+    qaAmountStr = qaAmountStr === '0' ? k : qaAmountStr + k;
+  }
+  document.getElementById('qaAmount').textContent = rp(parseInt(qaAmountStr||'0', 10));
+}
+async function qaSave() {
+  const jml  = parseInt(qaAmountStr||'0', 10);
+  const date = document.getElementById('qaDate').value || nowYMD();
+  const desk = document.getElementById('qaDeskripsi').value.trim() || qaCategory;
+  const by   = document.getElementById('qaDibayarOleh').value;
+  const note = document.getElementById('qaCatatan').value.trim();
+
+  if (!qaCategory) return showToast('Pilih kategori dulu', false);
+  if (!jml || jml <= 0) return showToast('Jumlah harus lebih dari 0', false);
+  if (!by) return showToast('Pilih nama pembayar', false);
+
+  const exp = {
+    __id: genId(), date, category: qaCategory,
+    description: desk, amount: jml, paid_by: by, notes: note,
+    created_at: new Date().toISOString(),
+  };
+
+  try {
+    await saveExpenseToSheets(exp);
+    expenses.push(exp);
+    updateSummary();
+    populateFilterBulan();
+    populateRekapSelects();
+    if (document.getElementById('tab-list').classList.contains('active')) renderList();
+    if (document.getElementById('tab-rekap').classList.contains('active')) renderRekap();
+    closeQuickAdd();
+    showToast('Pengeluaran tersimpan! ✓', true);
+  } catch(e) {
+    showToast('Gagal simpan: ' + e.message, false);
+  }
+}
+document.getElementById('quickAddOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeQuickAdd(); });
 
 // ══════════════════════════════════════
 // FORM SUBMIT
@@ -846,6 +1605,7 @@ async function submitExpense() {
     populateFilterBulan();
     populateRekapSelects();
     resetForm();
+    toggleAddExpense(false);
     showToast('Pengeluaran berhasil disimpan! ✓', true);
   } catch(e) {
     showToast('Gagal simpan: ' + e.message, false);
@@ -978,7 +1738,7 @@ function renderRekap() {
   } else {
     document.getElementById('rekapKatList').innerHTML = katSorted.map(([kat, v]) => {
       const pct = total > 0 ? Math.round(v.total/total*100) : 0;
-      const c = KAT_CONFIG[kat] || KAT_CONFIG['Lainnya'];
+      const c = catInfo(kat);
       return `<div style="margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
           ${katBadge(kat)}
@@ -1028,17 +1788,7 @@ function openEdit(id) {
 
   // Populate select kategori
   const katSel = document.getElementById('editKategori');
-  katSel.innerHTML = `<option value="">Pilih kategori...</option>
-    <option value="ATK">📎 ATK</option>
-    <option value="Listrik">💡 Listrik</option>
-    <option value="Internet">🌐 Internet</option>
-    <option value="Transportasi">🚗 Transportasi</option>
-    <option value="Konsumsi">🍱 Konsumsi</option>
-    <option value="Kebersihan">🧹 Kebersihan</option>
-    <option value="Perlengkapan">📦 Perlengkapan</option>
-    <option value="Gaji">👤 Gaji/Honor</option>
-    <option value="Sewa">🏠 Sewa</option>
-    <option value="Lainnya">📋 Lainnya</option>`;
+  katSel.innerHTML = '<option value="">Pilih kategori...</option>' + allCats().map(c => `<option value="${c.key}">${c.key}</option>`).join('');
 
   document.getElementById('editDate').value      = e.date || '';
   document.getElementById('editDateText').textContent = e.date ? fmtDate(e.date) : 'Pilih tanggal';
@@ -1127,6 +1877,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('inputDateText').textContent = fmtDate(today);
   document.getElementById('inputDateText').classList.remove('placeholder');
 
+  populateCategoryDropdowns();
   populateRekapSelects();
   startPolling();
 });
