@@ -36,6 +36,14 @@ function _route(action, data) {
     case 'updateInvoice': return handleUpdateInvoice(data.backendId, data.updates, data.updatedBy);
     case 'deleteInvoice': return handleDeleteInvoice(data.backendId, data.deletedBy);
     case 'uploadProof':  return handleUploadProof(data.base64, data.mimeType, data.invoiceNumber);
+    // Pengeluaran (expense.html)
+    case 'getExpenses':   return handleGetExpenses();
+    case 'saveExpense':   return handleSaveExpense(data.expense);
+    case 'updateExpense': return handleUpdateExpense(data.id, data.updates);
+    case 'deleteExpense': return handleDeleteExpense(data.id);
+    // Kategori kustom (tersinkron tim)
+    case 'getCategories': return handleGetCategories();
+    case 'saveCategory':  return handleSaveCategory(data.category);
     default: return _json({ error: 'Action tidak dikenal: ' + action });
   }
 }
@@ -53,7 +61,9 @@ function doGet(e) {
 
     // GET biasa
     const action = e.parameter.action || '';
-    if (action === 'getInvoices') return handleGetInvoices();
+    if (action === 'getInvoices')   return handleGetInvoices();
+    if (action === 'getExpenses')   return handleGetExpenses();
+    if (action === 'getCategories') return handleGetCategories();
 
     // Health check
     return _json({ status: 'ok', message: 'Markaz Belajar GAS aktif ✓', timestamp: new Date().toISOString() });
@@ -237,6 +247,231 @@ function handleUploadProof(base64, mimeType, invoiceNumber) {
   } catch (err) {
     return _json({ success: false, error: err.toString() });
   }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HANDLER: getExpenses / saveExpense / updateExpense / deleteExpense
+//  (dipakai oleh expense.html — Pengeluaran Operasional)
+// ═══════════════════════════════════════════════════════════
+function handleGetExpenses() {
+  try {
+    const sheet = getExpenseSheet();
+    const rows  = sheet.getDataRange().getValues();
+    if (rows.length <= 1) return _json({ expenses: [] });
+
+    const headers = rows[0];
+    const expenses = rows.slice(1).map(row => {
+      const obj = {};
+      headers.forEach((h, i) => {
+        let val = row[i];
+        if (typeof val === 'string' && (val.startsWith('{') || val.startsWith('['))) {
+          try { val = JSON.parse(val); } catch (_) {}
+        }
+        obj[h] = val;
+      });
+      return obj;
+    });
+
+    return _json({ expenses });
+  } catch (err) {
+    return _json({ error: err.toString() });
+  }
+}
+
+function handleSaveExpense(expense) {
+  try {
+    if (!expense) return _json({ error: 'Data pengeluaran kosong.' });
+
+    const sheet   = getExpenseSheet();
+    const headers = getOrCreateExpenseHeaders(sheet);
+    const id      = expense.__id || Utilities.getUuid();
+    expense.__id  = id;
+
+    // Normalisasi tanggal jadi string biar tidak digeser timezone oleh Sheets
+    if (expense.date) expense.date = String(expense.date);
+
+    const row = headers.map(h => {
+      const val = expense[h];
+      if (val !== undefined && val !== null && typeof val === 'object') return JSON.stringify(val);
+      return val !== undefined ? val : '';
+    });
+
+    sheet.appendRow(row);
+    return _json({ ok: true, id });
+
+  } catch (err) {
+    return _json({ error: err.toString() });
+  }
+}
+
+function handleUpdateExpense(id, updates) {
+  try {
+    if (!id || !updates) return _json({ error: 'Parameter tidak lengkap.' });
+
+    const sheet   = getExpenseSheet();
+    const headers = getOrCreateExpenseHeaders(sheet);
+    const rows    = sheet.getDataRange().getValues();
+    const idCol   = headers.indexOf('__id');
+
+    if (idCol < 0) return _json({ error: 'Kolom __id tidak ditemukan.' });
+
+    for (let r = 1; r < rows.length; r++) {
+      if (rows[r][idCol] === id) {
+        Object.keys(updates).forEach(key => {
+          const col = headers.indexOf(key);
+          if (col >= 0) {
+            let val = updates[key];
+            if (val !== null && typeof val === 'object') val = JSON.stringify(val);
+            sheet.getRange(r + 1, col + 1).setValue(val);
+          }
+        });
+        const updatedCol = headers.indexOf('updated_at');
+        if (updatedCol >= 0) sheet.getRange(r + 1, updatedCol + 1).setValue(new Date().toISOString());
+        return _json({ ok: true });
+      }
+    }
+
+    return _json({ error: 'Pengeluaran tidak ditemukan.' });
+
+  } catch (err) {
+    return _json({ error: err.toString() });
+  }
+}
+
+function handleDeleteExpense(id) {
+  try {
+    if (!id) return _json({ error: 'id tidak ada.' });
+
+    const sheet   = getExpenseSheet();
+    const headers = getOrCreateExpenseHeaders(sheet);
+    const rows    = sheet.getDataRange().getValues();
+    const idCol   = headers.indexOf('__id');
+
+    if (idCol < 0) return _json({ error: 'Kolom __id tidak ditemukan.' });
+
+    for (let r = 1; r < rows.length; r++) {
+      if (rows[r][idCol] === id) {
+        sheet.deleteRow(r + 1);
+        return _json({ ok: true });
+      }
+    }
+
+    return _json({ error: 'Pengeluaran tidak ditemukan.' });
+
+  } catch (err) {
+    return _json({ error: err.toString() });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HANDLER: getCategories / saveCategory
+//  Kategori kustom buatan tim, tersinkron lewat sheet "categories"
+// ═══════════════════════════════════════════════════════════
+function handleGetCategories() {
+  try {
+    const sheet = getCategoriesSheet();
+    const rows  = sheet.getDataRange().getValues();
+    if (rows.length <= 1) return _json({ categories: [] });
+
+    const headers = rows[0];
+    const categories = rows.slice(1).map(row => {
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = row[i]; });
+      return obj;
+    }).filter(c => c.key); // buang baris kosong
+
+    return _json({ categories });
+  } catch (err) {
+    return _json({ error: err.toString() });
+  }
+}
+
+function handleSaveCategory(category) {
+  try {
+    if (!category || !category.key) return _json({ error: 'Data kategori kosong.' });
+
+    const sheet   = getCategoriesSheet();
+    const headers = getOrCreateCategoryHeaders(sheet);
+
+    // Cegah duplikat (case-insensitive)
+    const rows  = sheet.getDataRange().getValues();
+    const keyCol = headers.indexOf('key');
+    for (let r = 1; r < rows.length; r++) {
+      if (String(rows[r][keyCol]).toLowerCase() === String(category.key).toLowerCase()) {
+        return _json({ ok: true, alreadyExists: true });
+      }
+    }
+
+    const row = headers.map(h => {
+      if (h === 'created_at') return new Date().toISOString();
+      return category[h] !== undefined ? category[h] : '';
+    });
+
+    sheet.appendRow(row);
+    return _json({ ok: true });
+
+  } catch (err) {
+    return _json({ error: err.toString() });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HELPER: ambil/buat sheet "expenses"
+// ═══════════════════════════════════════════════════════════
+function getExpenseSheet() {
+  const ss    = SpreadsheetApp.openById(SHEET_ID);
+  let   sheet = ss.getSheetByName('expenses');
+  if (!sheet) sheet = ss.insertSheet('expenses');
+  return sheet;
+}
+
+function getOrCreateExpenseHeaders(sheet) {
+  const lastCol  = sheet.getLastColumn();
+  const firstRow = lastCol > 0 ? sheet.getRange(1, 1, 1, lastCol).getValues()[0] : [];
+
+  if (!firstRow || firstRow[0] === '') {
+    const defaultHeaders = [
+      '__id', 'date', 'category', 'description', 'amount',
+      'paid_by', 'notes', 'created_at', 'updated_at'
+    ];
+    sheet.getRange(1, 1, 1, defaultHeaders.length).setValues([defaultHeaders]);
+    const hRange = sheet.getRange(1, 1, 1, defaultHeaders.length);
+    hRange.setBackground('#1B6CA8');
+    hRange.setFontColor('#ffffff');
+    hRange.setFontWeight('bold');
+    sheet.setFrozenRows(1);
+    return defaultHeaders;
+  }
+
+  return firstRow.filter(h => h !== '');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HELPER: ambil/buat sheet "categories" (kategori kustom tim)
+// ═══════════════════════════════════════════════════════════
+function getCategoriesSheet() {
+  const ss    = SpreadsheetApp.openById(SHEET_ID);
+  let   sheet = ss.getSheetByName('categories');
+  if (!sheet) sheet = ss.insertSheet('categories');
+  return sheet;
+}
+
+function getOrCreateCategoryHeaders(sheet) {
+  const lastCol  = sheet.getLastColumn();
+  const firstRow = lastCol > 0 ? sheet.getRange(1, 1, 1, lastCol).getValues()[0] : [];
+
+  if (!firstRow || firstRow[0] === '') {
+    const defaultHeaders = ['key', 'color', 'bg', 'icon', 'created_at'];
+    sheet.getRange(1, 1, 1, defaultHeaders.length).setValues([defaultHeaders]);
+    const hRange = sheet.getRange(1, 1, 1, defaultHeaders.length);
+    hRange.setBackground('#1B6CA8');
+    hRange.setFontColor('#ffffff');
+    hRange.setFontWeight('bold');
+    sheet.setFrozenRows(1);
+    return defaultHeaders;
+  }
+
+  return firstRow.filter(h => h !== '');
 }
 
 // ═══════════════════════════════════════════════════════════
