@@ -258,6 +258,12 @@ textarea{resize:vertical;min-height:70px;}
 .trend-tag.high{background:var(--danger-dim);color:var(--danger);}
 .trend-tag.low{background:var(--success-dim);color:var(--success);}
 
+/* FOTO NOTA/STRUK */
+.proof-preview-wrap{display:none;align-items:center;gap:10px;margin-bottom:8px;}
+.proof-preview-wrap img{width:60px;height:60px;object-fit:cover;border-radius:10px;border:1px solid var(--border);flex-shrink:0;}
+.proof-thumb-link{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;overflow:hidden;border:1px solid var(--border);flex-shrink:0;}
+.proof-thumb-link img{width:100%;height:100%;object-fit:cover;display:block;}
+
 /* RINCIAN PER TANGGAL */
 .daterows-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
 .date-row{display:flex;align-items:center;justify-content:space-between;padding:7px 2px;border-bottom:1px solid var(--border);font-size:12px;}
@@ -358,6 +364,18 @@ textarea{resize:vertical;min-height:70px;}
       <label>Catatan (opsional)</label>
       <textarea id="editCatatan" placeholder="Catatan tambahan..."></textarea>
     </div>
+    <div class="modal-field">
+      <label>Foto Nota/Struk (opsional)</label>
+      <input type="file" accept="image/*" capture="environment" id="editProofFile" style="display:none;" onchange="handleProofSelect(this,'edit')">
+      <div class="proof-preview-wrap" id="editProofPreviewWrap">
+        <img id="editProofPreview" alt="Preview struk">
+        <button type="button" class="btn btn-ghost btn-small" onclick="clearProof('edit')">Hapus Foto</button>
+      </div>
+      <button type="button" class="btn btn-ghost btn-full" id="editProofBtn" onclick="document.getElementById('editProofFile').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Pilih/Ambil Foto Struk
+      </button>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost btn-full" onclick="closeEditModal()">Batal</button>
       <button class="btn btn-accent btn-full" onclick="submitEdit()">Simpan Perubahan</button>
@@ -444,6 +462,18 @@ textarea{resize:vertical;min-height:70px;}
     <div class="qa-extra">
       <label>Catatan (opsional)</label>
       <input type="text" id="qaCatatan" placeholder="Catatan tambahan...">
+    </div>
+    <div class="qa-extra">
+      <label>Foto Nota/Struk (opsional)</label>
+      <input type="file" accept="image/*" capture="environment" id="qaProofFile" style="display:none;" onchange="handleProofSelect(this,'qa')">
+      <div class="proof-preview-wrap" id="qaProofPreviewWrap">
+        <img id="qaProofPreview" alt="Preview struk">
+        <button type="button" class="btn btn-ghost btn-small" onclick="clearProof('qa')">Hapus Foto</button>
+      </div>
+      <button type="button" class="btn btn-ghost btn-full" id="qaProofBtn" onclick="document.getElementById('qaProofFile').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Pilih/Ambil Foto Struk
+      </button>
     </div>
   </div>
 </div>
@@ -681,6 +711,19 @@ textarea{resize:vertical;min-height:70px;}
           <textarea id="inputCatatan" placeholder="Catatan tambahan atau nomor struk..."></textarea>
         </div>
 
+        <div style="margin-top:12px;">
+          <label>Foto Nota/Struk (opsional)</label>
+          <input type="file" accept="image/*" capture="environment" id="inputProofFile" style="display:none;" onchange="handleProofSelect(this,'input')">
+          <div class="proof-preview-wrap" id="inputProofPreviewWrap">
+            <img id="inputProofPreview" alt="Preview struk">
+            <button type="button" class="btn btn-ghost btn-small" onclick="clearProof('input')">Hapus Foto</button>
+          </div>
+          <button type="button" class="btn btn-ghost btn-full" id="inputProofBtn" onclick="document.getElementById('inputProofFile').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Pilih/Ambil Foto Struk
+          </button>
+        </div>
+
         <!-- Preview jumlah -->
         <div id="amountPreview" style="display:none;background:var(--danger-dim);border:1px solid rgba(220,53,69,0.2);border-radius:var(--r);padding:10px 14px;margin-top:12px;align-items:center;justify-content:space-between;">
           <span style="font-size:12px;color:var(--text2);">Total yang akan dicatat:</span>
@@ -824,6 +867,15 @@ function hasGasUrl() {
 async function gasPost(action, payload) {
   const encoded = encodeURIComponent(JSON.stringify({ action, ...payload }));
   const resp = await fetch(`${GAS_URL}?method=post&data=${encoded}`, { cache: 'no-store' });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+// Helper: POST body asli (untuk payload besar seperti foto — tidak muat di query string GET)
+async function gasPostBody(action, payload) {
+  const resp = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action, ...payload }) });
   if (!resp.ok) throw new Error('HTTP ' + resp.status);
   const data = await resp.json();
   if (data.error) throw new Error(data.error);
@@ -1135,6 +1187,66 @@ async function saveCategoryToSheets(cat) {
     return { ok: true };
   }
   return await gasPost('saveCategory', { category: cat });
+}
+
+// ══════════════════════════════════════
+// FOTO NOTA/STRUK — kompresi + upload ke Google Drive
+// ══════════════════════════════════════
+function compressImage(file, maxWidth = 1280, quality = 0.72) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => reject(new Error('Gagal membaca gambar'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('Gagal membaca file'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadProofToSheets(base64, filename) {
+  if (!hasGasUrl()) return { success: true, viewUrl: '', thumbnailUrl: '' };
+  return await gasPostBody('uploadProof', { base64, mimeType: 'image/jpeg', filename });
+}
+
+// State foto per form: 'input' (form lengkap), 'qa' (quick add), 'edit' (modal edit)
+const proofData = { input: null, qa: null, edit: null };
+// Untuk modal edit: lacak foto yang sudah tersimpan di record & apakah user menghapusnya
+let editExistingProofUrl = null;
+let editProofRemoved = false;
+
+async function handleProofSelect(inputEl, scope) {
+  const file = inputEl.files[0];
+  if (!file) return;
+  try {
+    const dataUrl = await compressImage(file);
+    proofData[scope] = dataUrl;
+    if (scope === 'edit') editProofRemoved = false;
+    document.getElementById(scope+'ProofPreview').src = dataUrl;
+    document.getElementById(scope+'ProofPreviewWrap').style.display = 'flex';
+    const btn = document.getElementById(scope+'ProofBtn');
+    if (btn) btn.textContent = 'Ganti Foto Struk';
+  } catch(e) {
+    showToast('Gagal memproses foto: ' + e.message, false);
+  }
+}
+function clearProof(scope) {
+  proofData[scope] = null;
+  document.getElementById(scope+'ProofPreviewWrap').style.display = 'none';
+  const fileInput = document.getElementById(scope+'ProofFile');
+  if (fileInput) fileInput.value = '';
+  const btn = document.getElementById(scope+'ProofBtn');
+  if (btn) btn.textContent = 'Pilih/Ambil Foto Struk';
+  if (scope === 'edit') { editExistingProofUrl = null; editProofRemoved = true; }
 }
 
 // ══════════════════════════════════════
@@ -1497,6 +1609,7 @@ function openQuickAdd() {
   qaNewCatIcon = '';
   cancelNewCat();
   renderQaCats();
+  clearProof('qa');
   document.getElementById('qaAmount').textContent = 'Rp 0';
   document.getElementById('qaDeskripsi').value = '';
   document.getElementById('qaCatatan').value = '';
@@ -1600,7 +1713,17 @@ async function qaSave() {
     created_at: new Date().toISOString(),
   };
 
+  const saveBtn = document.querySelector('.qa-save');
+  const saveBtnHtml = saveBtn.innerHTML;
+  saveBtn.disabled = true;
+
   try {
+    if (proofData.qa) {
+      saveBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>`;
+      const up = await uploadProofToSheets(proofData.qa, `${qaCategory}_${date}`);
+      if (up.success === false) throw new Error(up.error || 'Upload foto gagal');
+      exp.proof_url = up.thumbnailUrl || '';
+    }
     await saveExpenseToSheets(exp);
     expenses.push(exp);
     updateSummary();
@@ -1612,6 +1735,9 @@ async function qaSave() {
     showToast('Pengeluaran tersimpan! ✓', true);
   } catch(e) {
     showToast('Gagal simpan: ' + e.message, false);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = saveBtnHtml;
   }
 }
 document.getElementById('quickAddOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeQuickAdd(); });
@@ -1647,6 +1773,13 @@ async function submitExpense() {
   btn.disabled = true; btn.textContent = 'Menyimpan...';
 
   try {
+    if (proofData.input) {
+      btn.textContent = 'Mengunggah foto...';
+      const up = await uploadProofToSheets(proofData.input, `${kat}_${date}`);
+      if (up.success === false) throw new Error(up.error || 'Upload foto gagal');
+      exp.proof_url = up.thumbnailUrl || '';
+      btn.textContent = 'Menyimpan...';
+    }
     await saveExpenseToSheets(exp);
     expenses.push(exp);
     updateSummary();
@@ -1673,6 +1806,7 @@ function resetForm() {
   document.getElementById('inputDibayarOleh').value = '';
   document.getElementById('inputCatatan').value = '';
   document.getElementById('amountPreview').style.display = 'none';
+  clearProof('input');
 }
 
 // ══════════════════════════════════════
@@ -1722,8 +1856,13 @@ function renderList() {
       <td style="white-space:nowrap;font-size:11px;color:var(--text3);">${fmtDate(e.date)}</td>
       <td>${katBadge(e.category)}</td>
       <td>
-        <div style="font-weight:500;font-size:12px;">${e.description}</div>
-        ${e.notes ? `<div style="font-size:10px;color:var(--text3);margin-top:2px;">${e.notes}</div>` : ''}
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${e.proof_url ? `<a href="${e.proof_url}" target="_blank" rel="noopener" class="proof-thumb-link" title="Lihat foto struk"><img src="${e.proof_url}" alt="Struk"></a>` : ''}
+          <div>
+            <div style="font-weight:500;font-size:12px;">${e.description}</div>
+            ${e.notes ? `<div style="font-size:10px;color:var(--text3);margin-top:2px;">${e.notes}</div>` : ''}
+          </div>
+        </div>
       </td>
       <td style="font-size:12px;color:var(--text2);">${e.paid_by || '—'}</td>
       <td style="text-align:right;font-family:'Geist Mono',monospace;font-weight:600;color:var(--danger);font-size:12px;">${rp(e.amount)}</td>
@@ -1846,6 +1985,22 @@ function openEdit(id) {
   document.getElementById('editDibayarOleh').value = e.paid_by || '';
   document.getElementById('editCatatan').value   = e.notes || '';
 
+  // Foto struk yang sudah ada di record (kalau ada)
+  proofData.edit = null;
+  editProofRemoved = false;
+  editExistingProofUrl = e.proof_url || null;
+  const proofWrap = document.getElementById('editProofPreviewWrap');
+  const proofBtn  = document.getElementById('editProofBtn');
+  document.getElementById('editProofFile').value = '';
+  if (editExistingProofUrl) {
+    document.getElementById('editProofPreview').src = editExistingProofUrl;
+    proofWrap.style.display = 'flex';
+    proofBtn.textContent = 'Ganti Foto Struk';
+  } else {
+    proofWrap.style.display = 'none';
+    proofBtn.textContent = 'Pilih/Ambil Foto Struk';
+  }
+
   if (e.date) {
     const [y,m] = e.date.split('-');
     calState['editCal'] = { year: parseInt(y), month: parseInt(m)-1 };
@@ -1871,7 +2026,20 @@ async function submitEdit() {
 
   const updates = { date, category:kat, description:desk, amount:jml, paid_by:by, notes:note };
 
+  const saveBtn = document.querySelector('[onclick="submitEdit()"]');
+  const saveBtnHtml = saveBtn.innerHTML;
+  saveBtn.disabled = true;
+
   try {
+    if (proofData.edit) {
+      saveBtn.textContent = 'Mengunggah foto...';
+      const up = await uploadProofToSheets(proofData.edit, `${kat}_${date}`);
+      if (up.success === false) throw new Error(up.error || 'Upload foto gagal');
+      updates.proof_url = up.thumbnailUrl || '';
+    } else if (editProofRemoved) {
+      updates.proof_url = '';
+    }
+
     await updateExpenseInSheets(editingId, updates);
     const idx = expenses.findIndex(e => e.__id === editingId);
     if (idx >= 0) expenses[idx] = {...expenses[idx], ...updates};
@@ -1881,6 +2049,9 @@ async function submitEdit() {
     showToast('Pengeluaran diperbarui! ✓', true);
   } catch(e) {
     showToast('Gagal update: ' + e.message, false);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = saveBtnHtml;
   }
 }
 
