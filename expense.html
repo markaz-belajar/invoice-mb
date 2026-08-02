@@ -1508,7 +1508,12 @@ function renderTrendChart() {
   const trendLabel = { hari:'7 Hari', minggu:'6 Minggu', bulan:'6 Bulan', tahun:'6 Tahun' }[dashPeriodType];
   document.getElementById('trendTitle').textContent = `Tren ${trendLabel} Terakhir`;
 
-  const count = dashPeriodType === 'hari' ? 7 : 6;
+  const MB_START_YEAR = 2025; // data operasional baru mulai tercatat sejak tahun ini
+  const count = dashPeriodType === 'hari'
+    ? 7
+    : (dashPeriodType === 'tahun'
+        ? Math.min(6, Math.max(1, dashPeriodRef.getFullYear() - MB_START_YEAR + 1))
+        : 6);
   const series = buildTrendSeries(count);
   const values = series.map(s => s.total);
   const maxTotal = Math.max(...values);
