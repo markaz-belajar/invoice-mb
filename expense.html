@@ -1180,7 +1180,11 @@ function pickDate(calId, btnId, ymd) {
   renderCal(calId, btnId);
 }
 document.addEventListener('click', e => {
-  if (!e.target.closest('.date-wrap')) {
+  // Pakai composedPath() (bukan e.target.closest) supaya deteksi "klik di luar" tetap akurat
+  // walau elemen yang diklik (mis. tombol ‹/›) sudah diganti oleh renderCal sebelum event ini selesai.
+  const path = e.composedPath ? e.composedPath() : [e.target];
+  const insideDateWrap = path.some(el => el.classList && el.classList.contains('date-wrap'));
+  if (!insideDateWrap) {
     document.querySelectorAll('.cal-popup').forEach(c => c.classList.remove('open'));
     document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('open'));
   }
