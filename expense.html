@@ -152,7 +152,13 @@ textarea{resize:vertical;min-height:70px;}
 .cal-nav-btn{background:none;border:none;cursor:pointer;color:var(--text2);padding:5px 8px;border-radius:6px;display:flex;align-items:center;transition:background .1s;}
 .cal-nav-btn:hover{background:var(--surface2);}
 .cal-nav-btn svg{width:13px;height:13px;}
-.cal-month-lbl{font-size:13px;font-weight:600;color:var(--text);}
+.cal-month-lbl{font-size:13px;font-weight:600;color:var(--text);cursor:pointer;padding:3px 8px;border-radius:6px;transition:background .1s;}
+.cal-month-lbl:hover{background:var(--surface2);}
+.cal-grid-months{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.cal-m{text-align:center;font-size:12.5px;color:var(--text2);padding:12px 4px;border-radius:8px;cursor:pointer;transition:all .1s;font-weight:500;}
+.cal-m:hover{background:var(--surface2);}
+.cal-m.today{color:var(--accent);font-weight:700;}
+.cal-m.selected{background:var(--accent);color:#fff;font-weight:700;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
 .cal-dn{text-align:center;font-size:10px;color:var(--text3);padding:4px 0;font-weight:600;}
 .cal-d{text-align:center;font-size:12px;color:var(--text2);padding:6px 2px;border-radius:6px;cursor:pointer;transition:all .1s;}
@@ -623,17 +629,17 @@ textarea{resize:vertical;min-height:70px;}
     </div>
   </div>
 
-  <!-- Summary bulan ini (selalu tampil) -->
+  <!-- Summary — ikut filter periode di atas -->
   <div class="sum-grid" id="summaryCards">
     <div class="sum-card danger">
-      <div class="sum-label">Total Bulan Ini</div>
+      <div class="sum-label" id="sumLabelTotal">Total Bulan Ini</div>
       <div class="sum-value" id="sumTotal">Rp 0</div>
       <div class="sum-sub" id="sumBulan">—</div>
     </div>
     <div class="sum-card warning">
       <div class="sum-label">Transaksi</div>
       <div class="sum-value" id="sumCount">0</div>
-      <div class="sum-sub">entri bulan ini</div>
+      <div class="sum-sub" id="sumCountSub">entri bulan ini</div>
     </div>
     <div class="sum-card">
       <div class="sum-label">Terbesar</div>
@@ -1051,6 +1057,9 @@ function toggleAddExpense(forceOpen) {
 // CALENDAR (reusable)
 // ══════════════════════════════════════
 const calState = {};
+const CAL_BULAN_NAMES = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const CAL_BULAN_SHORT = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+
 function toggleCal(calId, btnId) {
   const cal = document.getElementById(calId);
   const isOpen = cal.classList.contains('open');
@@ -1058,21 +1067,26 @@ function toggleCal(calId, btnId) {
   document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('open'));
   if (!isOpen) {
     const today = new Date();
-    if (!calState[calId]) calState[calId] = { year: today.getFullYear(), month: today.getMonth() };
+    if (!calState[calId]) calState[calId] = { year: today.getFullYear(), month: today.getMonth(), view: 'days' };
+    calState[calId].view = 'days';
     renderCal(calId, btnId);
     cal.classList.add('open');
     document.getElementById(btnId).classList.add('open');
   }
 }
+
 function renderCal(calId, btnId) {
-  const { year, month } = calState[calId];
-  const names = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const state = calState[calId];
+  if (state.view === 'months') return renderCalMonths(calId, btnId);
+  if (state.view === 'years')  return renderCalYears(calId, btnId);
+
+  const { year, month } = state;
   const first = new Date(year, month, 1).getDay();
   const days = new Date(year, month+1, 0).getDate();
   const today = new Date();
   let html = `<div class="cal-nav">
     <button class="cal-nav-btn" onclick="calMove('${calId}','${btnId}',-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-    <span class="cal-month-lbl">${names[month]} ${year}</span>
+    <span class="cal-month-lbl" onclick="calShowMonths('${calId}','${btnId}')">${CAL_BULAN_NAMES[month]} ${year}</span>
     <button class="cal-nav-btn" onclick="calMove('${calId}','${btnId}',1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
   </div><div class="cal-grid">`;
   ['Min','Sen','Sel','Rab','Kam','Jum','Sab'].forEach(d => html += `<div class="cal-dn">${d}</div>`);
@@ -1086,6 +1100,64 @@ function renderCal(calId, btnId) {
   }
   html += '</div>';
   document.getElementById(calId).innerHTML = html;
+}
+
+// Tampilan pilih BULAN — grid 12 bulan untuk tahun aktif, lompat cepat tanpa klik satu-satu
+function renderCalMonths(calId, btnId) {
+  const { year, month } = calState[calId];
+  const today = new Date();
+  let html = `<div class="cal-nav">
+    <button class="cal-nav-btn" onclick="calMoveYear('${calId}','${btnId}',-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <span class="cal-month-lbl" onclick="calShowYears('${calId}','${btnId}')">${year}</span>
+    <button class="cal-nav-btn" onclick="calMoveYear('${calId}','${btnId}',1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+  </div><div class="cal-grid-months">`;
+  CAL_BULAN_SHORT.forEach((name, i) => {
+    const isCurrent = i === month;
+    const isThisMonth = i === today.getMonth() && year === today.getFullYear();
+    html += `<div class="cal-m${isCurrent?' selected':''}${isThisMonth?' today':''}" onclick="calPickMonth('${calId}','${btnId}',${i})">${name}</div>`;
+  });
+  html += '</div>';
+  document.getElementById(calId).innerHTML = html;
+}
+
+// Tampilan pilih TAHUN — grid 12 tahun, buat lompat jauh (mis. beda beberapa tahun)
+function renderCalYears(calId, btnId) {
+  const { year } = calState[calId];
+  const startYear = year - 5;
+  const today = new Date();
+  let html = `<div class="cal-nav">
+    <button class="cal-nav-btn" onclick="calShiftYearRange('${calId}','${btnId}',-12)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <span class="cal-month-lbl">${startYear} – ${startYear+11}</span>
+    <button class="cal-nav-btn" onclick="calShiftYearRange('${calId}','${btnId}',12)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+  </div><div class="cal-grid-months">`;
+  for (let y = startYear; y <= startYear+11; y++) {
+    const isCurrent = y === year;
+    const isThisYear = y === today.getFullYear();
+    html += `<div class="cal-m${isCurrent?' selected':''}${isThisYear?' today':''}" onclick="calPickYear('${calId}','${btnId}',${y})">${y}</div>`;
+  }
+  html += '</div>';
+  document.getElementById(calId).innerHTML = html;
+}
+
+function calShowMonths(calId, btnId) { calState[calId].view = 'months'; renderCal(calId, btnId); }
+function calShowYears(calId, btnId)  { calState[calId].view = 'years';  renderCal(calId, btnId); }
+function calPickMonth(calId, btnId, m) {
+  calState[calId].month = m;
+  calState[calId].view = 'days';
+  renderCal(calId, btnId);
+}
+function calPickYear(calId, btnId, y) {
+  calState[calId].year = y;
+  calState[calId].view = 'months';
+  renderCal(calId, btnId);
+}
+function calMoveYear(calId, btnId, dir) {
+  calState[calId].year += dir;
+  renderCal(calId, btnId);
+}
+function calShiftYearRange(calId, btnId, dir) {
+  calState[calId].year += dir;
+  renderCal(calId, btnId);
 }
 function calMove(calId, btnId, dir) {
   calState[calId].month += dir;
@@ -1104,6 +1176,7 @@ function pickDate(calId, btnId, ymd) {
   }
   document.getElementById(calId).classList.remove('open');
   document.getElementById(btnId).classList.remove('open');
+  calState[calId].view = 'days';
   renderCal(calId, btnId);
 }
 document.addEventListener('click', e => {
@@ -1309,18 +1382,8 @@ function startPolling() {
 // SUMMARY (bulan ini)
 // ══════════════════════════════════════
 function updateSummary() {
-  const ym = currentYM();
-  const thisMonth = expenses.filter(e => ymFromDate(e.date) === ym);
-  const total = thisMonth.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
-  const maxE = thisMonth.reduce((a,b) => (parseFloat(b.amount)||0) > (parseFloat(a.amount)||0) ? b : a, {amount:0});
-
-  document.getElementById('sumTotal').textContent = rp(total);
-  document.getElementById('sumCount').textContent = thisMonth.length;
-  document.getElementById('sumBulan').textContent = bulanLabel(ym);
-  document.getElementById('sumMax').textContent = maxE.amount ? rp(maxE.amount) : '—';
-  document.getElementById('sumMaxCat').textContent = maxE.category || '—';
-  document.getElementById('bulanBadge').textContent = `● ${bulanLabel(ym)}`;
-
+  // Badge kecil di header tetap menunjukkan bulan berjalan (konteks umum, bukan filter)
+  document.getElementById('bulanBadge').textContent = `● ${bulanLabel(currentYM())}`;
   renderDashPeriod();
 }
 
@@ -1536,6 +1599,18 @@ function renderDashPeriod() {
 
   const filtered = expenses.filter(e => e.date >= start && e.date <= end);
   const total = filtered.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
+
+  // Kartu ringkasan (Total / Transaksi / Terbesar) — ikut filter periode yang dipilih
+  const PERIOD_TITLE = { hari:'Total Hari Ini', minggu:'Total Minggu Ini', bulan:'Total Bulan Ini', tahun:'Total Tahun Ini' };
+  const PERIOD_SUB    = { hari:'entri hari ini', minggu:'entri minggu ini', bulan:'entri bulan ini', tahun:'entri tahun ini' };
+  document.getElementById('sumLabelTotal').textContent = PERIOD_TITLE[dashPeriodType] || 'Total';
+  document.getElementById('sumCountSub').textContent   = PERIOD_SUB[dashPeriodType] || 'entri';
+  document.getElementById('sumTotal').textContent = rp(total);
+  document.getElementById('sumCount').textContent = filtered.length;
+  document.getElementById('sumBulan').textContent = label;
+  const sumMaxE = filtered.reduce((a,b) => (parseFloat(b.amount)||0) > (parseFloat(a?.amount)||0) ? b : a, null);
+  document.getElementById('sumMax').textContent = sumMaxE ? rp(sumMaxE.amount) : '—';
+  document.getElementById('sumMaxCat').textContent = sumMaxE ? sumMaxE.category : '—';
 
   // Tertinggi / terendah / rata-rata
   let maxE = null, minE = null;
@@ -1898,28 +1973,36 @@ function populateRekapSelects() {
   const years = [...new Set(expenses.map(e => e.date?.slice(0,4)).filter(Boolean))].sort().reverse();
   const curYear = new Date().getFullYear().toString();
   const selTahun = document.getElementById('rekapTahun');
+  const prevTahun = selTahun.value;
   selTahun.innerHTML = years.map(y => `<option value="${y}"${y===curYear?' selected':''}>${y}</option>`).join('');
   if (!years.includes(curYear)) selTahun.innerHTML = `<option value="${curYear}" selected>${curYear}</option>` + selTahun.innerHTML;
+  if (prevTahun && years.includes(prevTahun)) selTahun.value = prevTahun;
 
   const selBulan = document.getElementById('rekapBulan');
   const bulanNames = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  const curMonth = new Date().getMonth()+1;
-  selBulan.innerHTML = bulanNames.map((n,i) => `<option value="${String(i+1).padStart(2,'0')}"${(i+1)===curMonth?' selected':''}>${n}</option>`).join('');
+  const prevBulan = selBulan.value;
+  // Default: "Semua Bulan" — supaya Rekap menampilkan seluruh riwayat setahun, bukan cuma bulan berjalan
+  selBulan.innerHTML = `<option value="">Semua Bulan</option>` + bulanNames.map((n,i) => `<option value="${String(i+1).padStart(2,'0')}">${n}</option>`).join('');
+  if (prevBulan !== undefined) selBulan.value = prevBulan;
 }
 
 function renderRekap() {
-  const bulan = document.getElementById('rekapBulan')?.value;
+  const bulan = document.getElementById('rekapBulan')?.value; // '' = semua bulan (setahun penuh)
   const tahun = document.getElementById('rekapTahun')?.value;
-  if (!bulan || !tahun) return;
-  const ym = `${tahun}-${bulan}`;
-  const filtered = expenses.filter(e => ymFromDate(e.date) === ym);
+  if (!tahun) return;
+
+  const filtered = expenses.filter(e => {
+    if (!e.date || e.date.slice(0,4) !== tahun) return false;
+    if (bulan && e.date.slice(5,7) !== bulan) return false;
+    return true;
+  });
   const total = filtered.reduce((s,e) => s+(parseFloat(e.amount)||0), 0);
   const avg   = filtered.length ? Math.round(total/filtered.length) : 0;
 
   document.getElementById('rekapTotal').textContent   = rp(total);
   document.getElementById('rekapJml').textContent     = filtered.length;
   document.getElementById('rekapAvg').textContent     = rp(avg);
-  document.getElementById('rekapPeriode').textContent = bulanLabel(ym);
+  document.getElementById('rekapPeriode').textContent = bulan ? bulanLabel(`${tahun}-${bulan}`) : `Tahun ${tahun}`;
 
   // Per kategori
   const byKat = {};
@@ -1951,27 +2034,34 @@ function renderRekap() {
     }).join('');
   }
 
-  // Per orang
+  // Per pembayar — rincian item per orang (bukan cuma total)
   const byOrang = {};
   filtered.forEach(e => {
-    const key = e.paid_by || 'Unknown';
-    if (!byOrang[key]) byOrang[key] = {total:0, count:0};
+    const key = e.paid_by || 'Tidak diketahui';
+    if (!byOrang[key]) byOrang[key] = { total:0, items: [] };
     byOrang[key].total += parseFloat(e.amount)||0;
-    byOrang[key].count++;
+    byOrang[key].items.push(e);
   });
   const orangSorted = Object.entries(byOrang).sort((a,b)=>b[1].total-a[1].total);
 
   if (orangSorted.length === 0) {
     document.getElementById('rekapOrangList').innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Tidak ada data</div>`;
   } else {
-    document.getElementById('rekapOrangList').innerHTML = `<table class="track-table">
-      <thead><tr><th>Nama</th><th style="text-align:right;">Jumlah</th><th style="text-align:right;">Transaksi</th></tr></thead>
-      <tbody>${orangSorted.map(([nama, v]) => `<tr>
-        <td style="font-weight:500;">${nama}</td>
-        <td style="text-align:right;font-family:'Geist Mono',monospace;font-weight:600;color:var(--danger);">${rp(v.total)}</td>
-        <td style="text-align:right;color:var(--text3);">${v.count}x</td>
-      </tr>`).join('')}</tbody>
-    </table>`;
+    document.getElementById('rekapOrangList').innerHTML = orangSorted.map(([nama, v]) => {
+      const itemsSorted = [...v.items].sort((a,b) => b.date.localeCompare(a.date));
+      const rows = itemsSorted.map(e => `
+        <div class="trend-row">
+          <span class="trend-row-label">${katBadge(e.category)} ${e.description} <span style="color:var(--text3);font-weight:400;">· ${fmtDate(e.date)}</span></span>
+          <span class="trend-row-amt">${rp(e.amount)}</span>
+        </div>`).join('');
+      return `<div style="margin-bottom:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-weight:700;font-size:13px;color:var(--text);">${nama}</span>
+          <span style="font-weight:700;font-size:13px;color:var(--danger);font-family:'Geist Mono',monospace;">${rp(v.total)}</span>
+        </div>
+        ${rows}
+      </div>`;
+    }).join('');
   }
 }
 
