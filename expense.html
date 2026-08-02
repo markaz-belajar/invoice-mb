@@ -1132,13 +1132,23 @@ function updatePreviewAmount() {
 // ══════════════════════════════════════
 async function fetchExpensesFromSheets() {
   if (!hasGasUrl()) {
-    return JSON.parse(localStorage.getItem('mb_expenses') || '[]');
+    return normalizeExpenseDates(JSON.parse(localStorage.getItem('mb_expenses') || '[]'));
   }
   const resp = await fetch(`${GAS_URL}?action=getExpenses&t=${Date.now()}`, { cache: 'no-store' });
   if (!resp.ok) throw new Error('HTTP ' + resp.status);
   const data = await resp.json();
   if (data.error) throw new Error(data.error);
-  return data.expenses || [];
+  return normalizeExpenseDates(data.expenses || []);
+}
+// Jaga-jaga: kalau field 'date' ternyata masih berupa timestamp ISO (mis. "2026-08-01T17:00:00.000Z"),
+// potong jadi tanggal bersih "YYYY-MM-DD" saja supaya filter periode tidak salah baca.
+function normalizeExpenseDates(list) {
+  return list.map(e => {
+    if (e && typeof e.date === 'string' && e.date.length > 10 && e.date.includes('T')) {
+      return { ...e, date: e.date.slice(0, 10) };
+    }
+    return e;
+  });
 }
 async function saveExpenseToSheets(exp) {
   if (!hasGasUrl()) {
