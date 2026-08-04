@@ -99,8 +99,9 @@ textarea{resize:vertical;min-height:70px;}
 .actions .btn{flex:1;justify-content:center;min-width:80px;font-size:12px;}
 
 /* SUMMARY CARDS */
-.sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
 @media(max-width:600px){.sum-grid{grid-template-columns:1fr 1fr;}}
+.sum-grid-3{grid-template-columns:repeat(3,1fr) !important;}
 .sum-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
 .sum-label{font-size:11px;color:var(--text3);font-weight:500;margin-bottom:4px;}
 .sum-value{font-size:18px;font-weight:700;color:var(--text);font-family:'Geist Mono',monospace;line-height:1.2;}
@@ -646,6 +647,11 @@ textarea{resize:vertical;min-height:70px;}
       <div class="sum-value" style="font-size:14px;" id="sumMax">—</div>
       <div class="sum-sub" id="sumMaxCat">—</div>
     </div>
+    <div class="sum-card success">
+      <div class="sum-label">Rata-rata</div>
+      <div class="sum-value" style="font-size:14px;" id="sumAvg">Rp 0</div>
+      <div class="sum-sub">per transaksi</div>
+    </div>
   </div>
 
   <!-- Tambah Pengeluaran — accordion, collapsed by default -->
@@ -808,7 +814,7 @@ textarea{resize:vertical;min-height:70px;}
   </div>
 
   <!-- Total rekap -->
-  <div class="sum-grid">
+  <div class="sum-grid sum-grid-3">
     <div class="sum-card danger">
       <div class="sum-label">Total Pengeluaran</div>
       <div class="sum-value" id="rekapTotal">Rp 0</div>
@@ -1491,16 +1497,25 @@ function buildTrendSeries(count = 6) {
 
 // Render chart garis tren + tabel per periode (mis. 6 bulan terakhir)
 // Bikin garis melengkung halus lewat titik-titik (quadratic bezier via titik tengah)
+// Catmull-Rom → Bezier: kurva halus yang MELEWATI PERSIS setiap titik data
+// (bukan cuma mendekati, seperti teknik "midpoint" sebelumnya yang bikin titik puncak/lembah meleset dari garis)
 function smoothPath(points) {
   if (points.length < 2) return `M ${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
+  if (points.length === 2) {
+    return `M ${points[0].x.toFixed(1)},${points[0].y.toFixed(1)} L ${points[1].x.toFixed(1)},${points[1].y.toFixed(1)}`;
+  }
   let d = `M ${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
   for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[i], p1 = points[i+1];
-    const midX = (p0.x + p1.x) / 2, midY = (p0.y + p1.y) / 2;
-    d += ` Q ${p0.x.toFixed(1)},${p0.y.toFixed(1)} ${midX.toFixed(1)},${midY.toFixed(1)}`;
+    const p0 = points[i === 0 ? 0 : i - 1];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
+    const cp1x = p1.x + (p2.x - p0.x) / 6;
+    const cp1y = p1.y + (p2.y - p0.y) / 6;
+    const cp2x = p2.x - (p3.x - p1.x) / 6;
+    const cp2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
   }
-  const last = points[points.length-1];
-  d += ` T ${last.x.toFixed(1)},${last.y.toFixed(1)}`;
   return d;
 }
 
@@ -1620,6 +1635,7 @@ function renderDashPeriod() {
   const sumMaxE = filtered.reduce((a,b) => (parseFloat(b.amount)||0) > (parseFloat(a?.amount)||0) ? b : a, null);
   document.getElementById('sumMax').textContent = sumMaxE ? rp(sumMaxE.amount) : '—';
   document.getElementById('sumMaxCat').textContent = sumMaxE ? sumMaxE.category : '—';
+  document.getElementById('sumAvg').textContent = filtered.length ? rp(Math.round(total/filtered.length)) : 'Rp 0';
 
   // Tertinggi / terendah / rata-rata
   let maxE = null, minE = null;
