@@ -247,11 +247,11 @@ textarea{resize:vertical;min-height:70px;}
 #periodDateInput{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none;}
 
 /* MINI STATS (tertinggi/terendah/rata-rata) */
-.stat-mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
-.stat-mini{background:var(--surface2);border-radius:12px;padding:10px;text-align:center;}
-.stat-mini-label{font-size:10px;color:var(--text3);margin-bottom:4px;}
-.stat-mini-value{font-size:13px;font-weight:700;color:var(--text);font-family:'Geist Mono',monospace;}
-.stat-mini-sub{font-size:9.5px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* HIGHLIGHT RINGKAS (transaksi terkecil) — satu baris, bukan kotak besar berulang */
+.mini-highlight{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:9px 12px;background:var(--surface2);border-radius:10px;margin-bottom:14px;font-size:12px;}
+.mini-highlight-label{color:var(--text2);font-weight:600;}
+.mini-highlight-value{font-weight:700;color:var(--text);font-family:'Geist Mono',monospace;}
+.mini-highlight-sub{color:var(--text3);font-size:11px;}
 
 /* TREN BEBERAPA PERIODE (chart garis + tabel tertinggi/terendah) */
 .trend-chart-wrap{width:100%;max-width:380px;margin:0 auto 10px;}
@@ -588,22 +588,10 @@ textarea{resize:vertical;min-height:70px;}
     </div>
 
     <div id="dashSub-ringkasan" class="dash-sub active">
-      <div class="stat-mini-grid">
-        <div class="stat-mini">
-          <div class="stat-mini-label">Transaksi Terbesar</div>
-          <div class="stat-mini-value" id="statMaxVal">—</div>
-          <div class="stat-mini-sub" id="statMaxSub">—</div>
-        </div>
-        <div class="stat-mini">
-          <div class="stat-mini-label">Transaksi Terkecil</div>
-          <div class="stat-mini-value" id="statMinVal">—</div>
-          <div class="stat-mini-sub" id="statMinSub">—</div>
-        </div>
-        <div class="stat-mini">
-          <div class="stat-mini-label">Rata-rata</div>
-          <div class="stat-mini-value" id="statAvgVal">—</div>
-          <div class="stat-mini-sub">per transaksi</div>
-        </div>
+      <div class="mini-highlight" id="statMinWrap">
+        <span class="mini-highlight-label">Transaksi terkecil:</span>
+        <span class="mini-highlight-value" id="statMinVal">—</span>
+        <span class="mini-highlight-sub" id="statMinSub">—</span>
       </div>
 
       <!-- Tren beberapa periode terakhir (mis. 6 bulan) — lihat periode tertinggi/terendah -->
@@ -1637,18 +1625,20 @@ function renderDashPeriod() {
   document.getElementById('sumMaxCat').textContent = sumMaxE ? sumMaxE.category : '—';
   document.getElementById('sumAvg').textContent = filtered.length ? rp(Math.round(total/filtered.length)) : 'Rp 0';
 
-  // Tertinggi / terendah / rata-rata
-  let maxE = null, minE = null;
+  // Transaksi terkecil (satu-satunya info yang belum ada di kartu ringkasan atas)
+  let minE = null;
   filtered.forEach(e => {
     const amt = parseFloat(e.amount) || 0;
-    if (!maxE || amt > parseFloat(maxE.amount)) maxE = e;
     if (!minE || amt < parseFloat(minE.amount)) minE = e;
   });
-  document.getElementById('statMaxVal').textContent = maxE ? rp(maxE.amount) : '—';
-  document.getElementById('statMaxSub').textContent = maxE ? `${maxE.category} · ${fmtDate(maxE.date)}` : '—';
-  document.getElementById('statMinVal').textContent = minE ? rp(minE.amount) : '—';
-  document.getElementById('statMinSub').textContent = minE ? `${minE.category} · ${fmtDate(minE.date)}` : '—';
-  document.getElementById('statAvgVal').textContent = filtered.length ? rp(Math.round(total/filtered.length)) : 'Rp 0';
+  const minWrap = document.getElementById('statMinWrap');
+  if (minE) {
+    minWrap.style.display = 'flex';
+    document.getElementById('statMinVal').textContent = rp(minE.amount);
+    document.getElementById('statMinSub').textContent = `${minE.category} · ${fmtDate(minE.date)}`;
+  } else {
+    minWrap.style.display = 'none';
+  }
 
   // Rincian per tanggal
   const byDate = {};
