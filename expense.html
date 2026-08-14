@@ -73,11 +73,17 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 
 textarea{resize:vertical;min-height:70px;}
 
 /* TABLE */
-.track-table{width:100%;border-collapse:collapse;margin-top:4px;}
-.track-table th{background:var(--accent-dim);padding:8px;text-align:left;font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);}
-.track-table td{padding:9px 8px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);vertical-align:middle;}
-.track-table tr:hover{background:rgba(27,108,168,0.04);}
-.track-table tr:last-child td{border-bottom:none;}
+/* LIST ROW — Riwayat, gaya list mobile (ikon + judul + subjudul + panah), satu baris = satu sentuhan */
+.list-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;-webkit-tap-highlight-color:transparent;}
+.list-row:last-child{border-bottom:none;}
+.list-row:hover,.list-row:active{background:var(--surface2);}
+.list-row-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.list-row-body{flex:1;min-width:0;}
+.list-row-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.list-row-sub{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.list-row-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.list-row-amt{font-size:12.5px;font-weight:700;color:var(--danger);font-family:'Geist Mono',monospace;white-space:nowrap;}
+.list-row-chevron{width:16px;height:16px;color:var(--text3);flex-shrink:0;}
 
 /* BADGES */
 .cat-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;}
@@ -386,6 +392,32 @@ textarea{resize:vertical;min-height:70px;}
     <div class="modal-actions">
       <button class="btn btn-ghost btn-full" onclick="closeEditModal()">Batal</button>
       <button class="btn btn-accent btn-full" onclick="submitEdit()">Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL PENGELUARAN BOTTOM SHEET (tap baris di Riwayat) -->
+<div class="qa-overlay" id="detailOverlay">
+  <div class="qa-sheet">
+    <div class="qa-handle"></div>
+    <div class="qa-head">
+      <h3>Detail Pengeluaran</h3>
+      <button class="qa-close" onclick="closeExpenseDetail()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div id="detailBody"></div>
+
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="detailEditClick()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit
+      </button>
+      <button class="btn btn-danger" style="flex:1;justify-content:center;" onclick="detailDeleteClick()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+        Hapus
+      </button>
     </div>
   </div>
 </div>
@@ -771,7 +803,7 @@ textarea{resize:vertical;min-height:70px;}
   </div>
 
   <div class="sec" style="padding:0;overflow:hidden;">
-    <div id="expenseList" style="overflow-x:auto;">
+    <div id="expenseList">
       <div class="empty-state" style="margin:16px;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         Belum ada pengeluaran
@@ -1841,6 +1873,49 @@ async function qaSave() {
   }
 }
 document.getElementById('quickAddOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeQuickAdd(); });
+document.getElementById('detailOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeExpenseDetail(); });
+
+// ══════════════════════════════════════
+// DETAIL PENGELUARAN (tap baris di Riwayat)
+// ══════════════════════════════════════
+let detailId = null;
+function openExpenseDetail(id) {
+  const e = expenses.find(x => x.__id === id);
+  if (!e) return;
+  detailId = id;
+  const c = catInfo(e.category);
+  document.getElementById('detailBody').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div class="list-row-icon" style="width:48px;height:48px;background:${c.bg};color:${c.color};flex-shrink:0;">${iconSvg(c.icon,22)}</div>
+      <div style="min-width:0;">
+        <div style="font-size:15px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.description}</div>
+        <div style="font-size:12px;color:var(--text3);">${e.category}</div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border-radius:var(--r);padding:14px;text-align:center;margin-bottom:14px;">
+      <div style="font-size:24px;font-weight:700;font-family:'Geist Mono',monospace;color:var(--danger);">${rp(e.amount)}</div>
+    </div>
+    <div class="date-row"><span class="date-row-date">Tanggal</span><span class="date-row-amt" style="font-family:inherit;">${fmtDate(e.date)}</span></div>
+    <div class="date-row"><span class="date-row-date">Dibayar oleh</span><span class="date-row-amt" style="font-family:inherit;">${e.paid_by || '—'}</span></div>
+    ${e.notes ? `<div class="date-row"><span class="date-row-date">Catatan</span><span class="date-row-amt" style="font-family:inherit;text-align:right;max-width:60%;">${e.notes}</span></div>` : ''}
+    ${e.proof_url ? `<a href="${e.proof_url}" target="_blank" rel="noopener" style="display:block;margin-top:12px;"><img src="${e.proof_url}" alt="Struk" style="width:100%;border-radius:12px;border:1px solid var(--border);display:block;"></a>` : ''}
+  `;
+  document.getElementById('detailOverlay').classList.add('open');
+}
+function closeExpenseDetail() {
+  document.getElementById('detailOverlay').classList.remove('open');
+  detailId = null;
+}
+function detailEditClick() {
+  const id = detailId;
+  closeExpenseDetail();
+  openEdit(id);
+}
+function detailDeleteClick() {
+  const id = detailId;
+  closeExpenseDetail();
+  openDelete(id);
+}
 
 // ══════════════════════════════════════
 // FORM SUBMIT
@@ -1941,44 +2016,20 @@ function renderList() {
     return;
   }
 
-  let html = `<table class="track-table">
-    <thead><tr>
-      <th>Tanggal</th>
-      <th>Kategori</th>
-      <th>Deskripsi</th>
-      <th>Dibayar oleh</th>
-      <th style="text-align:right;">Jumlah</th>
-      <th style="text-align:center;">Aksi</th>
-    </tr></thead><tbody>`;
-
-  filtered.forEach(e => {
-    html += `<tr class="fade-in">
-      <td style="white-space:nowrap;font-size:11px;color:var(--text3);">${fmtDate(e.date)}</td>
-      <td>${katBadge(e.category)}</td>
-      <td>
-        <div style="display:flex;align-items:center;gap:6px;">
-          ${e.proof_url ? `<a href="${e.proof_url}" target="_blank" rel="noopener" class="proof-thumb-link" title="Lihat foto struk"><img src="${e.proof_url}" alt="Struk"></a>` : ''}
-          <div>
-            <div style="font-weight:500;font-size:12px;">${e.description}</div>
-            ${e.notes ? `<div style="font-size:10px;color:var(--text3);margin-top:2px;">${e.notes}</div>` : ''}
-          </div>
-        </div>
-      </td>
-      <td style="font-size:12px;color:var(--text2);">${e.paid_by || '—'}</td>
-      <td style="text-align:right;font-family:'Geist Mono',monospace;font-weight:600;color:var(--danger);font-size:12px;">${rp(e.amount)}</td>
-      <td style="text-align:center;white-space:nowrap;">
-        <button class="btn-icon" onclick="openEdit('${e.__id}')" title="Edit" style="margin-right:4px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        </button>
-        <button class="btn-icon" onclick="openDelete('${e.__id}')" title="Hapus">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
-        </button>
-      </td>
-    </tr>`;
-  });
-
-  html += '</tbody></table>';
-  container.innerHTML = html;
+  container.innerHTML = filtered.map(e => {
+    const c = catInfo(e.category);
+    return `<div class="list-row fade-in" onclick="openExpenseDetail('${e.__id}')">
+      <div class="list-row-icon" style="background:${c.bg};color:${c.color};">${iconSvg(c.icon, 18)}</div>
+      <div class="list-row-body">
+        <div class="list-row-title">${e.description}</div>
+        <div class="list-row-sub">${e.category} · ${fmtDate(e.date)} · ${e.paid_by || '—'}</div>
+      </div>
+      <div class="list-row-right">
+        <div class="list-row-amt">${rp(e.amount)}</div>
+        <svg class="list-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ══════════════════════════════════════
