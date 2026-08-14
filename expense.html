@@ -187,6 +187,13 @@ textarea{resize:vertical;min-height:70px;}
 .qa-sheet{background:var(--surface);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:14px 16px 20px;max-height:92vh;overflow-y:auto;animation:qaUp .25s ease;}
 @keyframes qaUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 .qa-handle{width:38px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 14px;}
+/* Di layar lebar (desktop/tablet): tampil sebagai modal di tengah, bukan bottom sheet */
+@media(min-width:641px){
+  .qa-overlay{align-items:center;padding:20px;}
+  .qa-sheet{border-radius:20px;max-height:88vh;animation:qaPop .2s ease;}
+  .qa-handle{display:none;}
+}
+@keyframes qaPop{from{transform:scale(.96);opacity:0;}to{transform:scale(1);opacity:1;}}
 .qa-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .qa-head h3{font-size:15px;font-weight:700;color:var(--text);}
 .qa-close{background:var(--surface2);border:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;}
