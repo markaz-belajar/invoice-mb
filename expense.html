@@ -91,6 +91,8 @@ textarea{resize:vertical;min-height:70px;}
 
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;border:none;outline:none;transition:all .15s;white-space:nowrap;}
+.btn:disabled{opacity:.6;cursor:not-allowed;pointer-events:none;}
+.qa-key:disabled{opacity:.6;cursor:not-allowed;pointer-events:none;}
 .btn svg{width:14px;height:14px;flex-shrink:0;}
 .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}
 .btn-ghost:hover{background:var(--surface2);color:var(--text);border-color:var(--border2);}
@@ -1787,6 +1789,11 @@ async function createNewCategory() {
   const color = CUSTOM_PALETTE[idx];
   const newCat = { key: name, color, bg: hexToRgba(color, 0.12), icon: qaNewCatIcon };
 
+  const addBtn = document.querySelector('[onclick="createNewCategory()"]');
+  const addBtnHtml = addBtn.innerHTML;
+  addBtn.disabled = true;
+  addBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg> Menambahkan...`;
+
   try {
     await saveCategoryToSheets(newCat);
     CUSTOM_CATS.push(newCat);
@@ -1797,6 +1804,9 @@ async function createNewCategory() {
     showToast(`Kategori "${name}" ditambahkan! ✓`, true);
   } catch(e) {
     showToast('Gagal menambah kategori: ' + e.message, false);
+  } finally {
+    addBtn.disabled = false;
+    addBtn.innerHTML = addBtnHtml;
   }
 }
 function qaKey(k) {
@@ -1829,10 +1839,10 @@ async function qaSave() {
   const saveBtn = document.querySelector('.qa-save');
   const saveBtnHtml = saveBtn.innerHTML;
   saveBtn.disabled = true;
+  saveBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>`;
 
   try {
     if (proofData.qa) {
-      saveBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>`;
       const up = await uploadProofToSheets(proofData.qa, `${qaCategory}_${date}`);
       if (up.success === false) throw new Error(up.error || 'Upload foto gagal');
       exp.proof_url = up.thumbnailUrl || '';
@@ -2177,10 +2187,11 @@ async function submitEdit() {
   const saveBtn = document.querySelector('[onclick="submitEdit()"]');
   const saveBtnHtml = saveBtn.innerHTML;
   saveBtn.disabled = true;
+  saveBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg> Menyimpan...`;
 
   try {
     if (proofData.edit) {
-      saveBtn.textContent = 'Mengunggah foto...';
+      saveBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg> Mengunggah foto...`;
       const up = await uploadProofToSheets(proofData.edit, `${kat}_${date}`);
       if (up.success === false) throw new Error(up.error || 'Upload foto gagal');
       updates.proof_url = up.thumbnailUrl || '';
@@ -2217,6 +2228,13 @@ function closeDeleteModal() {
   document.getElementById('deleteModal').classList.remove('open');
 }
 async function confirmDelete() {
+  const delBtn = document.querySelector('[onclick="confirmDelete()"]');
+  const cancelBtn = document.querySelector('[onclick="closeDeleteModal()"]');
+  const delBtnHtml = delBtn.innerHTML;
+  delBtn.disabled = true;
+  if (cancelBtn) cancelBtn.disabled = true;
+  delBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg> Menghapus...`;
+
   try {
     await deleteExpenseFromSheets(deletingId);
     expenses = expenses.filter(e => e.__id !== deletingId);
@@ -2227,6 +2245,10 @@ async function confirmDelete() {
     showToast('Pengeluaran dihapus', true);
   } catch(e) {
     showToast('Gagal hapus: ' + e.message, false);
+  } finally {
+    delBtn.disabled = false;
+    delBtn.innerHTML = delBtnHtml;
+    if (cancelBtn) cancelBtn.disabled = false;
   }
 }
 
