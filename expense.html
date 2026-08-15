@@ -242,6 +242,21 @@ textarea{resize:vertical;min-height:70px;}
 
 /* DASHBOARD SUBTABS (Ringkasan / Rincian Kategori) — compact */
 .subtab-pill{display:flex;gap:3px;background:var(--surface2);border-radius:10px;padding:2px;margin-bottom:12px;max-width:280px;}
+.subtab-pill-wide{max-width:none;}
+
+/* EXPAND BLOCK — accordion untuk "Per Kategori" & "Per Pembayar" di History */
+.expand-block{border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:10px;}
+.expand-block:last-child{margin-bottom:0;}
+.expand-header{width:100%;display:flex;align-items:center;gap:10px;padding:12px 14px;background:transparent;border:none;cursor:pointer;text-align:left;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+.expand-header:hover{background:var(--surface2);}
+.expand-chevron{width:16px;height:16px;color:var(--text3);flex-shrink:0;transition:transform .2s;}
+.expand-block.open .expand-chevron{transform:rotate(90deg);}
+.expand-body{display:none;border-top:1px solid var(--border);}
+.expand-block.open .expand-body{display:block;}
+.expand-amt{font-family:'Geist Mono',monospace;font-weight:600;font-size:13px;color:var(--text);}
+.expand-meta{font-size:10px;color:var(--text3);margin-left:6px;}
+.expand-bar-track{height:6px;background:var(--surface2);border-radius:99px;overflow:hidden;}
+.expand-bar-fill{height:100%;border-radius:99px;transition:width .4s ease;}
 .subtab-btn{flex:1;border:none;background:transparent;padding:5px 8px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;}
 .subtab-btn.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
 .dash-sub{display:none;}
@@ -572,11 +587,7 @@ textarea{resize:vertical;min-height:70px;}
     </button>
     <button class="nav-tab" onclick="switchTab('list',this)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-      Riwayat
-    </button>
-    <button class="nav-tab" onclick="switchTab('rekap',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-      Rekap
+      History
     </button>
   </div>
 </div>
@@ -787,108 +798,73 @@ textarea{resize:vertical;min-height:70px;}
 
 </div><!-- /tab-input -->
 
-<!-- ══ TAB: RIWAYAT ══ -->
+<!-- ══ TAB: HISTORY (gabungan Riwayat + Rekap) ══ -->
 <div id="tab-list" class="tab-content">
 
   <div class="filter-bar">
-    <select id="filterBulan" onchange="renderList()">
-      <option value="">Semua Bulan</option>
-    </select>
-    <select id="filterKat" onchange="renderList()">
-      <option value="">Semua Kategori</option>
-      <option value="ATK">ATK</option>
-      <option value="Listrik">Listrik</option>
-      <option value="Internet">Internet</option>
-      <option value="Transportasi">Transportasi</option>
-      <option value="Konsumsi">Konsumsi</option>
-      <option value="Kebersihan">Kebersihan</option>
-      <option value="Perlengkapan">Perlengkapan</option>
-      <option value="Gaji">Gaji/Honor</option>
-      <option value="Sewa">Sewa</option>
-      <option value="Lainnya">Lainnya</option>
-    </select>
-    <span class="filter-count" id="filterCount">0 entri</span>
+    <select id="histBulan" onchange="renderHistory()"></select>
+    <select id="histTahun" onchange="renderHistory()"></select>
+    <select id="histKat" onchange="renderHistory()"></select>
+  </div>
+  <div class="filter-count" id="filterCount" style="margin-bottom:10px;">0 entri</div>
+
+  <div class="sum-grid" id="histSumGrid">
+    <div class="sum-card danger">
+      <div class="sum-label">Total</div>
+      <div class="sum-value" id="histTotal">Rp 0</div>
+      <div class="sum-sub" id="histPeriodeLabel">—</div>
+    </div>
+    <div class="sum-card warning">
+      <div class="sum-label">Transaksi</div>
+      <div class="sum-value" id="histJml">0</div>
+      <div class="sum-sub">transaksi</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Terbesar</div>
+      <div class="sum-value" style="font-size:14px;" id="histMax">—</div>
+      <div class="sum-sub" id="histMaxCat">—</div>
+    </div>
+    <div class="sum-card success">
+      <div class="sum-label">Rata-rata</div>
+      <div class="sum-value" style="font-size:14px;" id="histAvg">Rp 0</div>
+      <div class="sum-sub">per transaksi</div>
+    </div>
   </div>
 
-  <div class="sec" style="padding:0;overflow:hidden;">
-    <div id="expenseList">
-      <div class="empty-state" style="margin:16px;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Belum ada pengeluaran
+  <div class="subtab-pill subtab-pill-wide" id="histSubtabs">
+    <button class="subtab-btn active" onclick="switchHistSub('daftar',this)">Daftar</button>
+    <button class="subtab-btn" onclick="switchHistSub('kategori',this)">Per Kategori</button>
+    <button class="subtab-btn" onclick="switchHistSub('pembayar',this)">Per Pembayar</button>
+  </div>
+
+  <div id="histSub-daftar" class="dash-sub active">
+    <div class="sec" style="padding:0;overflow:hidden;">
+      <div id="expenseList">
+        <div class="empty-state" style="margin:16px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Belum ada pengeluaran
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="histSub-kategori" class="dash-sub">
+    <div class="sec">
+      <div id="histKatList">
+        <div class="empty-state">Belum ada data</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="histSub-pembayar" class="dash-sub">
+    <div class="sec">
+      <div id="histOrangList">
+        <div class="empty-state">Belum ada data</div>
       </div>
     </div>
   </div>
 
 </div><!-- /tab-list -->
-
-<!-- ══ TAB: REKAP ══ -->
-<div id="tab-rekap" class="tab-content">
-
-  <div class="sec">
-    <div class="sec-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Filter Rekap
-    </div>
-    <div class="g2">
-      <div>
-        <label>Bulan</label>
-        <select id="rekapBulan" onchange="renderRekap()"></select>
-      </div>
-      <div>
-        <label>Tahun</label>
-        <select id="rekapTahun" onchange="renderRekap()"></select>
-      </div>
-    </div>
-  </div>
-
-  <!-- Total rekap -->
-  <div class="sum-grid sum-grid-3">
-    <div class="sum-card danger">
-      <div class="sum-label">Total Pengeluaran</div>
-      <div class="sum-value" id="rekapTotal">Rp 0</div>
-      <div class="sum-sub" id="rekapPeriode">—</div>
-    </div>
-    <div class="sum-card warning">
-      <div class="sum-label">Jumlah Transaksi</div>
-      <div class="sum-value" id="rekapJml">0</div>
-      <div class="sum-sub">transaksi</div>
-    </div>
-    <div class="sum-card">
-      <div class="sum-label">Rata-rata/Transaksi</div>
-      <div class="sum-value" style="font-size:14px;" id="rekapAvg">Rp 0</div>
-      <div class="sum-sub">per entri</div>
-    </div>
-  </div>
-
-  <!-- Rekap per kategori -->
-  <div class="sec">
-    <div class="sec-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-      Per Kategori
-    </div>
-    <div id="rekapKatList">
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        Pilih bulan dan tahun
-      </div>
-    </div>
-  </div>
-
-  <!-- Rekap per orang -->
-  <div class="sec">
-    <div class="sec-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Per Pembayar
-    </div>
-    <div id="rekapOrangList">
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-        Pilih bulan dan tahun
-      </div>
-    </div>
-  </div>
-
-</div><!-- /tab-rekap -->
 
 </div><!-- /wrap -->
 </div><!-- /container -->
@@ -1005,8 +981,8 @@ function populateCategoryDropdowns() {
   const inputSel = document.getElementById('inputKategori');
   if (inputSel) { const cur = inputSel.value; inputSel.innerHTML = `<option value="">Pilih kategori...</option>${opts}`; inputSel.value = cur; }
 
-  const filterSel = document.getElementById('filterKat');
-  if (filterSel) { const cur = filterSel.value; filterSel.innerHTML = `<option value="">Semua Kategori</option>${opts}`; filterSel.value = cur; }
+  const histKatSel = document.getElementById('histKat');
+  if (histKatSel) { const cur = histKatSel.value; histKatSel.innerHTML = `<option value="">Semua Kategori</option>${opts}`; histKatSel.value = cur; }
 }
 
 // ══════════════════════════════════════
@@ -1067,8 +1043,7 @@ function switchTab(name, btn) {
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'list') renderList();
-  if (name === 'rekap') renderRekap();
+  if (name === 'list') renderHistory();
 }
 
 function switchDashSub(view, btn) {
@@ -1397,10 +1372,8 @@ async function syncData(isManual=false) {
     const timeStr = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
     setSyncStatus('ok', `${expenses.length} entri · sync ${timeStr}`);
     updateSummary();
-    populateFilterBulan();
-    populateRekapSelects();
-    if (document.getElementById('tab-list').classList.contains('active')) renderList();
-    if (document.getElementById('tab-rekap').classList.contains('active')) renderRekap();
+    populateHistFilters();
+    if (document.getElementById('tab-list').classList.contains('active')) renderHistory();
     if (isManual) showToast('Data berhasil disinkronkan! ✓', true);
   } catch(e) {
     setSyncStatus('error','Gagal sync: ' + e.message);
@@ -1867,10 +1840,8 @@ async function qaSave() {
     await saveExpenseToSheets(exp);
     expenses.push(exp);
     updateSummary();
-    populateFilterBulan();
-    populateRekapSelects();
-    if (document.getElementById('tab-list').classList.contains('active')) renderList();
-    if (document.getElementById('tab-rekap').classList.contains('active')) renderRekap();
+    populateHistFilters();
+    if (document.getElementById('tab-list').classList.contains('active')) renderHistory();
     closeQuickAdd();
     showToast('Pengeluaran tersimpan! ✓', true);
   } catch(e) {
@@ -1966,8 +1937,8 @@ async function submitExpense() {
     await saveExpenseToSheets(exp);
     expenses.push(exp);
     updateSummary();
-    populateFilterBulan();
-    populateRekapSelects();
+    populateHistFilters();
+    if (document.getElementById('tab-list').classList.contains('active')) renderHistory();
     resetForm();
     toggleAddExpense(false);
     showToast('Pengeluaran berhasil disimpan! ✓', true);
@@ -1995,121 +1966,124 @@ function resetForm() {
 // ══════════════════════════════════════
 // RENDER LIST
 // ══════════════════════════════════════
-function populateFilterBulan() {
-  const sel = document.getElementById('filterBulan');
-  const cur = sel.value;
-  const yms = [...new Set(expenses.map(e => ymFromDate(e.date)).filter(Boolean))].sort().reverse();
-  sel.innerHTML = '<option value="">Semua Bulan</option>' + yms.map(ym => `<option value="${ym}"${ym===cur?' selected':''}>${bulanLabel(ym)}</option>`).join('');
+// Baris list yang dipakai berulang di ketiga sub-tampilan (Daftar / Per Kategori / Per Pembayar)
+function listRowHtml(e) {
+  const c = catInfo(e.category);
+  return `<div class="list-row fade-in" onclick="openExpenseDetail('${e.__id}')">
+    <div class="list-row-icon" style="background:${c.bg};color:${c.color};">${iconSvg(c.icon, 18)}</div>
+    <div class="list-row-body">
+      <div class="list-row-cat" style="color:${c.color};">${e.category}</div>
+      <div class="list-row-title">${e.description}</div>
+      <div class="list-row-sub">${fmtDate(e.date)} · ${e.paid_by || '—'}</div>
+    </div>
+    <div class="list-row-right">
+      <div class="list-row-amt">${rp(e.amount)}</div>
+      <svg class="list-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </div>`;
+}
+function toggleExpand(btn) {
+  btn.closest('.expand-block').classList.toggle('open');
 }
 
-function renderList() {
-  const filterBulan = document.getElementById('filterBulan').value;
-  const filterKat   = document.getElementById('filterKat').value;
+function populateHistFilters() {
+  const selBulan = document.getElementById('histBulan');
+  const bulanNames = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const prevBulan = selBulan.value;
+  selBulan.innerHTML = `<option value="">Semua Bulan</option>` + bulanNames.map((n,i) => `<option value="${String(i+1).padStart(2,'0')}">${n}</option>`).join('');
+  if (prevBulan !== undefined) selBulan.value = prevBulan;
 
-  let filtered = expenses.filter(e => {
-    if (filterBulan && ymFromDate(e.date) !== filterBulan) return false;
-    if (filterKat && e.category !== filterKat) return false;
+  const selTahun = document.getElementById('histTahun');
+  const prevTahun = selTahun.value;
+  const years = [...new Set(expenses.map(e => e.date?.slice(0,4)).filter(Boolean))].sort().reverse();
+  const curYear = new Date().getFullYear().toString();
+  selTahun.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
+  if (!years.includes(curYear)) selTahun.innerHTML = `<option value="${curYear}">${curYear}</option>` + selTahun.innerHTML;
+  if (prevTahun && (years.includes(prevTahun) || prevTahun === curYear)) selTahun.value = prevTahun;
+  else selTahun.value = curYear;
+
+  const selKat = document.getElementById('histKat');
+  const prevKat = selKat.value;
+  const opts = allCats().map(c => `<option value="${c.key}">${c.key}</option>`).join('');
+  selKat.innerHTML = `<option value="">Semua Kategori</option>${opts}`;
+  if (prevKat !== undefined) selKat.value = prevKat;
+}
+
+function switchHistSub(view, btn) {
+  document.querySelectorAll('#tab-list .dash-sub').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('#histSubtabs .subtab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('histSub-'+view).classList.add('active');
+  btn.classList.add('active');
+}
+
+function renderHistory() {
+  const bulan = document.getElementById('histBulan').value;
+  const tahun = document.getElementById('histTahun').value;
+  const kat   = document.getElementById('histKat').value;
+
+  const filtered = expenses.filter(e => {
+    if (!e.date) return false;
+    if (tahun && e.date.slice(0,4) !== tahun) return false;
+    if (bulan && e.date.slice(5,7) !== bulan) return false;
+    if (kat && e.category !== kat) return false;
     return true;
   }).sort((a,b) => b.date.localeCompare(a.date));
 
+  const total = filtered.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
+  const maxE  = filtered.reduce((a,b) => (parseFloat(b.amount)||0) > (parseFloat(a?.amount)||0) ? b : a, null);
+
   document.getElementById('filterCount').textContent = `${filtered.length} entri`;
+  document.getElementById('histTotal').textContent   = rp(total);
+  document.getElementById('histJml').textContent     = filtered.length;
+  document.getElementById('histMax').textContent     = maxE ? rp(maxE.amount) : '—';
+  document.getElementById('histMaxCat').textContent  = maxE ? maxE.category : '—';
+  document.getElementById('histAvg').textContent     = filtered.length ? rp(Math.round(total/filtered.length)) : 'Rp 0';
+  document.getElementById('histPeriodeLabel').textContent = bulan ? bulanLabel(`${tahun}-${bulan}`) : (tahun ? `Tahun ${tahun}` : 'Semua periode');
 
-  const container = document.getElementById('expenseList');
+  // ── Daftar ──
+  document.getElementById('expenseList').innerHTML = filtered.length
+    ? filtered.map(listRowHtml).join('')
+    : `<div class="empty-state" style="margin:16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Tidak ada data
+      </div>`;
 
-  if (filtered.length === 0) {
-    container.innerHTML = `<div class="empty-state" style="margin:16px;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      Tidak ada data
-    </div>`;
-    return;
-  }
-
-  container.innerHTML = filtered.map(e => {
-    const c = catInfo(e.category);
-    return `<div class="list-row fade-in" onclick="openExpenseDetail('${e.__id}')">
-      <div class="list-row-icon" style="background:${c.bg};color:${c.color};">${iconSvg(c.icon, 18)}</div>
-      <div class="list-row-body">
-        <div class="list-row-cat" style="color:${c.color};">${e.category}</div>
-        <div class="list-row-title">${e.description}</div>
-        <div class="list-row-sub">${fmtDate(e.date)} · ${e.paid_by || '—'}</div>
-      </div>
-      <div class="list-row-right">
-        <div class="list-row-amt">${rp(e.amount)}</div>
-        <svg class="list-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ══════════════════════════════════════
-// REKAP
-// ══════════════════════════════════════
-function populateRekapSelects() {
-  const years = [...new Set(expenses.map(e => e.date?.slice(0,4)).filter(Boolean))].sort().reverse();
-  const curYear = new Date().getFullYear().toString();
-  const selTahun = document.getElementById('rekapTahun');
-  const prevTahun = selTahun.value;
-  selTahun.innerHTML = years.map(y => `<option value="${y}"${y===curYear?' selected':''}>${y}</option>`).join('');
-  if (!years.includes(curYear)) selTahun.innerHTML = `<option value="${curYear}" selected>${curYear}</option>` + selTahun.innerHTML;
-  if (prevTahun && years.includes(prevTahun)) selTahun.value = prevTahun;
-
-  const selBulan = document.getElementById('rekapBulan');
-  const bulanNames = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  const prevBulan = selBulan.value;
-  // Default: "Semua Bulan" — supaya Rekap menampilkan seluruh riwayat setahun, bukan cuma bulan berjalan
-  selBulan.innerHTML = `<option value="">Semua Bulan</option>` + bulanNames.map((n,i) => `<option value="${String(i+1).padStart(2,'0')}">${n}</option>`).join('');
-  if (prevBulan !== undefined) selBulan.value = prevBulan;
-}
-
-function renderRekap() {
-  const bulan = document.getElementById('rekapBulan')?.value; // '' = semua bulan (setahun penuh)
-  const tahun = document.getElementById('rekapTahun')?.value;
-  if (!tahun) return;
-
-  const filtered = expenses.filter(e => {
-    if (!e.date || e.date.slice(0,4) !== tahun) return false;
-    if (bulan && e.date.slice(5,7) !== bulan) return false;
-    return true;
-  });
-  const total = filtered.reduce((s,e) => s+(parseFloat(e.amount)||0), 0);
-  const avg   = filtered.length ? Math.round(total/filtered.length) : 0;
-
-  document.getElementById('rekapTotal').textContent   = rp(total);
-  document.getElementById('rekapJml').textContent     = filtered.length;
-  document.getElementById('rekapAvg').textContent     = rp(avg);
-  document.getElementById('rekapPeriode').textContent = bulan ? bulanLabel(`${tahun}-${bulan}`) : `Tahun ${tahun}`;
-
-  // Per kategori
+  // ── Per Kategori (expand untuk lihat item) ──
   const byKat = {};
   filtered.forEach(e => {
     if (!byKat[e.category]) byKat[e.category] = {total:0, count:0};
     byKat[e.category].total += parseFloat(e.amount)||0;
     byKat[e.category].count++;
   });
-  const katSorted = Object.entries(byKat).sort((a,b)=>b[1].total-a[1].total);
-
+  const katSorted = Object.entries(byKat).sort((a,b) => b[1].total - a[1].total);
+  const katCont = document.getElementById('histKatList');
   if (katSorted.length === 0) {
-    document.getElementById('rekapKatList').innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Tidak ada data</div>`;
+    katCont.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Tidak ada data</div>`;
   } else {
-    document.getElementById('rekapKatList').innerHTML = katSorted.map(([kat, v]) => {
+    katCont.innerHTML = katSorted.map(([katName, v]) => {
       const pct = total > 0 ? Math.round(v.total/total*100) : 0;
-      const c = catInfo(kat);
-      return `<div style="margin-bottom:12px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-          ${katBadge(kat)}
-          <div style="text-align:right;">
-            <span style="font-family:'Geist Mono',monospace;font-weight:600;font-size:13px;color:var(--text);">${rp(v.total)}</span>
-            <span style="font-size:10px;color:var(--text3);margin-left:6px;">${v.count} transaksi · ${pct}%</span>
+      const c = catInfo(katName);
+      const itemsHtml = filtered.filter(e => e.category === katName).map(listRowHtml).join('');
+      return `<div class="expand-block">
+        <button class="expand-header" onclick="toggleExpand(this)">
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;gap:8px;">
+              ${katBadge(katName)}
+              <div style="text-align:right;white-space:nowrap;">
+                <span class="expand-amt">${rp(v.total)}</span>
+                <span class="expand-meta">${v.count}x · ${pct}%</span>
+              </div>
+            </div>
+            <div class="expand-bar-track"><div class="expand-bar-fill" style="width:${pct}%;background:${c.color};"></div></div>
           </div>
-        </div>
-        <div style="height:6px;background:var(--surface2);border-radius:99px;overflow:hidden;">
-          <div style="height:100%;width:${pct}%;background:${c.color};border-radius:99px;transition:width .4s ease;"></div>
-        </div>
+          <svg class="expand-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="expand-body">${itemsHtml}</div>
       </div>`;
     }).join('');
   }
 
-  // Per pembayar — rincian item per orang (bukan cuma total)
+  // ── Per Pembayar (collapsed default, expand untuk lihat item) ──
   const byOrang = {};
   filtered.forEach(e => {
     const key = e.paid_by || 'Tidak diketahui';
@@ -2117,34 +2091,23 @@ function renderRekap() {
     byOrang[key].total += parseFloat(e.amount)||0;
     byOrang[key].items.push(e);
   });
-  const orangSorted = Object.entries(byOrang).sort((a,b)=>b[1].total-a[1].total);
-
+  const orangSorted = Object.entries(byOrang).sort((a,b) => b[1].total - a[1].total);
+  const orangCont = document.getElementById('histOrangList');
   if (orangSorted.length === 0) {
-    document.getElementById('rekapOrangList').innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Tidak ada data</div>`;
+    orangCont.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Tidak ada data</div>`;
   } else {
-    document.getElementById('rekapOrangList').innerHTML = orangSorted.map(([nama, v]) => {
+    orangCont.innerHTML = orangSorted.map(([nama, v]) => {
       const itemsSorted = [...v.items].sort((a,b) => b.date.localeCompare(a.date));
-      const rows = itemsSorted.map(e => {
-        const c = catInfo(e.category);
-        return `<div class="list-row" onclick="openExpenseDetail('${e.__id}')">
-          <div class="list-row-icon" style="background:${c.bg};color:${c.color};">${iconSvg(c.icon, 18)}</div>
-          <div class="list-row-body">
-            <div class="list-row-cat" style="color:${c.color};">${e.category}</div>
-            <div class="list-row-title">${e.description}</div>
-            <div class="list-row-sub">${fmtDate(e.date)}</div>
+      const itemsHtml = itemsSorted.map(listRowHtml).join('');
+      return `<div class="expand-block">
+        <button class="expand-header" onclick="toggleExpand(this)">
+          <div style="flex:1;display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <span style="font-weight:700;font-size:13px;color:var(--text);">${nama}</span>
+            <span style="white-space:nowrap;"><span class="expand-amt" style="color:var(--danger);">${rp(v.total)}</span><span class="expand-meta">${v.items.length}x</span></span>
           </div>
-          <div class="list-row-right">
-            <div class="list-row-amt">${rp(e.amount)}</div>
-            <svg class="list-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </div>
-        </div>`;
-      }).join('');
-      return `<div style="margin-bottom:20px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:0 2px 8px;">
-          <span style="font-weight:700;font-size:13px;color:var(--text);">${nama}</span>
-          <span style="font-weight:700;font-size:13px;color:var(--danger);font-family:'Geist Mono',monospace;">${rp(v.total)}</span>
-        </div>
-        <div style="border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;">${rows}</div>
+          <svg class="expand-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="expand-body">${itemsHtml}</div>
       </div>`;
     }).join('');
   }
@@ -2229,7 +2192,7 @@ async function submitEdit() {
     const idx = expenses.findIndex(e => e.__id === editingId);
     if (idx >= 0) expenses[idx] = {...expenses[idx], ...updates};
     updateSummary();
-    renderList();
+    renderHistory();
     closeEditModal();
     showToast('Pengeluaran diperbarui! ✓', true);
   } catch(e) {
@@ -2258,8 +2221,8 @@ async function confirmDelete() {
     await deleteExpenseFromSheets(deletingId);
     expenses = expenses.filter(e => e.__id !== deletingId);
     updateSummary();
-    populateFilterBulan();
-    renderList();
+    populateHistFilters();
+    renderHistory();
     closeDeleteModal();
     showToast('Pengeluaran dihapus', true);
   } catch(e) {
@@ -2282,7 +2245,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('inputDateText').classList.remove('placeholder');
 
   populateCategoryDropdowns();
-  populateRekapSelects();
+  populateHistFilters();
   startPolling();
 });
 </script>
