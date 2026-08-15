@@ -807,8 +807,14 @@ textarea{resize:vertical;min-height:70px;}
     <select id="histBulan" onchange="renderHistory()"></select>
     <select id="histTahun" onchange="renderHistory()"></select>
     <select id="histKat" onchange="renderHistory()"></select>
+    <span class="filter-count" id="filterCount">0 entri</span>
   </div>
-  <div class="filter-count" id="filterCount" style="margin-bottom:10px;">0 entri</div>
+
+  <div class="subtab-pill subtab-pill-wide" id="histSubtabs">
+    <button class="subtab-btn active" onclick="switchHistSub('daftar',this)">Daftar</button>
+    <button class="subtab-btn" onclick="switchHistSub('kategori',this)">Per Kategori</button>
+    <button class="subtab-btn" onclick="switchHistSub('pembayar',this)">Per Pembayar</button>
+  </div>
 
   <div class="sum-grid" id="histSumGrid">
     <div class="sum-card danger">
@@ -831,12 +837,6 @@ textarea{resize:vertical;min-height:70px;}
       <div class="sum-value" style="font-size:14px;" id="histAvg">Rp 0</div>
       <div class="sum-sub">per transaksi</div>
     </div>
-  </div>
-
-  <div class="subtab-pill subtab-pill-wide" id="histSubtabs">
-    <button class="subtab-btn active" onclick="switchHistSub('daftar',this)">Daftar</button>
-    <button class="subtab-btn" onclick="switchHistSub('kategori',this)">Per Kategori</button>
-    <button class="subtab-btn" onclick="switchHistSub('pembayar',this)">Per Pembayar</button>
   </div>
 
   <div id="histSub-daftar" class="dash-sub active">
