@@ -286,6 +286,7 @@ textarea{resize:vertical;min-height:70px;}
 
 /* TREN BEBERAPA PERIODE (chart garis + tabel tertinggi/terendah) */
 .trend-chart-wrap{width:100%;max-width:380px;margin:0 auto 10px;}
+@media(min-width:641px){.trend-chart-wrap{max-width:none;}}
 .trend-chart-wrap svg{width:100%;height:auto;display:block;}
 .trend-row{display:flex;align-items:center;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--border);font-size:12px;}
 .trend-row:last-child{border-bottom:none;}
@@ -1505,15 +1506,9 @@ function smoothPath(points) {
   return points.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
 }
 
-// Format angka rupiah ringkas untuk label sumbu-y (mis. 528rb, 1,2jt)
+// Format angka rupiah sumbu-y — angka asli (pemisah ribuan), bukan disingkat, biar sesuai persis dengan nilai real transaksinya
 function formatCompactRp(n) {
-  const abs = Math.abs(n);
-  if (abs >= 1000000) {
-    const jt = n/1000000;
-    return (Number.isInteger(jt) ? jt : jt.toFixed(1)).toString().replace('.', ',') + 'jt';
-  }
-  if (abs >= 1000) return Math.round(n/1000) + 'rb';
-  return String(Math.round(n));
+  return Math.round(n).toLocaleString('id-ID');
 }
 
 function renderTrendChart() {
@@ -1536,7 +1531,7 @@ function renderTrendChart() {
   const activeMax = activeValues.length ? Math.max(...activeValues) : 0;
   const activeMin = activeValues.length ? Math.min(...activeValues) : 0;
 
-  const W = 300, H = 80, padL = 34, padR = 10, padTop = 12, padBottom = 10;
+  const W = 300, H = 80, padL = 40, padR = 10, padTop = 12, padBottom = 10;
   const stepX = series.length > 1 ? (W - padL - padR) / (series.length-1) : 0;
   const range = (maxTotal - minTotal) || 1;
   const plotH = H - padTop - padBottom;
