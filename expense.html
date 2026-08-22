@@ -404,7 +404,7 @@ textarea{resize:vertical;min-height:70px;}
     </div>
     <div class="modal-field">
       <label>Foto Nota/Struk (opsional)</label>
-      <input type="file" accept="image/*" capture="environment" id="editProofFile" style="display:none;" onchange="handleProofSelect(this,'edit')">
+      <input type="file" accept="image/*" id="editProofFile" style="display:none;" onchange="handleProofSelect(this,'edit')">
       <div class="proof-preview-wrap" id="editProofPreviewWrap">
         <img id="editProofPreview" alt="Preview struk">
         <button type="button" class="btn btn-ghost btn-small" onclick="clearProof('edit')">Hapus Foto</button>
@@ -529,7 +529,7 @@ textarea{resize:vertical;min-height:70px;}
     </div>
     <div class="qa-extra">
       <label>Foto Nota/Struk (opsional)</label>
-      <input type="file" accept="image/*" capture="environment" id="qaProofFile" style="display:none;" onchange="handleProofSelect(this,'qa')">
+      <input type="file" accept="image/*" id="qaProofFile" style="display:none;" onchange="handleProofSelect(this,'qa')">
       <div class="proof-preview-wrap" id="qaProofPreviewWrap">
         <img id="qaProofPreview" alt="Preview struk">
         <button type="button" class="btn btn-ghost btn-small" onclick="clearProof('qa')">Hapus Foto</button>
@@ -766,7 +766,7 @@ textarea{resize:vertical;min-height:70px;}
 
         <div style="margin-top:12px;">
           <label>Foto Nota/Struk (opsional)</label>
-          <input type="file" accept="image/*" capture="environment" id="inputProofFile" style="display:none;" onchange="handleProofSelect(this,'input')">
+          <input type="file" accept="image/*" id="inputProofFile" style="display:none;" onchange="handleProofSelect(this,'input')">
           <div class="proof-preview-wrap" id="inputProofPreviewWrap">
             <img id="inputProofPreview" alt="Preview struk">
             <button type="button" class="btn btn-ghost btn-small" onclick="clearProof('input')">Hapus Foto</button>
@@ -1505,6 +1505,17 @@ function smoothPath(points) {
   return points.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
 }
 
+// Format angka rupiah ringkas untuk label sumbu-y (mis. 528rb, 1,2jt)
+function formatCompactRp(n) {
+  const abs = Math.abs(n);
+  if (abs >= 1000000) {
+    const jt = n/1000000;
+    return (Number.isInteger(jt) ? jt : jt.toFixed(1)).toString().replace('.', ',') + 'jt';
+  }
+  if (abs >= 1000) return Math.round(n/1000) + 'rb';
+  return String(Math.round(n));
+}
+
 function renderTrendChart() {
   const trendLabel = { hari:'7 Hari', minggu:'6 Minggu', bulan:'6 Bulan', tahun:'6 Tahun' }[dashPeriodType];
   document.getElementById('trendTitle').textContent = `Tren ${trendLabel} Terakhir`;
@@ -1525,13 +1536,13 @@ function renderTrendChart() {
   const activeMax = activeValues.length ? Math.max(...activeValues) : 0;
   const activeMin = activeValues.length ? Math.min(...activeValues) : 0;
 
-  const W = 300, H = 80, padX = 16, padTop = 12, padBottom = 10;
-  const stepX = series.length > 1 ? (W - padX*2) / (series.length-1) : 0;
+  const W = 300, H = 80, padL = 34, padR = 10, padTop = 12, padBottom = 10;
+  const stepX = series.length > 1 ? (W - padL - padR) / (series.length-1) : 0;
   const range = (maxTotal - minTotal) || 1;
   const plotH = H - padTop - padBottom;
 
   const points = series.map((s,i) => {
-    const x = padX + i*stepX;
+    const x = padL + i*stepX;
     const y = maxTotal === minTotal
       ? padTop + plotH/2
       : padTop + plotH - ((s.total - minTotal)/range) * plotH;
@@ -1553,8 +1564,20 @@ function renderTrendChart() {
     `<text x="${p.x.toFixed(1)}" y="${H + 14}" font-size="6.5" fill="var(--text3)" text-anchor="middle">${p.shortLabel}</text>`
   ).join('');
 
+  // Sumbu-Y kiri: garis bantu horizontal + label rupiah ringkas (528rb, 1,2jt, dst)
+  const Y_LEVELS = 4;
+  let yAxisSvg = '';
+  for (let i = 0; i < Y_LEVELS; i++) {
+    const frac = i / (Y_LEVELS - 1); // 0 (bawah) .. 1 (atas)
+    const val = minTotal + frac * (maxTotal - minTotal);
+    const y = padTop + plotH - frac * plotH;
+    yAxisSvg += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W-padR}" y2="${y.toFixed(1)}" stroke="var(--border)" stroke-width="0.5" vector-effect="non-scaling-stroke"/>`;
+    yAxisSvg += `<text x="${(padL-5).toFixed(1)}" y="${(y+2).toFixed(1)}" font-size="6.5" fill="var(--text3)" text-anchor="end">${formatCompactRp(val)}</text>`;
+  }
+
   document.getElementById('trendSvg').setAttribute('viewBox', `0 0 ${W} ${H + 18}`);
   document.getElementById('trendSvg').innerHTML = `
+    ${yAxisSvg}
     <path d="${areaD}" fill="var(--accent-dim)"/>
     <path d="${lineD}" fill="none" stroke="var(--accent)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
     ${dotsSvg}
