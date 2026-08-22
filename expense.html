@@ -1531,7 +1531,11 @@ function renderTrendChart() {
   const activeMax = activeValues.length ? Math.max(...activeValues) : 0;
   const activeMin = activeValues.length ? Math.min(...activeValues) : 0;
 
-  const W = 300, H = 80, padL = 40, padR = 10, padTop = 12, padBottom = 10;
+  // Lebar viewBox mengikuti lebar layar sesungguhnya (px), supaya 1 unit selalu = 1px —
+  // teks/titik jadi ukurannya konsisten di HP maupun desktop, tidak ikut membesar saat melebar.
+  const wrapEl = document.querySelector('.trend-chart-wrap');
+  const W = Math.max(wrapEl ? wrapEl.clientWidth : 0, 260) || 300;
+  const H = 80, padL = 40, padR = 10, padTop = 12, padBottom = 10;
   const stepX = series.length > 1 ? (W - padL - padR) / (series.length-1) : 0;
   const range = (maxTotal - minTotal) || 1;
   const plotH = H - padTop - padBottom;
@@ -2270,6 +2274,15 @@ document.addEventListener('DOMContentLoaded', () => {
   populateCategoryDropdowns();
   populateHistFilters();
   startPolling();
+
+  // Render ulang chart tren saat layar berubah ukuran (resize desktop / rotasi HP)
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (document.getElementById('tab-input').classList.contains('active')) renderTrendChart();
+    }, 200);
+  });
 });
 </script>
 </body>
