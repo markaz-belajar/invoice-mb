@@ -2012,9 +2012,10 @@ function populateHistFilters() {
   const prevTahun = selTahun.value;
   const years = [...new Set(expenses.map(e => e.date?.slice(0,4)).filter(Boolean))].sort().reverse();
   const curYear = new Date().getFullYear().toString();
-  selTahun.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
-  if (!years.includes(curYear)) selTahun.innerHTML = `<option value="${curYear}">${curYear}</option>` + selTahun.innerHTML;
-  if (prevTahun && (years.includes(prevTahun) || prevTahun === curYear)) selTahun.value = prevTahun;
+  let yearOpts = years.map(y => `<option value="${y}">${y}</option>`).join('');
+  if (!years.includes(curYear)) yearOpts = `<option value="${curYear}">${curYear}</option>` + yearOpts;
+  selTahun.innerHTML = `<option value="">Semua Tahun</option>${yearOpts}`;
+  if (prevTahun !== undefined && (prevTahun === '' || years.includes(prevTahun) || prevTahun === curYear)) selTahun.value = prevTahun;
   else selTahun.value = curYear;
 
   const selKat = document.getElementById('histKat');
@@ -2053,7 +2054,12 @@ function renderHistory() {
   document.getElementById('histMax').textContent     = maxE ? rp(maxE.amount) : '—';
   document.getElementById('histMaxCat').textContent  = maxE ? maxE.category : '—';
   document.getElementById('histAvg').textContent     = filtered.length ? rp(Math.round(total/filtered.length)) : 'Rp 0';
-  document.getElementById('histPeriodeLabel').textContent = bulan ? bulanLabel(`${tahun}-${bulan}`) : (tahun ? `Tahun ${tahun}` : 'Semua periode');
+  const bulanNamesFull = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  let periodeLabel = 'Semua periode';
+  if (bulan && tahun) periodeLabel = bulanLabel(`${tahun}-${bulan}`);
+  else if (bulan && !tahun) periodeLabel = `${bulanNamesFull[parseInt(bulan)-1]} (semua tahun)`;
+  else if (!bulan && tahun) periodeLabel = `Tahun ${tahun}`;
+  document.getElementById('histPeriodeLabel').textContent = periodeLabel;
 
   // ── Daftar ──
   document.getElementById('expenseList').innerHTML = filtered.length
