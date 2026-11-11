@@ -434,7 +434,7 @@ textarea{resize:vertical;min-height:70px;}
       <input type="text" id="editDeskripsi" placeholder="Keterangan pengeluaran">
     </div>
     <div id="editPpcHost"></div>
-    <div class="modal-field">
+    <div class="modal-field" id="editJumlahWrap">
       <label>Jumlah (Rp)</label>
       <input type="number" id="editJumlah" placeholder="0" min="0">
     </div>
@@ -819,7 +819,7 @@ textarea{resize:vertical;min-height:70px;}
         <div id="inputPpcHost"></div>
 
         <div class="g2" style="margin-top:12px;">
-          <div>
+          <div id="inputJumlahWrap">
             <label>Jumlah (Rp) <span style="color:var(--danger)">*</span></label>
             <input type="number" id="inputJumlah" placeholder="0" min="0" oninput="updatePreviewAmount()">
           </div>
@@ -1301,7 +1301,7 @@ async function fetchExpensesFromSheets() {
   if (!resp.ok) throw new Error('HTTP ' + resp.status);
   const data = await resp.json();
   if (data.error) throw new Error(data.error);
-  return normalizeExpenseDates(data.expenses || []);
+  return ppcMapMerge(normalizeExpenseDates(data.expenses || []));
 }
 // Jaga-jaga: kalau field 'date' ternyata masih berupa timestamp ISO (mis. "2026-08-01T17:00:00.000Z"),
 // potong jadi tanggal bersih "YYYY-MM-DD" saja supaya filter periode tidak salah baca.
@@ -1313,7 +1313,20 @@ function normalizeExpenseDates(list) {
     return e;
   });
 }
+function ppcMapGet() { try { return JSON.parse(localStorage.getItem('mb_ppc') || '{}'); } catch(e) { return {}; } }
+function ppcMapSet(id, qty, unit) {
+  try {
+    const m = ppcMapGet();
+    if (qty > 0 && unit > 0) m[id] = { qty, unit_price: unit }; else delete m[id];
+    localStorage.setItem('mb_ppc', JSON.stringify(m));
+  } catch(e) {}
+}
+function ppcMapMerge(list) {
+  const m = ppcMapGet();
+  return list.map(e => (!(e.qty > 0 && e.unit_price > 0) && m[e.__id]) ? { ...e, ...m[e.__id] } : e);
+}
 async function saveExpenseToSheets(exp) {
+  ppcMapSet(exp.__id, exp.qty, exp.unit_price);
   if (!hasGasUrl()) {
     const local = JSON.parse(localStorage.getItem('mb_expenses') || '[]');
     local.push(exp);
@@ -1323,6 +1336,7 @@ async function saveExpenseToSheets(exp) {
   return await gasPost('saveExpense', { expense: exp });
 }
 async function updateExpenseInSheets(id, updates) {
+  if ('qty' in updates) ppcMapSet(id, updates.qty, updates.unit_price);
   if (!hasGasUrl()) {
     const local = JSON.parse(localStorage.getItem('mb_expenses') || '[]');
     const idx = local.findIndex(e => e.__id === id);
@@ -1964,9 +1978,8 @@ function openExpenseDetail(id) {
     </div>
     <div style="background:var(--surface2);border-radius:var(--r);padding:14px;text-align:center;margin-bottom:14px;">
       <div style="font-size:24px;font-weight:700;font-family:'Geist Mono',monospace;color:var(--danger);">${rp(e.amount)}</div>
+      ${(e.qty>0 && e.unit_price>0) ? `<div style="font-size:13px;font-weight:600;color:var(--text2);margin-top:4px;">${e.qty} pcs × ${rp(e.unit_price)}</div>` : ''}
     </div>
-    ${(e.qty>0 && e.unit_price>0) ? `<div class="date-row"><span class="date-row-date">Jumlah</span><span class="date-row-amt" style="font-family:inherit;">${e.qty} pcs</span></div>
-    <div class="date-row"><span class="date-row-date">Harga per pcs</span><span class="date-row-amt" style="font-family:inherit;">${rp(e.unit_price)}</span></div>` : ''}
     <div class="date-row"><span class="date-row-date">Tanggal</span><span class="date-row-amt" style="font-family:inherit;">${fmtDate(e.date)}</span></div>
     <div class="date-row"><span class="date-row-date">Dibayar oleh</span><span class="date-row-amt" style="font-family:inherit;">${e.paid_by || '—'}</span></div>
     ${e.notes ? `<div class="date-row"><span class="date-row-date">Catatan</span><span class="date-row-amt" style="font-family:inherit;text-align:right;max-width:60%;">${e.notes}</span></div>` : ''}
@@ -2003,6 +2016,7 @@ async function submitExpense() {
   if (!date) return showToast('Tanggal harus diisi', false);
   if (!kat)  return showToast('Pilih kategori', false);
   if (!desk) return showToast('Deskripsi harus diisi', false);
+  if (ppcIsOn('input') && !(parseFloat(document.getElementById('inputUnit').value) > 0)) return showToast('Isi harga per pcs', false);
   if (!jml || jml <= 0) return showToast('Jumlah harus lebih dari 0', false);
   if (!by)   return showToast('Nama pembayar harus diisi', false);
 
@@ -2069,7 +2083,7 @@ function listRowHtml(e) {
     <div class="list-row-body">
       <div class="list-row-cat" style="color:${c.color};">${e.category}</div>
       <div class="list-row-title">${e.description}</div>
-      <div class="list-row-sub">${fmtDate(e.date)} · ${e.paid_by || '—'}${(e.qty>0 && e.unit_price>0) ? ' · ' + e.qty + ' × ' + rp(e.unit_price) : ''}</div>
+      <div class="list-row-sub">${fmtDate(e.date)} · ${e.paid_by || '—'}${(e.qty>0 && e.unit_price>0) ? ' · ' + e.qty + ' pcs × ' + rp(e.unit_price) : ''}</div>
     </div>
     <div class="list-row-right">
       <div class="list-row-amt">${rp(e.amount)}</div>
@@ -2435,7 +2449,7 @@ function ppcBoxHtml(p) {
     </div>
     <div class="ppc-fields" id="${p}PpcFields" style="display:none;">
       <div><label>Jumlah (pcs)</label><input type="number" id="${p}Qty" min="1" value="1" oninput="ppcRecalc('${p}')"></div>
-      <div><label>Harga per pcs (Rp)</label><input type="number" id="${p}Unit" min="0" placeholder="0" oninput="ppcRecalc('${p}')"></div>
+      <div><label>Harga / pcs (Rp)</label><input type="number" id="${p}Unit" min="0" placeholder="0" oninput="ppcRecalc('${p}')"></div>
     </div>
     <div class="ppc-hint" id="${p}PpcHint" style="display:none;"></div>
   </div>`;
@@ -2447,11 +2461,19 @@ function ppcSet(p, on) {
   document.getElementById(p + 'PpcFields').style.display = on ? 'grid' : 'none';
   document.getElementById(p + 'PpcHint').style.display = on ? 'block' : 'none';
   const amt = ppcAmountEl(p);
-  amt.readOnly = on;
+  const wrap = document.getElementById(p + 'JumlahWrap');
+  if (wrap) wrap.style.display = on ? 'none' : '';
   if (on) {
-    const unitEl = document.getElementById(p + 'Unit');
-    if (!unitEl.value && parseFloat(amt.value) > 0) { unitEl.value = amt.value; document.getElementById(p + 'Qty').value = 1; }
+    const wasOn = amt.dataset.ppc === '1';
+    amt.dataset.ppc = '1';
+    if (!wasOn) {
+      // baru dinyalakan: total lama tidak dianggap harga satuan
+      const unitEl = document.getElementById(p + 'Unit');
+      if (!unitEl.value) amt.value = '';
+    }
     ppcRecalc(p);
+  } else {
+    amt.dataset.ppc = '';
   }
 }
 function ppcRecalc(p) {
@@ -2459,7 +2481,7 @@ function ppcRecalc(p) {
   const unit = parseFloat(document.getElementById(p + 'Unit').value) || 0;
   const total = qty * unit;
   ppcAmountEl(p).value = total > 0 ? total : '';
-  document.getElementById(p + 'PpcHint').textContent = qty + ' pcs × ' + rp(unit) + ' = ' + rp(total);
+  document.getElementById(p + 'PpcHint').innerHTML = qty + ' pcs × ' + rp(unit) + ' = <b>' + rp(total) + '</b>';
   if (p === 'input') updatePreviewAmount();
 }
 function ppcPayload(p) {
