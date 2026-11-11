@@ -336,6 +336,42 @@ textarea{resize:vertical;min-height:70px;}
 .spin{animation:spin 1s linear infinite;}
 @keyframes slideIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 .fade-in{animation:slideIn .25s ease both;}
+
+/* === v2: per pcs, saran nama, popup nota === */
+.chip-row{display:flex;gap:8px;margin-top:8px;}
+.chip{flex:1;padding:9px 10px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.ppc-box{background:var(--surface2);border-radius:var(--r);padding:10px 12px;margin-top:12px;}
+.ppc-box.qa{margin:0 0 10px;}
+.ppc-q{font-size:12px;font-weight:600;color:var(--text);}
+.ppc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.ppc-lbl{font-size:13px;font-weight:600;color:var(--text);}
+.ppc-lbl small{display:block;font-size:11px;font-weight:500;color:var(--text2);margin-top:1px;}
+.ppc-switch{position:relative;display:inline-block;width:44px;height:26px;flex:none;cursor:pointer;}
+.ppc-switch input{opacity:0;width:0;height:0;position:absolute;}
+.ppc-switch span{position:absolute;inset:0;background:var(--border);border-radius:26px;transition:background .2s;}
+.ppc-switch span::before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25);}
+.ppc-switch input:checked + span{background:var(--accent);}
+.ppc-switch input:checked + span::before{transform:translateX(18px);}
+.ppc-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+.ppc-hint{font-size:11px;color:var(--text2);margin-top:8px;}
+.qa-ppc-sub{display:none;text-align:center;font-size:12px;color:var(--text2);margin:-4px 0 10px;font-weight:600;}
+.qty-stepper{display:flex;align-items:center;gap:6px;}
+.qty-stepper button{width:38px;height:38px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:18px;font-weight:700;cursor:pointer;font-family:inherit;}
+.qty-stepper input{width:100%;text-align:center;}
+.sg-wrap{position:relative;}
+.sg-list{display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;box-shadow:0 8px 24px rgba(28,43,58,.18);z-index:60;max-height:230px;overflow-y:auto;}
+.sg-list.up{top:auto;bottom:100%;margin:0 0 4px;}
+.sg-item{padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--border);}
+.sg-item:last-child{border-bottom:none;}
+.sg-item:hover{background:var(--surface2);}
+.sg-name{font-size:13px;font-weight:600;color:var(--text);}
+.sg-meta{font-size:11px;color:var(--text3);margin-top:1px;}
+.proof-lb{display:none;position:fixed;inset:0;background:rgba(10,18,28,.8);z-index:2500;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);}
+.proof-lb.open{display:flex;}
+.proof-lb-card{background:var(--surface);border-radius:16px;padding:10px;max-width:560px;width:100%;max-height:92vh;display:flex;flex-direction:column;gap:8px;}
+.proof-lb-card img{width:100%;max-height:70vh;object-fit:contain;border-radius:10px;background:var(--surface2);}
+.proof-lb-actions{display:flex;gap:8px;}
 </style>
 </head>
 <body>
@@ -343,6 +379,17 @@ textarea{resize:vertical;min-height:70px;}
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- POPUP FOTO NOTA -->
+<div class="proof-lb" id="proofLb" onclick="if(event.target===this)closeProofPopup()">
+  <div class="proof-lb-card">
+    <img id="proofLbImg" alt="Foto nota">
+    <div class="proof-lb-actions">
+      <a id="proofLbLink" class="btn btn-ghost" style="flex:1;justify-content:center;text-decoration:none;" target="_blank" rel="noopener">Buka ukuran penuh</a>
+      <button class="btn btn-accent" style="flex:1;justify-content:center;" onclick="closeProofPopup()">Tutup</button>
+    </div>
+  </div>
+</div>
 
 <!-- DELETE CONFIRM MODAL -->
 <div class="modal-overlay" id="deleteModal">
@@ -386,6 +433,7 @@ textarea{resize:vertical;min-height:70px;}
       <label>Deskripsi</label>
       <input type="text" id="editDeskripsi" placeholder="Keterangan pengeluaran">
     </div>
+    <div id="editPpcHost"></div>
     <div class="modal-field">
       <label>Jumlah (Rp)</label>
       <input type="number" id="editJumlah" placeholder="0" min="0">
@@ -476,6 +524,24 @@ textarea{resize:vertical;min-height:70px;}
     <div class="qa-amount-row">
       <span id="qaAmount" class="qa-amount-display">Rp 0</span>
     </div>
+    <div class="qa-ppc-sub" id="qaPpcSub"></div>
+
+    <div class="ppc-box qa">
+      <div class="ppc-row">
+        <div class="ppc-lbl">Per pcs / lembar</div>
+        <label class="ppc-switch"><input type="checkbox" id="qaPpcToggle" onchange="qaSetPpc(this.checked)"><span></span></label>
+      </div>
+      <div id="qaPpcFields" style="display:none;margin-top:10px;">
+        <div class="ppc-row">
+          <div class="ppc-lbl">Jumlah<small>Ketik harga per pcs di keypad</small></div>
+          <div class="qty-stepper" style="width:150px;">
+          <button type="button" onclick="qaQtyStep(-1)">−</button>
+          <input type="number" id="qaQty" value="1" min="1" oninput="qaQtyInput()">
+          <button type="button" onclick="qaQtyStep(1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="qa-row2">
       <div>
@@ -522,7 +588,10 @@ textarea{resize:vertical;min-height:70px;}
 
     <div class="qa-extra">
       <label>Deskripsi (opsional)</label>
-      <input type="text" id="qaDeskripsi" placeholder="Contoh: Beli spidol whiteboard">
+      <div class="sg-wrap">
+        <input type="text" id="qaDeskripsi" placeholder="Contoh: Beli spidol whiteboard" autocomplete="off" oninput="showSuggest('qa')" onfocus="showSuggest('qa')" onblur="hideSuggest('qa')">
+        <div class="sg-list up" id="qaSg"></div>
+      </div>
     </div>
     <div class="qa-extra">
       <label>Catatan (opsional)</label>
@@ -741,8 +810,13 @@ textarea{resize:vertical;min-height:70px;}
 
         <div style="margin-top:12px;">
           <label>Deskripsi <span style="color:var(--danger)">*</span></label>
-          <input type="text" id="inputDeskripsi" placeholder="Contoh: Beli spidol whiteboard 2 lusin">
+          <div class="sg-wrap">
+            <input type="text" id="inputDeskripsi" placeholder="Contoh: Beli spidol whiteboard 2 lusin" autocomplete="off" oninput="showSuggest('input')" onfocus="showSuggest('input')" onblur="hideSuggest('input')">
+            <div class="sg-list" id="inputSg"></div>
+          </div>
         </div>
+
+        <div id="inputPpcHost"></div>
 
         <div class="g2" style="margin-top:12px;">
           <div>
@@ -1730,6 +1804,7 @@ function openQuickAdd() {
   cancelNewCat();
   renderQaCats();
   clearProof('qa');
+  qaPpc = false; qaQty = 1; qaSetPpc(false); hideSuggest('qa');
   document.getElementById('qaAmount').textContent = 'Rp 0';
   document.getElementById('qaDeskripsi').value = '';
   document.getElementById('qaCatatan').value = '';
@@ -1822,10 +1897,10 @@ function qaKey(k) {
   } else {
     qaAmountStr = qaAmountStr === '0' ? k : qaAmountStr + k;
   }
-  document.getElementById('qaAmount').textContent = rp(parseInt(qaAmountStr||'0', 10));
+  qaRefreshAmount();
 }
 async function qaSave() {
-  const jml  = parseInt(qaAmountStr||'0', 10);
+  const jml  = qaTotal();
   const date = document.getElementById('qaDate').value || nowYMD();
   const desk = document.getElementById('qaDeskripsi').value.trim() || qaCategory;
   const by   = document.getElementById('qaDibayarOleh').value;
@@ -1841,6 +1916,7 @@ async function qaSave() {
     created_at: new Date().toISOString(),
   };
 
+  Object.assign(exp, qaPpc ? { qty: qaQty, unit_price: parseInt(qaAmountStr||'0',10) } : { qty: '', unit_price: '' });
   const saveBtn = document.querySelector('.qa-save');
   const saveBtnHtml = saveBtn.innerHTML;
   saveBtn.disabled = true;
@@ -1889,10 +1965,12 @@ function openExpenseDetail(id) {
     <div style="background:var(--surface2);border-radius:var(--r);padding:14px;text-align:center;margin-bottom:14px;">
       <div style="font-size:24px;font-weight:700;font-family:'Geist Mono',monospace;color:var(--danger);">${rp(e.amount)}</div>
     </div>
+    ${(e.qty>0 && e.unit_price>0) ? `<div class="date-row"><span class="date-row-date">Jumlah</span><span class="date-row-amt" style="font-family:inherit;">${e.qty} pcs</span></div>
+    <div class="date-row"><span class="date-row-date">Harga per pcs</span><span class="date-row-amt" style="font-family:inherit;">${rp(e.unit_price)}</span></div>` : ''}
     <div class="date-row"><span class="date-row-date">Tanggal</span><span class="date-row-amt" style="font-family:inherit;">${fmtDate(e.date)}</span></div>
     <div class="date-row"><span class="date-row-date">Dibayar oleh</span><span class="date-row-amt" style="font-family:inherit;">${e.paid_by || '—'}</span></div>
     ${e.notes ? `<div class="date-row"><span class="date-row-date">Catatan</span><span class="date-row-amt" style="font-family:inherit;text-align:right;max-width:60%;">${e.notes}</span></div>` : ''}
-    ${e.proof_url ? `<a href="${e.proof_url}" target="_blank" rel="noopener" style="display:block;margin-top:12px;"><img src="${e.proof_url}" alt="Struk" style="width:100%;border-radius:12px;border:1px solid var(--border);display:block;"></a>` : ''}
+    ${e.proof_url ? `<button type="button" class="btn btn-ghost btn-full" style="margin-top:12px;justify-content:center;" onclick="openProofPopup('${e.__id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Lihat Foto Nota</button>` : ''}
   `;
   document.getElementById('detailOverlay').classList.add('open');
 }
@@ -1938,6 +2016,7 @@ async function submitExpense() {
     created_at: new Date().toISOString(),
   };
 
+  Object.assign(exp, ppcPayload('input'));
   const btn = document.querySelector('[onclick="submitExpense()"]');
   btn.disabled = true; btn.textContent = 'Menyimpan...';
 
@@ -1975,6 +2054,7 @@ function resetForm() {
   document.getElementById('inputDibayarOleh').value = '';
   document.getElementById('inputCatatan').value = '';
   document.getElementById('amountPreview').style.display = 'none';
+  ppcSet('input', false); document.getElementById('inputQty').value = 1; document.getElementById('inputUnit').value = '';
   clearProof('input');
 }
 
@@ -1989,7 +2069,7 @@ function listRowHtml(e) {
     <div class="list-row-body">
       <div class="list-row-cat" style="color:${c.color};">${e.category}</div>
       <div class="list-row-title">${e.description}</div>
-      <div class="list-row-sub">${fmtDate(e.date)} · ${e.paid_by || '—'}</div>
+      <div class="list-row-sub">${fmtDate(e.date)} · ${e.paid_by || '—'}${(e.qty>0 && e.unit_price>0) ? ' · ' + e.qty + ' × ' + rp(e.unit_price) : ''}</div>
     </div>
     <div class="list-row-right">
       <div class="list-row-amt">${rp(e.amount)}</div>
@@ -2160,6 +2240,7 @@ function openEdit(id) {
   document.getElementById('editJumlah').value    = e.amount || '';
   document.getElementById('editDibayarOleh').value = e.paid_by || '';
   document.getElementById('editCatatan').value   = e.notes || '';
+  ppcLoad('edit', e);
 
   // Foto struk yang sudah ada di record (kalau ada)
   proofData.edit = null;
@@ -2201,6 +2282,7 @@ async function submitEdit() {
   if (!date||!kat||!desk||!jml||!by) return showToast('Semua field wajib diisi', false);
 
   const updates = { date, category:kat, description:desk, amount:jml, paid_by:by, notes:note };
+  Object.assign(updates, ppcPayload('edit'));
 
   const saveBtn = document.querySelector('[onclick="submitEdit()"]');
   const saveBtnHtml = saveBtn.innerHTML;
@@ -2297,6 +2379,187 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 200);
   });
 });
+
+// ══════════════════════════════════════
+// v2: POPUP NOTA, SARAN NAMA, MODE PER PCS
+// ══════════════════════════════════════
+
+// ── Popup foto nota ──
+function openProofPopup(id) {
+  const e = expenses.find(x => x.__id === id);
+  if (!e || !e.proof_url) return;
+  document.getElementById('proofLbImg').src = e.proof_url;
+  const m = /[?&]id=([^&]+)/.exec(e.proof_url);
+  document.getElementById('proofLbLink').href = m ? 'https://drive.google.com/file/d/' + m[1] + '/view' : e.proof_url;
+  document.getElementById('proofLb').classList.add('open');
+}
+function closeProofPopup() {
+  document.getElementById('proofLb').classList.remove('open');
+  document.getElementById('proofLbImg').src = '';
+}
+
+// ── Mode per pcs: Quick Add (keypad) ──
+let qaPpc = false, qaQty = 1;
+function qaUnit()  { return parseInt(qaAmountStr || '0', 10) || 0; }
+function qaTotal() { return qaPpc ? (qaQty || 0) * qaUnit() : qaUnit(); }
+function qaRefreshAmount() {
+  document.getElementById('qaAmount').textContent = rp(qaTotal());
+  const sub = document.getElementById('qaPpcSub');
+  if (qaPpc) { sub.style.display = 'block'; sub.textContent = qaQty + ' pcs × ' + rp(qaUnit()) + ' per pcs'; }
+  else sub.style.display = 'none';
+}
+function qaSetPpc(on) {
+  qaPpc = !!on;
+  document.getElementById('qaPpcToggle').checked = qaPpc;
+  document.getElementById('qaPpcFields').style.display = qaPpc ? 'block' : 'none';
+  if (!qaPpc) qaQty = 1;
+  document.getElementById('qaQty').value = qaQty;
+  qaRefreshAmount();
+}
+function qaQtyStep(d) {
+  qaQty = Math.max(1, (qaQty || 0) + d);
+  document.getElementById('qaQty').value = qaQty;
+  qaRefreshAmount();
+}
+function qaQtyInput() {
+  qaQty = parseInt(document.getElementById('qaQty').value, 10) || 0;
+  qaRefreshAmount();
+}
+
+// ── Mode per pcs: form utama & edit (field biasa) ──
+function ppcBoxHtml(p) {
+  return `<div class="ppc-box">
+    <div class="ppc-row">
+      <div class="ppc-lbl">Per pcs / lembar</div>
+      <label class="ppc-switch"><input type="checkbox" id="${p}PpcToggle" onchange="ppcSet('${p}',this.checked)"><span></span></label>
+    </div>
+    <div class="ppc-fields" id="${p}PpcFields" style="display:none;">
+      <div><label>Jumlah (pcs)</label><input type="number" id="${p}Qty" min="1" value="1" oninput="ppcRecalc('${p}')"></div>
+      <div><label>Harga per pcs (Rp)</label><input type="number" id="${p}Unit" min="0" placeholder="0" oninput="ppcRecalc('${p}')"></div>
+    </div>
+    <div class="ppc-hint" id="${p}PpcHint" style="display:none;"></div>
+  </div>`;
+}
+function ppcAmountEl(p) { return document.getElementById(p === 'input' ? 'inputJumlah' : 'editJumlah'); }
+function ppcIsOn(p) { return document.getElementById(p + 'PpcToggle').checked; }
+function ppcSet(p, on) {
+  document.getElementById(p + 'PpcToggle').checked = !!on;
+  document.getElementById(p + 'PpcFields').style.display = on ? 'grid' : 'none';
+  document.getElementById(p + 'PpcHint').style.display = on ? 'block' : 'none';
+  const amt = ppcAmountEl(p);
+  amt.readOnly = on;
+  if (on) {
+    const unitEl = document.getElementById(p + 'Unit');
+    if (!unitEl.value && parseFloat(amt.value) > 0) { unitEl.value = amt.value; document.getElementById(p + 'Qty').value = 1; }
+    ppcRecalc(p);
+  }
+}
+function ppcRecalc(p) {
+  const qty  = parseFloat(document.getElementById(p + 'Qty').value)  || 0;
+  const unit = parseFloat(document.getElementById(p + 'Unit').value) || 0;
+  const total = qty * unit;
+  ppcAmountEl(p).value = total > 0 ? total : '';
+  document.getElementById(p + 'PpcHint').textContent = qty + ' pcs × ' + rp(unit) + ' = ' + rp(total);
+  if (p === 'input') updatePreviewAmount();
+}
+function ppcPayload(p) {
+  if (!ppcIsOn(p)) return { qty: '', unit_price: '' };
+  return {
+    qty: parseFloat(document.getElementById(p + 'Qty').value) || 0,
+    unit_price: parseFloat(document.getElementById(p + 'Unit').value) || 0
+  };
+}
+function ppcLoad(p, e) {
+  const on = e && e.qty > 0 && e.unit_price > 0;
+  document.getElementById(p + 'Qty').value  = on ? e.qty : 1;
+  document.getElementById(p + 'Unit').value = on ? e.unit_price : '';
+  ppcSet(p, !!on);
+  if (on) ppcRecalc(p);
+}
+document.getElementById('inputPpcHost').innerHTML = ppcBoxHtml('input');
+document.getElementById('editPpcHost').innerHTML  = ppcBoxHtml('edit');
+
+// ── Saran nama dari data yang pernah diinput ──
+const sgCache = { qa: [], input: [] };
+function buildSuggestions(query) {
+  const q = (query || '').trim().toLowerCase();
+  const map = new Map();
+  expenses.forEach(e => {
+    const name = (e.description || '').trim();
+    if (!name) return;
+    const key = name.toLowerCase();
+    const stamp = (e.date || '') + (e.created_at || '');
+    const cur = map.get(key);
+    if (!cur) map.set(key, { description: name, count: 1, latest: e, stamp });
+    else {
+      cur.count++;
+      if (stamp > cur.stamp) { cur.latest = e; cur.stamp = stamp; cur.description = name; }
+    }
+  });
+  let arr = [...map.values()];
+  if (q) arr = arr.filter(x => x.description.toLowerCase().includes(q));
+  arr.sort((a, b) => {
+    const as = a.description.toLowerCase().startsWith(q) ? 0 : 1;
+    const bs = b.description.toLowerCase().startsWith(q) ? 0 : 1;
+    return as - bs || b.count - a.count || (b.stamp > a.stamp ? 1 : -1);
+  });
+  return arr.slice(0, 6);
+}
+function showSuggest(p) {
+  const input = document.getElementById(p === 'qa' ? 'qaDeskripsi' : 'inputDeskripsi');
+  const box = document.getElementById(p + 'Sg');
+  const q = input.value;
+  if (q.trim().length < 1) { box.style.display = 'none'; return; }
+  const list = buildSuggestions(q).filter(x => x.description.toLowerCase() !== q.trim().toLowerCase());
+  sgCache[p] = list;
+  if (!list.length) { box.style.display = 'none'; return; }
+  box.innerHTML = list.map((s, i) => {
+    const l = s.latest;
+    const price = (l.qty > 0 && l.unit_price > 0) ? rp(l.unit_price) + ' / pcs' : rp(l.amount);
+    return `<div class="sg-item" onmousedown="event.preventDefault();pickSuggest('${p}',${i})">
+      <div class="sg-name">${s.description}</div>
+      <div class="sg-meta">${l.category || ''} · terakhir ${price} · ${s.count}x dicatat</div>
+    </div>`;
+  }).join('');
+  box.style.display = 'block';
+}
+function hideSuggest(p) {
+  setTimeout(() => { const b = document.getElementById(p + 'Sg'); if (b) b.style.display = 'none'; }, 150);
+}
+function pickSuggest(p, i) {
+  const s = sgCache[p][i];
+  if (!s) return;
+  const l = s.latest;
+  const isPpc = l.qty > 0 && l.unit_price > 0;
+  document.getElementById(p + 'Sg').style.display = 'none';
+
+  if (p === 'qa') {
+    document.getElementById('qaDeskripsi').value = s.description;
+    if (l.category && allCats().some(c => c.key === l.category)) qaPickCat(l.category);
+    if (isPpc) {
+      qaAmountStr = String(Math.round(l.unit_price));
+      qaQty = 1;
+      qaSetPpc(true);
+    } else {
+      qaAmountStr = String(Math.round(l.amount) || 0);
+      qaSetPpc(false);
+    }
+  } else {
+    document.getElementById('inputDeskripsi').value = s.description;
+    const kat = document.getElementById('inputKategori');
+    if (!kat.value && l.category) kat.value = l.category;
+    if (isPpc) {
+      document.getElementById('inputQty').value = 1;
+      document.getElementById('inputUnit').value = l.unit_price;
+      ppcSet('input', true);
+    } else {
+      ppcSet('input', false);
+      document.getElementById('inputJumlah').value = l.amount || '';
+    }
+    updatePreviewAmount();
+  }
+}
+
 </script>
 </body>
 </html>
